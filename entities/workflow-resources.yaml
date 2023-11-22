@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: workflow-orchestrator-entities
+  description: A collection of Backstage entities for Workflow orchestrator
+spec:
+  type: url
+  targets:
+    - https://github.com/dmartinol/workflow-gpt/tree/main/entities/system.yaml
+    - https://github.com/dmartinol/workflow-gpt/tree/main/entities/group.yaml
