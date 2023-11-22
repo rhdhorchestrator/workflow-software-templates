@@ -1,0 +1,11 @@
+id: ${{ values.artifactId }}
+version: '${{ values.version}}'
+specVersion: '0.8'
+name: '${{ values.artifactId }}'
+description: '${{ values.description }}'
+start: 'StartState'
+states:
+  - name: 'StartState'
+    type: 'operation'
+    actions: []
+    end: true

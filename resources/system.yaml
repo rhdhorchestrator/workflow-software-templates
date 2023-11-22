@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: janus-orchestrator
+  title: Janus-Orchestrator
+  description: Workflow orchestrator for Janus IDP 
+spec:
+  owner: janus-orchestrator
