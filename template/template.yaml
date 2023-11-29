@@ -5,7 +5,6 @@ metadata:
   title: Workflow bootstrap project
   description: Bootstrap project for serverless workflows
   tags:
-    - workflow-bootstrap
     - orchestrator
     - built-in
   links:
@@ -99,6 +98,14 @@ spec:
           artifactId: ${{ parameters.artifactId }}
           version: ${{ parameters.version }}
           sourceControl: github.com
+    - id: renameFiles
+      action: fs:rename
+      name: Rename files
+      input:
+        files:
+          - from: src/main/resources/schemas/input-schema.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}-schema.json
+            overwrite: true
     - id: catalogTemplate
       name: Generating the Catalog Info Component
       action: fetch:template

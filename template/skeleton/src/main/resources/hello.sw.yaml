@@ -3,6 +3,9 @@ version: '${{ values.version}}'
 specVersion: '0.8'
 name: '${{ values.artifactId }}'
 description: '${{ values.description }}'
+dataInputSchema:
+  failOnValidationErrors: true
+  schema: schemas/${{ values.artifactId }}-schema.json
 start: 'StartState'
 states:
   - name: 'StartState'
