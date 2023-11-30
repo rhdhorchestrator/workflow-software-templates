@@ -39,14 +39,14 @@ curl -v -X POST -H "Content-Type: application/json" http://localhost:8080/${{ va
 ```
 
 # Dev UI Tools
-`Serverless Workflow Tools`
+Use the `Serverless Workflow Tools` to manage and monitor the published workflows:
 ```bash
 open -t http://localhost:8080/q/dev/org.kie.kogito.kogito-quarkus-serverless-workflow-devui/workflowInstances
 ```
 
-`Data Index GraphQL UI`
+Use the `Data Index GraphQL UI` to query the state of the [Data Index service](https://sonataflow.org/serverlessworkflow/main/data-index/data-index-core-concepts.html):
 ```bash
-http://localhost:8080/q/dev/org.kie.kogito.kogito-addons-quarkus-data-index-inmemory/dataindex
+open -t http://localhost:8080/q/dev/org.kie.kogito.kogito-addons-quarkus-data-index-inmemory/dataindex
 ```
 
 # Next steps
