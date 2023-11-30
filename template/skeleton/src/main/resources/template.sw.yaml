@@ -1,7 +1,7 @@
-id: ${{ values.artifactId }}
+id: ${{ values.workflowId }}
 version: '${{ values.version}}'
 specVersion: '0.8'
-name: '${{ values.artifactId }}'
+name: '${{ values.workflowId }}'
 description: '${{ values.description }}'
 dataInputSchema:
   failOnValidationErrors: true

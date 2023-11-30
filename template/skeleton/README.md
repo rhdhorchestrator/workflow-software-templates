@@ -25,21 +25,17 @@ mvn compile quarkus:dev
 ```
 
 ## Testing with curl
-Assuming that you stored in [input.json](./input.json) the input parameters (if any) following the input schema specifications at
+First, validate the workflows exposed by the application:
+```shell script
+curl -v -H "Content-Type: application/json" http://localhost:8080/management/processes
+```
+(${{ values.workflowId }} should be included in the returned array)
+
+Then, assuming that you stored in [input.json](./input.json) the input parameters (if any) following the input schema specifications at
 [${{ values.artifactId }}-schema.json](./src/main/resources/schemas/${{ values.artifactId }}-schema.json ), run the following to create an
-instance of the ${{ values.artifactId }} workflow:
+instance of the ${{ values.workflowId }} workflow:
 ```shell script
-curl -v -X POST -H "Content-Type: application/json" http://localhost:8080/${{ values.artifactId }} -d@input.json
-```
-
-## Building the container image
-```shell script
-kn-workflow quarkus build --image dev.local/${{ values.artifactId }}
-```
-
-## Deploying the application
-```shell script
-kn-workflow quarkus deploy
+curl -v -X POST -H "Content-Type: application/json" http://localhost:8080/${{ values.workflowId }} -d@input.json
 ```
 
 # Dev UI Tools
@@ -53,11 +49,14 @@ open -t http://localhost:8080/q/dev/org.kie.kogito.kogito-quarkus-serverless-wor
 http://localhost:8080/q/dev/org.kie.kogito.kogito-addons-quarkus-data-index-inmemory/dataindex
 ```
 
-**TODO**:
-* DB
-* `kn-workflow` to build, push and deploy
-* Dev guide: 
-  * UT and IT
-  * Subflows
-  * Configuration properties
-    * How CM are built
+# Next steps
+## Building, deploying and running in cluster environment
+## Developing tests
+:construction:
+# Developer's guide
+## Using subflows
+:construction:
+## Externalizing the configuration
+:construction:
+## Preparing a CI pipeline
+:construction:
