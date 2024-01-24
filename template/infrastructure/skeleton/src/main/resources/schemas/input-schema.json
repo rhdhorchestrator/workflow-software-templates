@@ -1,0 +1,12 @@
+{
+  "$id": "classpath:/schemas/${{ values.artifactId }}-schema.json",
+  "title": "${{ values.workflowId }}: Data Input Schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "${{ values.artifactId }}__sub_schema__sample_data.json": {
+      "$ref": "${{ values.artifactId }}__sub_schema__sample_section.json",
+      "type": "object"
+    }
+  }
+}

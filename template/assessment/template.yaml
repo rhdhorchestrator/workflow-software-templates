@@ -1,0 +1,158 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: assessment-workflow-bootstrap
+  title: Assessment workflow bootstrap project
+  description: Bootstrap project for assessment serverless workflows
+  tags:
+    - orchestrator
+    - built-in
+  links:
+    - url: https://openshift-knative.github.io/docs/docs/latest/serverless-logic/about.html
+      title: About OpenShift Serverless Logic
+      icon: techdocs
+    - url: https://kiegroup.github.io/kogito-docs/serverlessworkflow/latest/index.html
+      title: SonataFlow Guides
+      icon: techdocs
+spec:
+  owner: janus-orchestrator
+  type: assessment-workflow-bootstrap
+
+  parameters:
+    - title: Provide information about the workflow software project
+      description: Configure the github repository where the Maven software project is located 
+      required:
+        - orgName
+        - repoName
+        - owner
+        - system
+      properties:
+        orgName:
+          title: Organization Name
+          type: string
+          ui:autofocus: true
+          description: Github organization Name
+        repoName:
+          title: Repository Name
+          type: string
+          description: Github repository name
+        description:
+          title: Description
+          type: string
+          description: Description added to the README file
+        owner:
+          title: Owner
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind:
+                - Group
+                - User
+        system:
+          title: System
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind:
+                - System
+    - title: Provide information about the Maven software project
+      required:
+        - groupId
+        - artifactId
+        - version
+        - workflowId
+      properties:
+        groupId:
+          title: Group ID
+          type: string
+          default: io.janus.workflow
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-._][a-zA-Z0-9]+)*$'
+          description: Maven Group ID eg (io.janus.workflow)
+          ui:autofocus: true
+        artifactId:
+          title: Artifact ID
+          type: string
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-._][a-zA-Z0-9]+)*$'
+          description: Maven Artifact ID
+        version:
+          title: Project version
+          type: string
+          default: 1.0.0-SNAPSHOT
+          description: Maven version, also used to tag the generated artifacts
+        workflowId:
+          title: Workflow ID
+          type: string
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
+          description: Workflow ID
+
+  steps:
+    - id: sourceCodeTemplate
+      name: Generating the Source Code Component
+      action: fetch:template
+      input:
+        # "Relative path is not allowed to refer to a directory outside its parent"
+        url: ./skeleton/
+        values:
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          description: ${{ parameters.description }}
+          groupId: ${{ parameters.groupId }}
+          artifactId: ${{ parameters.artifactId }}
+          version: ${{ parameters.version }}
+          workflowId: ${{ parameters.workflowId }}
+          sourceControl: github.com
+    - id: renameFiles
+      action: fs:rename
+      name: Rename files
+      input:
+        files:
+          - from: src/main/resources/schemas/input-schema.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}-schema.json
+            overwrite: true
+          - from: src/main/resources/schemas/template__sub_schema__sample_section.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
+            overwrite: true
+          - from: src/main/resources/template.sw.yaml
+            to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
+            overwrite: true
+    - id: catalogTemplate
+      name: Generating the Catalog Info Component
+      action: fetch:template
+      input:
+        url: https://github.com/janus-idp/software-templates/tree/main/skeletons/catalog-info/
+        values:
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          applicationType: workflow-project
+          description: ${{ parameters.description }}
+          sourceControl: github.com
+          lifecycle: development
+    - id: publish
+      name: Publishing to the Source Code Repository
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: ${{ parameters.description }}
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        defaultBranch: main
+
+    - id: register
+      name: Registering the Catalog Info Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: Open the Source Code Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open the Catalog Info Component
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
