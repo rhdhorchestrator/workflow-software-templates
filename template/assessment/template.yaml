@@ -63,6 +63,7 @@ spec:
         - artifactId
         - version
         - workflowId
+        - defaultInfrastructureWorkflowId
       properties:
         groupId:
           title: Group ID
@@ -86,6 +87,11 @@ spec:
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
           description: Workflow ID
+        defaultInfrastructureWorkflowId:
+          title: Default Infrastucture Workflow ID
+          type: string
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
+          description: Default Infrastucture Workflow ID
   
   steps:
     - id: sourceCodeTemplate
@@ -104,6 +110,7 @@ spec:
           artifactId: ${{ parameters.artifactId }}
           version: ${{ parameters.version }}
           workflowId: ${{ parameters.workflowId }}
+          defaultInfrastructureWorkflowId: ${{ parameters.defaultInfrastructureWorkflowId }}
           sourceControl: github.com
     
     - id: renameFiles
@@ -127,7 +134,7 @@ spec:
             to: src/main/resources/specs/${{ parameters.artifactId }}-precheck.yaml
             overwrite: true
           - from: src/main/resources/template-default-infrastructure.sw.yaml
-            to: src/main/resources/${{ parameters.workflowId }}-default-infrastructure.sw.yaml
+            to: src/main/resources/${{ parameters.defaultInfrastructureWorkflowId }}.sw.yaml
             overwrite: true
           - from: src/main/resources/template.sw.yaml
             to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
