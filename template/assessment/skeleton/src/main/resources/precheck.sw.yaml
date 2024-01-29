@@ -12,7 +12,7 @@ functions:
     type: expression
     operation: ".result | flatten | map(.id)"
   - name: checkProcessDefinitionExistence
-    operation: specs/dataindex.yaml#reactiveGraphQLHandlerPost
+    operation: "specs/${{ values.artifactId }}-dataindex.yaml#reactiveGraphQLHandlerPost"
   - name: removeMissingWorkflowsFromOptions
     type: expression
     operation: '.missingWorkflows as $f | .result | walk( if type == "object" then select(all($f[] != .id; .)) else . end )'

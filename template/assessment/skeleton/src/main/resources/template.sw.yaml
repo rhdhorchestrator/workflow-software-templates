@@ -20,18 +20,18 @@ functions:
     type: custom
     operation: "sysout:INFO"
   - name: preCheck
-    operation: "specs/precheck.yaml#createResource_preCheck"
+    operation: "specs/${{ values.artifactId }}-precheck.yaml#createResource_preCheck"
 states:
   - name: StartState
     type: operation
     stateDataFilter:
-      output: '. +={workflowOptions: {migrationOptions: [{id: "move2kube", name: "Move2Kube workflow"}]}}'
+      output: '. +={workflowOptions: .preCheck.workflowdata.validatedResult}'
     actions:
       - name: executeAction
         functionRef:
           refName: execute
           arguments:
-            repositoryUrl: ".repositoryUrl"
+            userInput: ".userInput"
         actionDataFilter:
           toStateData: ".result"
       - name: preCheck

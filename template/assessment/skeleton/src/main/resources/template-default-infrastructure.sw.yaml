@@ -1,0 +1,14 @@
+id: "${{ values.workflowId }}DefaultInfrastructureWorkflow"
+version: '${{ values.version}}'
+specVersion: '0.8'
+name: "${{ values.workflowId }}DefaultInfrastructureWorkflow"
+description: "${{ values.description }} default infrastructure workflow"
+annotations:
+  - "workflow-type/infrastructure"
+start: StartState
+states:
+    - name: StartState
+      type: inject
+      data:
+          message: Start state...
+      end: true

@@ -34,7 +34,7 @@ out/
 ##############################
 ## Infrastructure Workflow
 ##############################
-
+template/assessment/skeleton/target/
 
 ##############################
 ## Assessment Workflow

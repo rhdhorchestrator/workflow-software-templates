@@ -17,7 +17,6 @@ metadata:
 spec:
   owner: janus-orchestrator
   type: assessment-workflow-bootstrap
-
   parameters:
     - title: Provide information about the workflow software project
       description: Configure the github repository where the Maven software project is located 
@@ -57,6 +56,7 @@ spec:
             catalogFilter:
               kind:
                 - System
+    
     - title: Provide information about the Maven software project
       required:
         - groupId
@@ -86,7 +86,7 @@ spec:
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
           description: Workflow ID
-
+  
   steps:
     - id: sourceCodeTemplate
       name: Generating the Source Code Component
@@ -105,20 +105,34 @@ spec:
           version: ${{ parameters.version }}
           workflowId: ${{ parameters.workflowId }}
           sourceControl: github.com
+    
     - id: renameFiles
       action: fs:rename
       name: Rename files
       input:
         files:
           - from: src/main/resources/schemas/input-schema.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}-schema.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}-input-schema.json
             overwrite: true
-          - from: src/main/resources/schemas/template__sub_schema__sample_section.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
+          - from: src/main/resources/schemas/workflow-option-output-schema.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}-workflow-option-output-schema.json
+            overwrite: true
+          - from: src/main/resources/schemas/workflow-options-output-schema.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}-workflow-options-output-schema.json
+            overwrite: true
+          - from: src/main/resources/specs/dataindex.yaml
+            to: src/main/resources/specs/${{ parameters.artifactId }}-dataindex.yaml
+            overwrite: true
+          - from: src/main/resources/specs/precheck.yaml
+            to: src/main/resources/specs/${{ parameters.artifactId }}-precheck.yaml
+            overwrite: true
+          - from: src/main/resources/template-default-infrastructure.sw.yaml
+            to: src/main/resources/${{ parameters.workflowId }}-default-infrastructure.sw.yaml
             overwrite: true
           - from: src/main/resources/template.sw.yaml
             to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
             overwrite: true
+    
     - id: catalogTemplate
       name: Generating the Catalog Info Component
       action: fetch:template
@@ -133,6 +147,7 @@ spec:
           description: ${{ parameters.description }}
           sourceControl: github.com
           lifecycle: development
+    
     - id: publish
       name: Publishing to the Source Code Repository
       action: publish:github
@@ -141,14 +156,14 @@ spec:
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
-
+    
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
-
+  
   output:
     links:
       - title: Open the Source Code Repository
