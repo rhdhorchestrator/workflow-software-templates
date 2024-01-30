@@ -1,68 +1,70 @@
-# Assessment workflow
-The assessment workflow is used to perform some checks on user's input(s) and to return a list of suitable infrastructure workflows aka workflow options. 
-Its common use case is to assess inputs (ie: a link to their project code and/or an application identifying code), and based on a logic determined by the enterprise returns a list of infrastructure workflows.
+# ${{ values.artifactId }}
 
-The goal in this example is to show how an assessment operation can be implemented in order to perform some check(s) on a user's input(s) and to return suitable workflow options.
+${{ values.description }}
 
-## Assessment flow
-In this example, the assessment flow consists of:
-- **Start**
-  - get the project code repository (repositoryUrl) from the user
-- **Assessment**
-  - check whether the repositoryUrl is a java project or not and return workflow options
-    - _For simplicity's sake, the java project check is simulated by verifying the presence of the keyword `java` in the repositoryUrl_
-  - print workflow options grouped into six categories (current version, upgrade options, migrate options, new options, continuation options, other options) to the user
-- **PreCheck**
-  - validate whether the workflows in the returned assessment options exist
-  - if there are non-existed workflows in the options, then remove them from the options and output the remaining valid ones
-- **End**
+## Prerequisites
+* Java 11+ is installed.
+* Apache Maven 3.8.6 or later is installed.
+* [Quarkus CLI](https://quarkus.io/guides/cli-tooling) or [Knative Workflow CLI](https://kiegroup.github.io/kogito-docs/serverlessworkflow/latest/testing-and-troubleshooting/kn-plugin-workflow-overview.html) 0.21.3 or later is installed.
+* (Optional) Docker is installed.
+* (Optional) Podman is installed.
+* (Optional) Kubernetes CLI is installed.
+* Visual Studio Code with [Red Hat Java Extension](https://marketplace.visualstudio.com/items?itemName=redhat.java) and 
+[Red Hat Serverless Workflow Editor](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-extension-serverless-workflow-editor) 
+are installed to edit your workflows.
 
-**Note**:
-This example assumes that the workflow options returned upon assessment are available.
-The list of workflows provided into `resources/infrastructures` are purely illustrative.
+## References
+* [About OpenShift Serverless Logic](https://openshift-knative.github.io/docs/docs/latest/serverless-logic/about.html)
+* [SonataFlow Guides](https://kiegroup.github.io/kogito-docs/serverlessworkflow/latest/index.html)
 
-## How to run
+## Running ${{ values.artifactId }} in Quarkus dev mode
+You can run your application in dev mode that enables live coding using:
 
-```bash
-mvn clean quarkus:dev
+```shell script
+mvn compile quarkus:dev
 ```
 
-Example of POST to trigger the flow:
-```bash
-curl -XPOST -H "Content-Type: application/json" http://localhost:8080/assessment -d '{"repositoryUrl": "_YOUR_JAVA_REPOSITORY_"}'
+## Testing with curl
+First, validate the workflows exposed by the application:
+
+```shell script
+curl -v -H "Content-Type: application/json" http://localhost:8080/management/processes
+```
+(${{ values.workflowId }} should be included in the returned array)
+
+Run the following to create an instance of the ${{ values.workflowId }} workflow:
+
+```shell script
+curl -XPOST -H "Content-Type: application/json" http://localhost:8080/${{ values.workflowId }} -d '{"userInput": "default"}'
 ```
 
 Response:
 ```
 {
-    "id": "c9a0ce80-8cd2-49d2-81e1-05606e52c9c9",
+    "id": "_GENERATED_UUID_",
     "workflowdata": {
         "workflowOptions": {
             "currentVersion": {
-                "id": "ocpOnbarding",
-                "name": "Ocp Onboarding"
+                "id": "${{ values.defaultInfrastructureWorkflowId }}",
+                "name": "${{ values.defaultInfrastructureWorkflowId }}"
             },
             "upgradeOptions": [],
-            "migrationOptions": [
-                {
-                    "id": "move2kube",
-                    "name": "Move2Kube"
-                }
-            ],
-            "newOptions": [
-                {
-                    "id": "vmOnboarding",
-                    "name": "Vm Onboarding"
-                }
-            ],
+            "migrationOptions": [],
+            "newOptions": [],
             "continuationOptions": [],
-            "otherOptions": [
-                {
-                    "id": "training",
-                    "name": "Training"
-                }
-            ]
+            "otherOptions": []
         }
     }
 }
+```
+
+# Dev UI Tools
+Use the `Serverless Workflow Tools` to manage and monitor the published workflows:
+```bash
+open -t http://localhost:8080/q/dev/org.kie.kogito.kogito-quarkus-serverless-workflow-devui/workflowInstances
+```
+
+Use the `Data Index GraphQL UI` to query the state of the [Data Index service](https://sonataflow.org/serverlessworkflow/main/data-index/data-index-core-concepts.html):
+```bash
+open -t http://localhost:8080/q/dev/org.kie.kogito.kogito-addons-quarkus-data-index-inmemory/dataindex
 ```

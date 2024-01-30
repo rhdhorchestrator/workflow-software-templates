@@ -7,15 +7,15 @@ annotations:
   - "workflow-type/assessment"
 dataInputSchema:
   failOnValidationErrors: true
-  schema: schemas/${{ values.artifactId }}-schema.json
+  schema: schemas/${{ values.artifactId }}-input-schema.json
 start: StartState
 extensions:
-  - extensionid: workflow-output-schema
-    outputSchema: schema/workflow-options-output-schema.json
+  - extensionid: ${{ values.artifactId }}-output-schema
+    outputSchema: schema/${{ values.artifactId }}-workflow-options-output-schema.json
 functions:
   - name: execute
     type: custom
-    operation: "service:java:com.redhat.parodos.workflow.assessment.BasicAssessment::execute"
+    operation: "service:java:${{ values.groupId }}.${{ values.artifactId }}.DefaultAssessment::execute"
   - name: logOuput
     type: custom
     operation: "sysout:INFO"

@@ -1,11 +1,11 @@
-package com.redhat.parodos.workflow.assessment;
+package ${{ values.groupId }}.${{ values.artifactId }};
 
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
-public class BasicAssessment {
+public class DefaultAssessment {
     public WorkflowOptions execute(String userInput) {
         WorkflowOptions workflowOptions = new WorkflowOptions();
         if (userInput.toLowerCase().contains("default")) { // basic check on user input to mimic an assessment
