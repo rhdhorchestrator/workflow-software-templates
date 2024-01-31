@@ -88,10 +88,10 @@ spec:
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
           description: Workflow ID
         defaultInfrastructureWorkflowId:
-          title: Default Infrastucture Workflow ID
+          title: Default Infrastructure Workflow ID
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-          description: Default Infrastucture Workflow ID
+          description: Default Infrastructure Workflow ID
   
   steps:
     - id: sourceCodeTemplate
