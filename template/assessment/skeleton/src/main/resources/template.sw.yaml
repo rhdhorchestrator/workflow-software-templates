@@ -6,12 +6,14 @@ description: '${{ values.description }}'
 annotations:
   - "workflow-type/assessment"
 dataInputSchema:
-  failOnValidationErrors: true
   schema: schemas/${{ values.artifactId }}-input-schema.json
+  failOnValidationErrors: true
 start: StartState
 extensions:
-  - extensionid: ${{ values.artifactId }}-output-schema
-    outputSchema: schemas/${{ values.artifactId }}-workflow-options-output-schema.json
+  - extensionid: workflow-output-schema
+    outputSchema:
+      schema: schemas/${{ values.artifactId }}-workflow-options-output-schema.json
+      failOnValidationErrors: true
 functions:
   - name: execute
     type: custom
@@ -19,8 +21,6 @@ functions:
   - name: logOuput
     type: custom
     operation: "sysout:INFO"
-  - name: preCheck
-    operation: "specs/${{ values.artifactId }}-precheck.yaml#createResource_preCheck"
 states:
   - name: StartState
     type: operation
@@ -35,14 +35,10 @@ states:
         actionDataFilter:
           toStateData: ".result"
       - name: preCheck
-        functionRef:
-          refName: preCheck
-          arguments:
-            workflowdata:
-              result: .
+        subFlowRef:
+          workflowId: "${{ values.workflowId }}PreCheck"
         actionDataFilter:
-            fromStateData: .result
-            toStateData: ".preCheck"
+          toStateData: ".preCheck"
       - name: printAction
         functionRef:
           refName: logOuput

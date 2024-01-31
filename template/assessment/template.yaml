@@ -130,11 +130,11 @@ spec:
           - from: src/main/resources/specs/dataindex.yaml
             to: src/main/resources/specs/${{ parameters.artifactId }}-dataindex.yaml
             overwrite: true
-          - from: src/main/resources/specs/precheck.yaml
-            to: src/main/resources/specs/${{ parameters.artifactId }}-precheck.yaml
-            overwrite: true
           - from: src/main/resources/template-default-infrastructure.sw.yaml
             to: src/main/resources/${{ parameters.defaultInfrastructureWorkflowId }}.sw.yaml
+            overwrite: true
+          - from: src/main/resources/precheck.sw.yaml
+            to: src/main/resources/${{ parameters.artifactId }}-precheck.sw.yaml
             overwrite: true
           - from: src/main/resources/template.sw.yaml
             to: src/main/resources/${{ parameters.artifactId }}.sw.yaml

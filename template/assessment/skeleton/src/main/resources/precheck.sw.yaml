@@ -1,7 +1,7 @@
-id: "${{ values.workflowId }}-preCheck"
+id: "${{ values.workflowId }}PreCheck"
 version: '${{ values.version}}'
 specVersion: '0.8'
-name: "${{ values.workflowId }}-preCheck"
+name: "${{ values.workflowId }}PreCheck"
 description: "${{ values.description }} pre-check"
 start: ExtractWorkflows
 functions:
