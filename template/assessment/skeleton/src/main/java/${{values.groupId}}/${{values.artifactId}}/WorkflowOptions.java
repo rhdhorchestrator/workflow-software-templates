@@ -1,4 +1,4 @@
-package com.redhat.parodos.workflow.assessment;
+package ${{ values.groupId }}.${{ values.artifactId }};
 
 import java.util.List;
 
