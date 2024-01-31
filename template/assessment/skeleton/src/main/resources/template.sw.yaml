@@ -11,7 +11,7 @@ dataInputSchema:
 start: StartState
 extensions:
   - extensionid: ${{ values.artifactId }}-output-schema
-    outputSchema: schema/${{ values.artifactId }}-workflow-options-output-schema.json
+    outputSchema: schemas/${{ values.artifactId }}-workflow-options-output-schema.json
 functions:
   - name: execute
     type: custom
