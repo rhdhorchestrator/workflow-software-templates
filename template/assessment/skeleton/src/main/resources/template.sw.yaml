@@ -1,0 +1,47 @@
+id: ${{ values.workflowId }}
+version: '${{ values.version}}'
+specVersion: '0.8'
+name: '${{ values.workflowId }}'
+description: '${{ values.description }}'
+annotations:
+  - "workflow-type/assessment"
+dataInputSchema:
+  schema: schemas/${{ values.artifactId }}-input-schema.json
+  failOnValidationErrors: true
+start: StartState
+extensions:
+  - extensionid: workflow-output-schema
+    outputSchema:
+      schema: schemas/${{ values.artifactId }}-workflow-options-output-schema.json
+      failOnValidationErrors: true
+functions:
+  - name: execute
+    type: custom
+    operation: "service:java:${{ values.groupId }}.${{ values.artifactId }}.DefaultAssessment::execute"
+  - name: logOuput
+    type: custom
+    operation: "sysout:INFO"
+states:
+  - name: StartState
+    type: operation
+    stateDataFilter:
+      output: '. +={workflowOptions: .preCheck.workflowdata.validatedResult}'
+    actions:
+      - name: executeAction
+        functionRef:
+          refName: execute
+          arguments:
+            userInput: ".userInput"
+        actionDataFilter:
+          toStateData: ".result"
+      - name: preCheck
+        subFlowRef:
+          workflowId: "${{ values.workflowId }}PreCheck"
+        actionDataFilter:
+          toStateData: ".preCheck"
+      - name: printAction
+        functionRef:
+          refName: logOuput
+          arguments:
+            message: ".preCheck"
+    end: true
