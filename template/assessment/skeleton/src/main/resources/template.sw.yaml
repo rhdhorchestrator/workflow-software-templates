@@ -25,7 +25,7 @@ states:
   - name: StartState
     type: operation
     stateDataFilter:
-      output: '. +={workflowOptions: .preCheck.workflowdata.validatedResult}'
+      output: '. +={workflowOptions: .preCheck.validatedResult}'
     actions:
       - name: executeAction
         functionRef:

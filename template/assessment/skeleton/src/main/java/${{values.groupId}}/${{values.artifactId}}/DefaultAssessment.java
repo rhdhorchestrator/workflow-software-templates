@@ -8,7 +8,7 @@ public class DefaultAssessment {
     public WorkflowOptions execute(String userInput) {
         WorkflowOptions workflowOptions = new WorkflowOptions();
         if (userInput.toLowerCase().contains("default")) { // basic check on user input to mimic an assessment
-            workflowOptions.setCurrentVersion(new WorkflowOption("${{ values.defaultInfrastructureWorkflowId }}", "${{ values.workflowId }} default infrastructure workflow"));
+            workflowOptions.setCurrentVersion(new WorkflowOption("${{ values.defaultInfrastructureWorkflowId }}", "${{ values.defaultInfrastructureWorkflowId }}"));
             workflowOptions.setUpgradeOptions(new ArrayList<>());
             workflowOptions.setMigrationOptions(new ArrayList<>());
             workflowOptions.setNewOptions(new ArrayList<>());
