@@ -42,10 +42,10 @@ spec:
           type: string
           description: Description added to the README file
         workflowId:
-          title: Workflow ID, the unique identifier of the workflow
+          title: Workflow ID
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-          description: Workflow ID
+          description: Workflow ID, the unique identifier of the workflow in SonataFlow
         defaultInfrastructureWorkflowId:
           title: Default Infrastructure Workflow ID
           type: string
