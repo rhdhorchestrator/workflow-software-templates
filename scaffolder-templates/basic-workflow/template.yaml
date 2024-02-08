@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: workflow-bootstrap
-  title: Workflow bootstrap project
-  description: Bootstrap project for serverless workflows
+  name: basic-workflow-bootstrap
+  title: Basic workflow bootstrap project
+  description: Bootstrap project for basic serverless workflows
   tags:
     - orchestrator
     - built-in
@@ -16,7 +16,7 @@ metadata:
       icon: techdocs
 spec:
   owner: janus-orchestrator
-  type: workflow-bootstrap
+  type: basic-workflow-bootstrap
 
   parameters:
     - title: Provide information about the workflow software project
@@ -24,6 +24,8 @@ spec:
       required:
         - orgName
         - repoName
+        - workflowId
+        - workflowType
         - owner
         - system
       properties:
@@ -40,6 +42,19 @@ spec:
           title: Description
           type: string
           description: Description added to the README file
+        workflowId:
+          title: Workflow ID
+          type: string
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
+          description: Workflow ID
+        workflowType:
+          title: Workflow Type
+          type: string
+          ui:field: WorkflowTypePicker
+          ui:options:
+            allowedTypes:
+              - assessment
+              - infrastructure
         owner:
           title: Owner
           type: string
@@ -62,7 +77,6 @@ spec:
         - groupId
         - artifactId
         - version
-        - workflowId
       properties:
         groupId:
           title: Group ID
@@ -81,11 +95,6 @@ spec:
           type: string
           default: 1.0.0-SNAPSHOT
           description: Maven version, also used to tag the generated artifacts
-        workflowId:
-          title: Workflow ID
-          type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-          description: Workflow ID
 
   steps:
     - id: sourceCodeTemplate
@@ -116,7 +125,7 @@ spec:
           - from: src/main/resources/schemas/template__sub_schema__sample_section.json
             to: src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
             overwrite: true
-          - from: src/main/resources/template.sw.yaml
+          - from: src/main/resources/${{ parameters.workflowType }-template.sw.yaml
             to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
             overwrite: true
     - id: catalogTemplate
