@@ -127,7 +127,7 @@ spec:
             overwrite: true
           - from: src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
             to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
-            overwrite: no
+            overwrite: false
     - id: deleteFile
       action: fs:delete
       name: Delete file
