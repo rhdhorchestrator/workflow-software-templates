@@ -127,7 +127,14 @@ spec:
             overwrite: true
           - from: src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
             to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
-            overwrite: true
+            overwrite: no
+    - id: deleteFile
+      action: fs:delete
+      name: Delete file
+      input:
+        files:
+          - src/main/resources/assessment-template.sw.yaml
+          - src/main/resources/infrastructure-template.sw.yaml
     - id: catalogTemplate
       name: Generating the Catalog Info Component
       action: fetch:template
