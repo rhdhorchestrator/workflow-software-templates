@@ -112,6 +112,7 @@ spec:
           artifactId: ${{ parameters.artifactId }}
           version: ${{ parameters.version }}
           workflowId: ${{ parameters.workflowId }}
+          workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
     - id: renameFiles
       action: fs:rename
@@ -124,7 +125,7 @@ spec:
           - from: src/main/resources/schemas/template__sub_schema__sample_section.json
             to: src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
             overwrite: true
-          - from: src/main/resources/${{ parameters.workflowType }-template.sw.yaml
+          - from: src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
             to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
             overwrite: true
     - id: catalogTemplate
