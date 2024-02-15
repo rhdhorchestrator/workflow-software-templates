@@ -8,5 +8,8 @@
       "$ref": "${{ values.artifactId }}__sub_schema__sample_section.json",
       "type": "object"
     }
-  }
+  },
+  "required": [
+    "${{ values.artifactId }}__sub_schema__sample_data.json"
+  ]
 }
