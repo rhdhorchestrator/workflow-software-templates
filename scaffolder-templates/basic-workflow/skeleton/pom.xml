@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<project
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+<project 
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" 
   xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
@@ -9,16 +9,16 @@
   <version>${{ values.version  }}</version>
   <description>${{ values.description }}</description>
   <properties>
+    <maven.compiler.release>17</maven.compiler.release>
     <compiler-plugin.version>3.10.1</compiler-plugin.version>
     <kogito.bom.artifact-id>kogito-bom</kogito.bom.artifact-id>
     <kogito.bom.group-id>org.kie.kogito</kogito.bom.group-id>
-    <kogito.bom.version>2.0.0-SNAPSHOT</kogito.bom.version>
-    <maven.compiler.release>17</maven.compiler.release>
+    <kogito.bom.version>999-SNAPSHOT</kogito.bom.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>2.16.10.Final</quarkus.platform.version>
+    <quarkus.platform.version>3.2.9.Final</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
   </properties>
@@ -38,20 +38,9 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>${quarkus.platform.group-id}</groupId>
-        <artifactId>quarkus-kogito-bom</artifactId>
-        <version>${quarkus.platform.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-kubernetes</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.kie.kogito</groupId>
       <artifactId>kogito-quarkus-serverless-workflow</artifactId>
@@ -59,10 +48,6 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-health</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-addons-quarkus-knative-eventing</artifactId>
     </dependency>
     <dependency>
       <groupId>org.kie.kogito</groupId>
@@ -74,7 +59,7 @@
     </dependency>
     <dependency>
       <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-addons-quarkus-data-index-inmemory</artifactId>
+      <artifactId>kogito-addons-quarkus-process-management</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -85,12 +70,8 @@
       <artifactId>quarkus-arc</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-container-image-docker</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-addons-quarkus-process-management</artifactId>
+      <artifactId>kogito-addons-quarkus-data-index-inmemory</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -169,8 +150,12 @@
       </properties>
     </profile>
   </profiles>
+  <!-- Temporary hack to use latest SonataFlow platform artifacts-->
   <repositories>
     <repository>
+      <id>apache-repository-snapshots</id>
+      <url>https://repository.apache.org/content/repositories/snapshots/</url>
+      <layout>default</layout>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -178,9 +163,6 @@
         <enabled>true</enabled>
         <updatePolicy>daily</updatePolicy>
       </snapshots>
-      <id>apache-repository-snapshots</id>
-      <url>https://repository.apache.org/content/repositories/snapshots/</url>
     </repository>
   </repositories>
 </project>
-  

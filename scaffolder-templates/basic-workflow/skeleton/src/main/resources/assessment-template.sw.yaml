@@ -19,8 +19,12 @@ states:
       transition: GetEmptyWorkflowOptions
   - name: GetDefaultWorkflowOptions
     type: operation
+    actions:
+      - name: getDefaultWorkflowOptions
+        actionDataFilter:
+          toStateData: '. +={workflowOptions: {currentVersion: {id: "${{ values.defaultInfrastructureWorkflowId }}", name: "${{ values.defaultInfrastructureWorkflowId }}"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
     stateDataFilter:
-      output: '. +={workflowOptions: {currentVersion: {id: "${{ values.defaultInfrastructureWorkflowId }}", name: "${{ values.defaultInfrastructureWorkflowId }}"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+      output: 
     end: true
   - name: GetEmptyWorkflowOptions
     type: operation

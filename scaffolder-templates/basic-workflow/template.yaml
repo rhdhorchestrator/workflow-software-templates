@@ -120,7 +120,7 @@ spec:
       input:
         files:
           - from: src/main/resources/schemas/input-schema.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}-schema.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}-input-schema.json
             overwrite: true
           - from: src/main/resources/schemas/template__sub_schema__sample_section.json
             to: src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
@@ -128,9 +128,9 @@ spec:
           - from: src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
             to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
             overwrite: false
-    - id: deleteFile
+    - id: deleteFiles
       action: fs:delete
-      name: Delete file
+      name: Delete files
       input:
         files:
           - src/main/resources/assessment-template.sw.yaml
