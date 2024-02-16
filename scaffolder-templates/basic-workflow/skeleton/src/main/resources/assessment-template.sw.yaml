@@ -1,0 +1,33 @@
+id: ${{ values.workflowId }}
+version: '${{ values.version}}'
+specVersion: '0.8'
+name: '${{ values.workflowId }}'
+description: '${{ values.description }}'
+annotations:
+  - "workflow-type/assessment"
+dataInputSchema:
+  schema: schemas/${{ values.artifactId }}-input-schema.json
+  failOnValidationErrors: true
+start: StartState
+states:
+  - name: StartState
+    type: switch
+    dataConditions:
+    - condition: "${ .someText == \"default\" }"
+      transition: GetDefaultWorkflowOptions
+    defaultCondition:
+      transition: GetEmptyWorkflowOptions
+  - name: GetDefaultWorkflowOptions
+    type: operation
+    actions:
+      - name: getDefaultWorkflowOptions
+        actionDataFilter:
+          toStateData: '. +={workflowOptions: {currentVersion: {id: "${{ values.defaultInfrastructureWorkflowId }}", name: "${{ values.defaultInfrastructureWorkflowId }}"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+    stateDataFilter:
+      output: 
+    end: true
+  - name: GetEmptyWorkflowOptions
+    type: operation
+    stateDataFilter:
+      output: '. +={workflowOptions: {currentVersion: {}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+    end: true

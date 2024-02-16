@@ -7,7 +7,7 @@ annotations:
   - "workflow-type/infrastructure"
 dataInputSchema:
   failOnValidationErrors: true
-  schema: schemas/${{ values.artifactId }}-schema.json
+  schema: schemas/${{ values.artifactId }}-input-schema.json
 functions:
   - name: logInfo
     type: custom

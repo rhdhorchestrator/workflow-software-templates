@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: workflow-bootstrap
-  title: Workflow bootstrap project
-  description: Bootstrap project for serverless workflows
+  name: complex-assessment-workflow-bootstrap
+  title: Complex assessment workflow bootstrap project
+  description: Bootstrap project for complex assessment serverless workflow using custom java code
   tags:
     - orchestrator
     - built-in
@@ -16,14 +16,15 @@ metadata:
       icon: techdocs
 spec:
   owner: janus-orchestrator
-  type: workflow-bootstrap
-
+  type: complex-assessment-workflow-bootstrap
   parameters:
     - title: Provide information about the workflow software project
       description: Configure the github repository where the Maven software project is located 
       required:
         - orgName
         - repoName
+        - workflowId
+        - defaultInfrastructureWorkflowId
         - owner
         - system
       properties:
@@ -40,6 +41,16 @@ spec:
           title: Description
           type: string
           description: Description added to the README file
+        workflowId:
+          title: Workflow ID
+          type: string
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
+          description: Workflow ID, the unique identifier of the workflow in SonataFlow
+        defaultInfrastructureWorkflowId:
+          title: Default Infrastructure Workflow ID
+          type: string
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
+          description: Default Infrastructure Workflow ID
         owner:
           title: Owner
           type: string
@@ -57,12 +68,12 @@ spec:
             catalogFilter:
               kind:
                 - System
+    
     - title: Provide information about the Maven software project
       required:
         - groupId
         - artifactId
         - version
-        - workflowId
       properties:
         groupId:
           title: Group ID
@@ -81,12 +92,7 @@ spec:
           type: string
           default: 1.0.0-SNAPSHOT
           description: Maven version, also used to tag the generated artifacts
-        workflowId:
-          title: Workflow ID
-          type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-          description: Workflow ID
-
+  
   steps:
     - id: sourceCodeTemplate
       name: Generating the Source Code Component
@@ -104,21 +110,36 @@ spec:
           artifactId: ${{ parameters.artifactId }}
           version: ${{ parameters.version }}
           workflowId: ${{ parameters.workflowId }}
+          defaultInfrastructureWorkflowId: ${{ parameters.defaultInfrastructureWorkflowId }}
           sourceControl: github.com
+    
     - id: renameFiles
       action: fs:rename
       name: Rename files
       input:
         files:
           - from: src/main/resources/schemas/input-schema.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}-schema.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}-input-schema.json
             overwrite: true
-          - from: src/main/resources/schemas/template__sub_schema__sample_section.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
+          - from: src/main/resources/schemas/workflow-option-output-schema.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}-workflow-option-output-schema.json
+            overwrite: true
+          - from: src/main/resources/schemas/workflow-options-output-schema.json
+            to: src/main/resources/schemas/${{ parameters.artifactId }}-workflow-options-output-schema.json
+            overwrite: true
+          - from: src/main/resources/specs/dataindex.yaml
+            to: src/main/resources/specs/${{ parameters.artifactId }}-dataindex.yaml
+            overwrite: true
+          - from: src/main/resources/template-default-infrastructure.sw.yaml
+            to: src/main/resources/${{ parameters.defaultInfrastructureWorkflowId }}.sw.yaml
+            overwrite: true
+          - from: src/main/resources/precheck.sw.yaml
+            to: src/main/resources/${{ parameters.artifactId }}-precheck.sw.yaml
             overwrite: true
           - from: src/main/resources/template.sw.yaml
             to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
             overwrite: true
+    
     - id: catalogTemplate
       name: Generating the Catalog Info Component
       action: fetch:template
@@ -133,6 +154,7 @@ spec:
           description: ${{ parameters.description }}
           sourceControl: github.com
           lifecycle: development
+    
     - id: publish
       name: Publishing to the Source Code Repository
       action: publish:github
@@ -141,14 +163,14 @@ spec:
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
-
+    
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
-
+  
   output:
     links:
       - title: Open the Source Code Repository
@@ -156,4 +178,3 @@ spec:
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-
