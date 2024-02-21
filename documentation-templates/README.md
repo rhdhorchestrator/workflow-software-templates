@@ -18,7 +18,7 @@ The assessment workflow project generated from the basic-workflow template is a 
     "upgradeOptions": [],
     "migrationOptions": [
         {
-            "id": "MigrationInfrastructure WorkflowTest",
+            "id": "MigrationInfrastructureWorkflowTest",
             "name": "Migration infrastructure workflow test"
         }
     ],
