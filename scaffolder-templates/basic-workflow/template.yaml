@@ -145,8 +145,9 @@ spec:
       name: Generating the Catalog Info Component
       action: fetch:template
       input:
-        url: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/tree/main/skeletons/catalog-info/
+        url: https://github.com/parodos-dev/red-hat-developer-hub-software-templates/blob/tekton-demo/skeletons/catalog-info/
         values:
+          namespace: sonataflow-infra
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}
           owner: ${{ parameters.owner }}
