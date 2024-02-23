@@ -139,7 +139,7 @@ spec:
       name: Generating the Catalog Info Component
       action: fetch:template
       input:
-        url: https://github.com/janus-idp/software-templates/tree/main/skeletons/catalog-info/
+        url: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/tree/main/skeletons/catalog-info/
         values:
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}
