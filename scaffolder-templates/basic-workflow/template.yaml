@@ -33,7 +33,7 @@ spec:
           title: Organization Name
           type: string
           ui:autofocus: true
-          description: Github organization Name
+          description: Github Organization Name
         repoName:
           title: Repository Name
           type: string
@@ -47,7 +47,7 @@ spec:
         workflowId:
           title: Workflow ID
           type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*-)([-.][a-zA-Z0-9]+)*$'
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
           description: Unique identifier of the workflow in SonataFlow
           default: application-onboarding
         workflowType:
