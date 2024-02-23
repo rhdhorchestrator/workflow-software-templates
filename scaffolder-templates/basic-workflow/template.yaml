@@ -38,15 +38,18 @@ spec:
           title: Repository Name
           type: string
           description: Github repository name
+          default: application-onboarding
         description:
           title: Description
           type: string
           description: Description added to the README file
+          default: A workflow for onboarding applications to OCP cluster
         workflowId:
           title: Workflow ID
           type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*-)([.][a-zA-Z0-9]+)*$'
           description: Unique identifier of the workflow in SonataFlow
+          default: application-onboarding
         workflowType:
           title: Workflow Type
           type: string
@@ -54,6 +57,7 @@ spec:
           enum:
             - assessment
             - infrastructure
+          default: infrastructure
         owner:
           title: Owner
           type: string
@@ -63,6 +67,7 @@ spec:
               kind:
                 - Group
                 - User
+          default: user:guest
         system:
           title: System
           type: string
@@ -89,6 +94,7 @@ spec:
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-._][a-zA-Z0-9]+)*$'
           description: Maven Artifact ID
+          default: application-onboarding
         version:
           title: Project version
           type: string
