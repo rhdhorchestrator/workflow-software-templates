@@ -214,7 +214,7 @@ spec:
       input:
         allowedHosts: ['github.com']
         description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
-        repoUrl: github.com?owner=${{ parameters.orgName }}&repo="${{ parameters.repoName }}-config"
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-config
         defaultBranch: main
         sourcePath: config
     - id: registerConfig
