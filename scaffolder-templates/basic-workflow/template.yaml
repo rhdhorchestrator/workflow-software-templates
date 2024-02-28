@@ -174,14 +174,23 @@ spec:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
     - id: configCodeTemplate
-      name: Generating the Source Code Component
+      name: Generating the Config Code Component
       action: fetch:template
       input:
         url: https://github.com/parodos-dev/workflow-kustomize-template.git
-        values: []
+        # TBD: what can we replace at this time?
+        values:
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          applicationType: workflow-project
+          description: ${{ parameters.description }}
+          sourceControl: github.com
+          lifecycle: development
         targetPath: config
     - id: publishConfig
-      name: Publishing to the Source Code Repository
+      name: Publishing to the Config Code Repository
       action: publish:github
       input:
         allowedHosts: ['github.com']
