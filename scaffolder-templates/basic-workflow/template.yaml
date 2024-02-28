@@ -114,27 +114,28 @@ spec:
           workflowId: ${{ parameters.workflowId }}
           workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
+        targetPath: workflow
     - id: renameFiles
       action: fs:rename
       name: Rename files
       input:
         files:
-          - from: src/main/resources/schemas/input-schema.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}-input-schema.json
+          - from: workflow/src/main/resources/schemas/input-schema.json
+            to: workflow/src/main/resources/schemas/${{ parameters.artifactId }}-input-schema.json
             overwrite: true
-          - from: src/main/resources/schemas/template__sub_schema__sample_section.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
+          - from: workflow/src/main/resources/schemas/template__sub_schema__sample_section.json
+            to: workflow/src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
             overwrite: true
-          - from: src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
-            to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
+          - from: workflow/src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
+            to: workflow/src/main/resources/${{ parameters.artifactId }}.sw.yaml
             overwrite: false
     - id: deleteFiles
       action: fs:delete
       name: Delete files
       input:
         files:
-          - src/main/resources/assessment-template.sw.yaml
-          - src/main/resources/infrastructure-template.sw.yaml
+          - workflow/src/main/resources/assessment-template.sw.yaml
+          - workflow/src/main/resources/infrastructure-template.sw.yaml
     - id: catalogTemplate
       name: Generating the Catalog Info Component
       action: fetch:template
@@ -163,6 +164,8 @@ spec:
       name: Create webhook to trigger the pipeline
       action: github:webhook
       # https://github.com/backstage/backstage/blob/master/plugins/scaffolder-backend-module-github/src/actions/githubWebhook.ts
+      # Note: `Resource not accessible by personal access token`
+      # See https://docs.github.com/en/rest/repos/webhooks?apiVersion=2022-11-28#create-a-repository-webhook
       input:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         webhookUrl: https://${{ parameters.workflowId }}-sonataflow-infra.apps.ocp-dev01.lab.eng.tlv2.redhat.com
@@ -189,21 +192,37 @@ spec:
           sourceControl: github.com
           lifecycle: development
         targetPath: config
+    - id: catalogConfigTemplate
+      name: Generating the Config Catalog Info Component
+      action: fetch:template
+      input:
+        url: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/tree/main/skeletons/catalog-info/
+        values:
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}-config
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          applicationType: workflow-project
+          description: ${{ parameters.description }}
+          sourceControl: github.com
+          lifecycle: development
+          dependsOn: ${{ parameters.repoName }}
+        targetPath: config
     - id: publishConfig
       name: Publishing to the Config Code Repository
       action: publish:github
       input:
         allowedHosts: ['github.com']
         description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
-        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-config
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo="${{ parameters.repoName }}-config"
         defaultBranch: main
         sourcePath: config
-    # - id: register
-    #   name: Registering the Catalog Info Component
-    #   action: catalog:register
-    #   input:
-    #     repoContentsUrl: ${{ steps.publishConfig.output.repoContentsUrl }}
-    #     catalogInfoPath: /catalog-info.yaml
+    - id: registerConfig
+      name: Registering the Config Catalog Info Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publishConfig.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
 
 
   output:
