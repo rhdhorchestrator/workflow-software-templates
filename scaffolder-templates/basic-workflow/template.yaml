@@ -168,7 +168,7 @@ spec:
       # See https://docs.github.com/en/rest/repos/webhooks?apiVersion=2022-11-28#create-a-repository-webhook
       input:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
-        webhookUrl: https://${{ parameters.workflowId }}-sonataflow-infra.apps.ocp-dev01.lab.eng.tlv2.redhat.com
+        webhookUrl: https://${{ parameters.workflowId }}-sonataflow-infra.apps.cluster-jkrpp.dynamic.redhatworkshops.io/
         contentType: json
     - id: register
       name: Registering the Catalog Info Component
