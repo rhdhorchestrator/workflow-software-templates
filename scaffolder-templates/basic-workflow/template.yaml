@@ -103,6 +103,7 @@ spec:
         # "Relative path is not allowed to refer to a directory outside its parent"
         url: ./skeleton/
         values:
+          namespace: sonataflow-infra
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}
           owner: ${{ parameters.owner }}

@@ -1,0 +1,25 @@
+# From https://github.com/parodos-dev/red-hat-developer-hub-software-templates/blob/tekton-demo/skeletons/tekton/tekton/eventlistener.yaml
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: ${{ values.repoName }}-el
+  namespace: ${{ values.namespace }}
+spec:
+  triggers:
+    - bindings:
+        - kind: ClusterTriggerBinding
+          ref: github-push
+      interceptors:
+        - params:
+            - name: eventTypes
+              value: ["push"]
+          ref:
+            name: github
+        - params:
+            - name: filter
+              value: body.ref == 'refs/heads/main'
+          ref:
+            name: cel
+      template:
+        ref: ${{ values.repoName }}-run-pipeline
