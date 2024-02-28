@@ -1,0 +1,5 @@
+namespace: sonataflow-infra
+workflowId: ${{ values.workflowId }}
+gitUrl: ${{ values.workflowId }}
+gitConfigUrl: ${{ values.workflowId }}
+convertToFlat: 'true'
