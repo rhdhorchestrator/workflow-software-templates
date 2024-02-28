@@ -149,6 +149,7 @@ spec:
           description: ${{ parameters.description }}
           sourceControl: github.com
           lifecycle: development
+        targetPath: workflow
     - id: publish
       name: Publishing to the Source Code Repository
       action: publish:github
@@ -157,13 +158,44 @@ spec:
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
-
+        sourcePath: workflow
+    - id: create-webhook
+      name: Create webhook to trigger the pipeline
+      action: github:webhook
+      # https://github.com/backstage/backstage/blob/master/plugins/scaffolder-backend-module-github/src/actions/githubWebhook.ts
+      input:
+        repoUrl: ${{ steps.publish.output.repoContentsUrl }}
+        webhookUrl: https://${{ parameters.workflowId }}-sonataflow-infra.apps.ocp-dev01.lab.eng.tlv2.redhat.com
+        contentType: json
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
+    - id: configCodeTemplate
+      name: Generating the Source Code Component
+      action: fetch:template
+      input:
+        url: https://github.com/parodos-dev/workflow-kustomize-template.git
+        values: []
+        targetPath: config
+    - id: publishConfig
+      name: Publishing to the Source Code Repository
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-config
+        defaultBranch: main
+        sourcePath: config
+    # - id: register
+    #   name: Registering the Catalog Info Component
+    #   action: catalog:register
+    #   input:
+    #     repoContentsUrl: ${{ steps.publishConfig.output.repoContentsUrl }}
+    #     catalogInfoPath: /catalog-info.yaml
+
 
   output:
     links:
