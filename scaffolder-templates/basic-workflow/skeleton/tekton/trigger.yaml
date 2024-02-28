@@ -16,10 +16,9 @@ spec:
     - apiVersion: tekton.dev/v1
       kind: PipelineRun
       metadata:
-        # TODO: add workflow Id someway
         name: ${{ values.repoName }}-pipeline-$(uid)
         labels:
-          backstage.io/kubernetes-id: __PLACEHOLDER__
+          backstage.io/kubernetes-id: ${{ values.repoName }}
       spec:
         params:
           - name: gitUrl
