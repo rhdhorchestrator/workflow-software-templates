@@ -164,7 +164,7 @@ spec:
       action: github:webhook
       # https://github.com/backstage/backstage/blob/master/plugins/scaffolder-backend-module-github/src/actions/githubWebhook.ts
       input:
-        repoUrl: ${{ steps.publish.output.repoContentsUrl }}
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         webhookUrl: https://${{ parameters.workflowId }}-sonataflow-infra.apps.ocp-dev01.lab.eng.tlv2.redhat.com
         contentType: json
     - id: register
