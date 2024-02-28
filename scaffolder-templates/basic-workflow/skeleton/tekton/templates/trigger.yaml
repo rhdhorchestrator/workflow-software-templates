@@ -1,0 +1,101 @@
+# From https://github.com/parodos-dev/red-hat-developer-hub-software-templates/blob/tekton-demo/skeletons/tekton/tekton/eventlistener.yaml
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: ${{ values.repoName }}-run-pipeline
+  namespace: ${{ .Values.namespace }}
+spec:
+  params:
+    - name: git-revision
+      description: The git revision
+      default: main
+    - name: git-repo-url
+      description: The repo url
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        # TODO: add workflow Id someway
+        name: ${{ values.repoName }}-pipeline-$(uid)
+        labels:
+          backstage.io/kubernetes-id: __PLACEHOLDER__
+      spec:
+        params:
+          - name: gitUrl
+            value: ${{ values.repoName }}
+          - name: gitConfigUrl
+            value: ${{ values.gitConfigUrl }}
+          - name: workflowId
+            value: ${{ values.workflowId }}
+          - name: convertToFlat
+            value: 'true'
+        pipelineRef:
+          name: workflow-deployment
+        workspaces:
+          - name: workflow-source
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+          - name: workflow-config
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+          - name: docker-credentials
+            secret:
+              secretName: docker-credentials
+          - name: ssh-creds
+            secret:
+              secretName: git-ssh-credentials
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: ${{ values.repoName }}-el
+  namespace: ${{ .Values.namespace }}
+spec:
+  triggers:
+    - bindings:
+        - kind: ClusterTriggerBinding
+          ref: github-push
+      interceptors:
+        - params:
+            - name: eventTypes
+              value: ["push"]
+          ref:
+            name: github
+        - params:
+            - name: filter
+              value: body.ref == 'refs/heads/main'
+          ref:
+            name: cel
+      template:
+        ref: ${{ values.repoName }}-run-pipeline
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: webhook-${{ values.repoName }}-el
+  namespace: ${{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/managed-by: EventListener
+    app.kubernetes.io/part-of: Triggers
+    eventlistener: ${{ values.repoName }}-el
+spec:
+  to:
+    kind: Service
+    name: el-${{ values.repoName }}-el
+    weight: 100
+  port:
+    targetPort: http-listener
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge

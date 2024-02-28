@@ -114,27 +114,28 @@ spec:
           workflowId: ${{ parameters.workflowId }}
           workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
+        targetPath: workflow
     - id: renameFiles
       action: fs:rename
       name: Rename files
       input:
         files:
-          - from: src/main/resources/schemas/input-schema.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}-input-schema.json
+          - from: workflow/src/main/resources/schemas/input-schema.json
+            to: workflow/src/main/resources/schemas/${{ parameters.artifactId }}-input-schema.json
             overwrite: true
-          - from: src/main/resources/schemas/template__sub_schema__sample_section.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
+          - from: workflow/src/main/resources/schemas/template__sub_schema__sample_section.json
+            to: workflow/src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
             overwrite: true
-          - from: src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
-            to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
+          - from: workflow/src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
+            to: workflow/src/main/resources/${{ parameters.artifactId }}.sw.yaml
             overwrite: false
     - id: deleteFiles
       action: fs:delete
       name: Delete files
       input:
         files:
-          - src/main/resources/assessment-template.sw.yaml
-          - src/main/resources/infrastructure-template.sw.yaml
+          - workflow/src/main/resources/assessment-template.sw.yaml
+          - workflow/src/main/resources/infrastructure-template.sw.yaml
     - id: catalogTemplate
       name: Generating the Catalog Info Component
       action: fetch:template
@@ -149,6 +150,7 @@ spec:
           description: ${{ parameters.description }}
           sourceControl: github.com
           lifecycle: development
+        targetPath: workflow
     - id: publish
       name: Publishing to the Source Code Repository
       action: publish:github
@@ -157,13 +159,75 @@ spec:
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
-
+        sourcePath: workflow
+        secrets: {
+          K8S_CLUSTER_TOKEN: sha256~tXQGi5DD4ZXuAltohOEP2utzW1uNw99eyToG27kFWjk,
+          K8S_CLUSTER_URL: https://api.cluster-jkrpp.dynamic.redhatworkshops.io:6443
+        }
+    - id: create-webhook
+      name: Create webhook to trigger the pipeline
+      action: github:webhook
+      # https://github.com/backstage/backstage/blob/master/plugins/scaffolder-backend-module-github/src/actions/githubWebhook.ts
+      # Note: `Resource not accessible by personal access token`
+      # See https://docs.github.com/en/rest/repos/webhooks?apiVersion=2022-11-28#create-a-repository-webhook
+      input:
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        webhookUrl: https://${{ parameters.workflowId }}-sonataflow-infra.apps.cluster-jkrpp.dynamic.redhatworkshops.io/
+        contentType: json
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
+    - id: configCodeTemplate
+      name: Generating the Config Code Component
+      action: fetch:template
+      input:
+        url: https://github.com/parodos-dev/workflow-kustomize-template.git
+        # TBD: what can we replace at this time?
+        values:
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          applicationType: workflow-project
+          description: ${{ parameters.description }}
+          sourceControl: github.com
+          lifecycle: development
+        targetPath: config
+    - id: catalogConfigTemplate
+      name: Generating the Config Catalog Info Component
+      action: fetch:template
+      input:
+        url: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/tree/main/skeletons/catalog-info/
+        values:
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}-config
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          applicationType: workflow-project
+          description: ${{ parameters.description }}
+          sourceControl: github.com
+          lifecycle: development
+          dependsOn: "component:${{ parameters.repoName }}"
+        targetPath: config
+    - id: publishConfig
+      name: Publishing to the Config Code Repository
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-config
+        defaultBranch: main
+        sourcePath: config
+    - id: registerConfig
+      name: Registering the Config Catalog Info Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publishConfig.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
 
   output:
     links:

@@ -1,0 +1,8 @@
+apiVersion: v2
+name: ${{ values.workflowId }}
+description: A Helm chart to install the Tekton pipeline for workflow ${{ values.workflowId }}
+
+type: application
+
+version: ${{ values.version  }}
+appVersion: ${{ values.version  }}
