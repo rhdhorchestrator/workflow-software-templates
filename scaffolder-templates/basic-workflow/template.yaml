@@ -206,7 +206,7 @@ spec:
           description: ${{ parameters.description }}
           sourceControl: github.com
           lifecycle: development
-          dependsOn: ${{ parameters.repoName }}
+          dependsOn: "component:${{ parameters.repoName }}"
         targetPath: config
     - id: publishConfig
       name: Publishing to the Config Code Repository
