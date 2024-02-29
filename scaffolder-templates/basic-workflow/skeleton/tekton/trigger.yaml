@@ -3,7 +3,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: ${{ values.repoName }}-run-pipeline
+  name: ${{ values.workflowId }}-run-pipeline
   namespace: ${{ values.namespace }}
 spec:
   params:
@@ -16,7 +16,7 @@ spec:
     - apiVersion: tekton.dev/v1
       kind: PipelineRun
       metadata:
-        name: ${{ values.repoName }}-pipeline-$(uid)
+        name: ${{ values.workflowId }}-pipeline-$(uid)
         labels:
           backstage.io/kubernetes-id: ${{ values.repoName }}
       spec:

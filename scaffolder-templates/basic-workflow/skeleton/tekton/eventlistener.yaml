@@ -3,7 +3,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: ${{ values.repoName }}-el
+  name: ${{ values.workflowId }}-el
   namespace: ${{ values.namespace }}
 spec:
   triggers:
@@ -22,4 +22,4 @@ spec:
           ref:
             name: cel
       template:
-        ref: ${{ values.repoName }}-run-pipeline
+        ref: ${{ values.workflowId }}-run-pipeline
