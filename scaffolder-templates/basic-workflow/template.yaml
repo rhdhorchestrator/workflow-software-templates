@@ -94,7 +94,21 @@ spec:
           type: string
           default: 1.0.0-SNAPSHOT
           description: Maven version, also used to tag the generated artifacts
-
+    - title: Provide information about the Deployment environment
+      required:
+        - clusterDomain
+        - namespace
+      properties:
+        clusterDomain:
+          title: Cluster domain
+          type: string
+          default: cluster-jkrpp.dynamic.redhatworkshops.io
+          description: Cluster domain
+        namespace:
+          title: Namespace
+          type: string
+          default: sonataflow-infra
+          description: Deployment namespace
   steps:
     - id: sourceCodeTemplate
       name: Generating the Source Code Component
@@ -103,7 +117,7 @@ spec:
         # "Relative path is not allowed to refer to a directory outside its parent"
         url: ./skeleton/
         values:
-          namespace: sonataflow-infra
+          namespace: ${{ parameters.namespace }}
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}
           owner: ${{ parameters.owner }}
@@ -173,7 +187,7 @@ spec:
       # See https://docs.github.com/en/rest/repos/webhooks?apiVersion=2022-11-28#create-a-repository-webhook
       input:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
-        webhookUrl: https://${{ parameters.workflowId }}-sonataflow-infra.apps.cluster-jkrpp.dynamic.redhatworkshops.io/
+        webhookUrl: https://webhook-${{ parameters.workflowId }}-el-${{ parameters.namespace }}.apps.${{ parameters.clusterDomain }}/
         contentType: json
     - id: register
       name: Registering the Catalog Info Component
@@ -186,16 +200,8 @@ spec:
       action: fetch:template
       input:
         url: https://github.com/parodos-dev/workflow-kustomize-template.git
-        # TBD: what can we replace at this time?
         values:
-          orgName: ${{ parameters.orgName }}
-          repoName: ${{ parameters.repoName }}
-          owner: ${{ parameters.owner }}
-          system: ${{ parameters.system }}
-          applicationType: workflow-project
-          description: ${{ parameters.description }}
-          sourceControl: github.com
-          lifecycle: development
+          workflowId: ${{ parameters.workflowId }}
         targetPath: config
     - id: catalogConfigTemplate
       name: Generating the Config Catalog Info Component
