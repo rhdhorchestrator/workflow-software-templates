@@ -164,8 +164,8 @@ spec:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
         sourcePath: workflow
+        # TODO: get from kubernetes pulgin settings
         secrets: {
-          K8S_CLUSTER_TOKEN: sha256~tXQGi5DD4ZXuAltohOEP2utzW1uNw99eyToG27kFWjk,
           K8S_CLUSTER_URL: https://api.cluster-jkrpp.dynamic.redhatworkshops.io:6443
         }
     - id: create-webhook
@@ -178,6 +178,13 @@ spec:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         webhookUrl: https://webhook-${{ parameters.workflowId }}-el-${{ parameters.namespace }}.apps.${{ parameters.clusterDomain }}/
         contentType: json
+    - id: deployTrigger
+      name: Deploy pipeline triggers
+      action: github:actions:dispatch
+      input:
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        workflowId: deploy.yaml
+        branchOrTagName: main
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register

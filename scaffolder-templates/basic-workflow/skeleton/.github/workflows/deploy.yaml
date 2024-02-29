@@ -1,0 +1,32 @@
+# Requirement: add a K8S_SECRET secret to your organization with the SA token
+# oc get secret backstage-k8s-token-4l5xv -n backstage-system -oyaml > secret.yaml
+# gh secret --repo parodos-dev/test-swf set K8S_SECRET <secret.yaml 
+name: Deploy the Pipeline trigger manifests for workflow ${{ values.workflowId }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set the Kubernetes context
+        uses: azure/k8s-set-context@v2
+        with:
+          method: service-account
+          k8s-url: ${{ secrets.K8S_CLUSTER_URL }}
+          k8s-secret: ${{ secrets.K8S_SECRET }}
+
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Deploy to the Kubernetes cluster
+        uses: azure/k8s-deploy@v1
+        with:
+          namespace: ${{ values.namespace }}
+          manifests: |
+            tekton/eventlistener.yaml
+            tekton/trigger.yaml
+            tekton/route.yaml
