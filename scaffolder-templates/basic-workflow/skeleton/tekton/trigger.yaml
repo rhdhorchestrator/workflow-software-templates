@@ -22,7 +22,7 @@ spec:
       spec:
         params:
           - name: gitUrl
-            value: ${{ values.repoName }}
+            value: ${{ values.gitUrl }}
           - name: gitConfigUrl
             value: ${{ values.gitConfigUrl }}
           - name: workflowId
