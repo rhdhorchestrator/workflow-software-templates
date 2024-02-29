@@ -18,7 +18,7 @@ spec:
       metadata:
         name: ${{ values.workflowId }}-pipeline-$(uid)
         labels:
-          backstage.io/kubernetes-id: ${{ values.repoName }}
+          backstage.io/kubernetes-id: ${{ values.repoName }}-ci
       spec:
         params:
           - name: gitUrl
