@@ -111,7 +111,7 @@ spec:
           description: Deployment namespace
   steps:
     - id: sourceCodeTemplate
-      name: Generating the Source Code Component
+      name: Generating the Source Code  and Catalog Info Component
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
@@ -131,6 +131,8 @@ spec:
           sourceControl: github.com
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
           gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+          applicationType: workflow-project
+          lifecycle: development
         targetPath: workflow
     - id: renameFiles
       action: fs:rename
@@ -153,22 +155,6 @@ spec:
         files:
           - workflow/src/main/resources/assessment-template.sw.yaml
           - workflow/src/main/resources/infrastructure-template.sw.yaml
-    - id: catalogTemplate
-      name: Generating the Catalog Info Component
-      action: fetch:template
-      input:
-        url: https://github.com/parodos-dev/red-hat-developer-hub-software-templates/blob/tekton-demo/skeletons/catalog-info/
-        values:
-          namespace: ${{ parameters.namespace }}
-          orgName: ${{ parameters.orgName }}
-          repoName: ${{ parameters.repoName }}
-          owner: ${{ parameters.owner }}
-          system: ${{ parameters.system }}
-          applicationType: workflow-project
-          description: ${{ parameters.description }}
-          sourceControl: github.com
-          lifecycle: development
-        targetPath: workflow
     - id: publish
       name: Publishing to the Source Code Repository
       action: publish:github
@@ -199,19 +185,12 @@ spec:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
     - id: configCodeTemplate
-      name: Generating the Config Code Component
+      name: Generating the Config Code Component and Catalog Info Component
       action: fetch:template
       input:
         url: https://github.com/parodos-dev/workflow-kustomize-template.git
         values:
           workflowId: ${{ parameters.workflowId }}
-        targetPath: config
-    - id: catalogConfigTemplate
-      name: Generating the Config Catalog Info Component
-      action: fetch:template
-      input:
-        url: https://github.com/parodos-dev/red-hat-developer-hub-software-templates/blob/tekton-demo/skeletons/catalog-info/
-        values:
           namespace: ${{ parameters.namespace }}
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}-config
