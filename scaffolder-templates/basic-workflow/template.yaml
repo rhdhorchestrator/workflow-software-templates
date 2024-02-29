@@ -38,7 +38,7 @@ spec:
           title: Repository Name
           type: string
           description: Github repository name
-          default: application-onboarding
+          default: onboarding
         description:
           title: Description
           type: string
@@ -49,7 +49,7 @@ spec:
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-.]?[a-zA-Z0-9]+)*$'
           description: Unique identifier of the workflow in SonataFlow
-          default: application-onboarding
+          default: onboarding
         workflowType:
           title: Workflow Type
           type: string
@@ -94,7 +94,7 @@ spec:
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-._][a-zA-Z0-9]+)*$'
           description: Maven Artifact ID
-          default: application-onboarding
+          default: onboarding
         version:
           title: Project version
           type: string
