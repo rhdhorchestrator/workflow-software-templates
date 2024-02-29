@@ -129,8 +129,8 @@ spec:
           workflowId: ${{ parameters.workflowId }}
           workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
-          gitUrl: git@github.com:${{ parameters.orgName }}/ ${{ parameters.repoName }}.git
-          gitConfigUrl: git@github.com:${{ parameters.orgName }}/ ${{ parameters.repoName }}-config.git
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
         targetPath: workflow
     - id: renameFiles
       action: fs:rename
