@@ -116,6 +116,8 @@ spec:
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
         url: ./skeleton/
+        copyWithoutTemplating:
+          - .github/workflows/deploy.yaml
         values:
           namespace: ${{ parameters.namespace }}
           orgName: ${{ parameters.orgName }}
