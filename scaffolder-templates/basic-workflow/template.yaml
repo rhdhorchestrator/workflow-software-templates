@@ -134,8 +134,6 @@ spec:
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
         url: ./skeleton/
-        copyWithoutTemplating:
-          - .github/workflows/deploy.yaml
         values:
           namespace: ${{ parameters.namespace }}
           orgName: ${{ parameters.orgName }}
@@ -175,6 +173,30 @@ spec:
         files:
           - workflow/src/main/resources/assessment-template.sw.yaml
           - workflow/src/main/resources/infrastructure-template.sw.yaml
+    - id: tektonTemplate
+      if: ${{ parameters.ci == 'tekton' }}
+      name: Generating the manifests of Tekton trigger
+      action: fetch:template
+      input:
+        url: ./tekton/
+        values:
+          namespace: ${{ parameters.namespace }}
+          repoName: ${{ parameters.repoName }}
+          workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+        targetPath: workflow/tekton
+    - id: gitHubTektonTemplate
+      if: ${{ parameters.ci == 'tekton' }}
+      name: Generating the GitHub action to deploy the Tekton trigger
+      action: fetch:template
+      input:
+        # "Relative path is not allowed to refer to a directory outside its parent"
+        url: ./.github/
+        copyWithoutTemplating:
+          - .github/workflows/deploy.yaml
+        values: []
+        targetPath: workflow/.github
     - id: publish
       name: Publishing to the Source Code Repository
       action: publish:github
