@@ -102,9 +102,21 @@ spec:
           description: Maven version, also used to tag the generated artifacts
     - title: Provide information about the Deployment environment
       required:
+        - ci
         - clusterDomain
         - namespace
       properties:
+        ci:
+          title: Select a CI method
+          type: string
+          description: This action will create a CI pipeline for your application based on chosen method
+          default: tekton
+          enum:
+            - none
+            - tekton
+          enumNames:
+            - None
+            - Tekton
         clusterDomain:
           title: Cluster domain
           type: string
@@ -173,11 +185,8 @@ spec:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
         sourcePath: workflow
-        # TODO: get from kubernetes pulgin settings
-        secrets: {
-          K8S_CLUSTER_URL: https://api.cluster-jkrpp.dynamic.redhatworkshops.io:6443
-        }
     - id: create-webhook
+      if: ${{ parameters.ci == 'tekton' }}
       name: Create webhook to trigger the pipeline
       action: github:webhook
       # https://github.com/backstage/backstage/blob/master/plugins/scaffolder-backend-module-github/src/actions/githubWebhook.ts
@@ -188,6 +197,7 @@ spec:
         webhookUrl: https://webhook-${{ parameters.workflowId }}-el-${{ parameters.namespace }}.apps.${{ parameters.clusterDomain }}/
         contentType: json
     - id: deployTrigger
+      if: ${{ parameters.ci == 'tekton' }}
       name: Deploy pipeline triggers
       action: github:actions:dispatch
       input:

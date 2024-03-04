@@ -5,23 +5,20 @@ name: Deploy the Pipeline trigger manifests workflow
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
       - name: Set the Kubernetes context
         uses: azure/k8s-set-context@v2
         with:
           method: service-account
           k8s-url: ${{ secrets.K8S_CLUSTER_URL }}
           k8s-secret: ${{ secrets.K8S_SECRET }}
-
-      - name: Checkout source code
-        uses: actions/checkout@v3
-
       - name: Deploy to the Kubernetes cluster
         uses: azure/k8s-deploy@v1
         with:
@@ -30,3 +27,18 @@ jobs:
             tekton/eventlistener.yaml
             tekton/trigger.yaml
             tekton/route.yaml
+      
+      # To be reviewed: needs a private repo to skip the need of a PR 
+      # - name: Commit a change to trigger the webhook
+      #   run: |
+      #     echo $(date) > tekton/trigger
+      #     git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+      #     git config --global user.name "${{ github.actor }}"
+      #     git add tekton/trigger
+      #     git commit --no-verify -m "Webhook trigger"
+      # - name: Push changes
+      #   uses: ad-m/github-push-action@master
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     branch: ${{ github.ref }}
+    
