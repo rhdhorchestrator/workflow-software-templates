@@ -195,7 +195,7 @@ spec:
         url: ./.github/
         copyWithoutTemplating:
           - .github/workflows/deploy.yaml
-        values: []
+        values: {}
         targetPath: workflow/.github
     - id: publish
       name: Publishing to the Source Code Repository
