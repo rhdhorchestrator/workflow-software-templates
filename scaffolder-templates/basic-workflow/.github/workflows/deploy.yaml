@@ -1,4 +1,5 @@
 # Requirement: add a K8S_SECRET secret to your organization with the SA token
+# Bind the SA with a cluster-admin Role
 # oc get secret backstage-k8s-token-4l5xv -n backstage-system -oyaml > secret.yaml
 # gh secret --repo parodos-dev/test-swf set K8S_SECRET <secret.yaml 
 name: Deploy the Pipeline trigger manifests workflow
