@@ -120,8 +120,7 @@ spec:
         clusterDomain:
           title: Cluster domain
           type: string
-          default: cluster-jkrpp.dynamic.redhatworkshops.io
-          description: Cluster domain
+          description: Host domain of the cluster to deploy the Tekton trigger 
         namespace:
           title: Namespace
           type: string
