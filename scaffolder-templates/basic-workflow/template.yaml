@@ -33,20 +33,23 @@ spec:
           title: Organization Name
           type: string
           ui:autofocus: true
-          description: Github organization Name
+          description: Github Organization Name
         repoName:
           title: Repository Name
           type: string
           description: Github repository name
+          default: onboarding
         description:
           title: Description
           type: string
           description: Description added to the README file
+          default: A workflow for onboarding applications to OCP cluster
         workflowId:
           title: Workflow ID
           type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
+          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-.]?[a-zA-Z0-9]+)*$'
           description: Unique identifier of the workflow in SonataFlow
+          default: onboarding
         workflowType:
           title: Workflow Type
           type: string
@@ -54,6 +57,7 @@ spec:
           enum:
             - assessment
             - infrastructure
+          default: infrastructure
         owner:
           title: Owner
           type: string
@@ -63,6 +67,7 @@ spec:
               kind:
                 - Group
                 - User
+          default: user:guest
         system:
           title: System
           type: string
@@ -89,20 +94,47 @@ spec:
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-._][a-zA-Z0-9]+)*$'
           description: Maven Artifact ID
+          default: onboarding
         version:
           title: Project version
           type: string
           default: 1.0.0-SNAPSHOT
           description: Maven version, also used to tag the generated artifacts
-
+    - title: Provide information about the Deployment environment
+      required:
+        - ci
+        - clusterDomain
+        - namespace
+      properties:
+        ci:
+          title: Select a CI method
+          type: string
+          description: This action will create a CI pipeline for your application based on chosen method
+          default: tekton
+          enum:
+            - none
+            - tekton
+          enumNames:
+            - None
+            - Tekton
+        clusterDomain:
+          title: Cluster domain
+          type: string
+          description: Host domain of the cluster to deploy the Tekton trigger 
+        namespace:
+          title: Namespace
+          type: string
+          default: sonataflow-infra
+          description: Deployment namespace
   steps:
     - id: sourceCodeTemplate
-      name: Generating the Source Code Component
+      name: Generating the Source Code  and Catalog Info Component
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
         url: ./skeleton/
         values:
+          namespace: ${{ parameters.namespace }}
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}
           owner: ${{ parameters.owner }}
@@ -114,6 +146,10 @@ spec:
           workflowId: ${{ parameters.workflowId }}
           workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+          applicationType: workflow-project
+          lifecycle: development
         targetPath: workflow
     - id: renameFiles
       action: fs:rename
@@ -136,35 +172,42 @@ spec:
         files:
           - workflow/src/main/resources/assessment-template.sw.yaml
           - workflow/src/main/resources/infrastructure-template.sw.yaml
-    - id: catalogTemplate
-      name: Generating the Catalog Info Component
+    - id: tektonTemplate
+      if: ${{ parameters.ci == 'tekton' }}
+      name: Generating the manifests of Tekton trigger
       action: fetch:template
       input:
-        url: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/tree/main/skeletons/catalog-info/
+        url: ./tekton/
         values:
-          orgName: ${{ parameters.orgName }}
+          namespace: ${{ parameters.namespace }}
           repoName: ${{ parameters.repoName }}
-          owner: ${{ parameters.owner }}
-          system: ${{ parameters.system }}
-          applicationType: workflow-project
-          description: ${{ parameters.description }}
-          sourceControl: github.com
-          lifecycle: development
-        targetPath: workflow
+          workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+        targetPath: workflow/tekton
+    - id: gitHubTektonTemplate
+      if: ${{ parameters.ci == 'tekton' }}
+      name: Generating the GitHub action to deploy the Tekton trigger
+      action: fetch:template
+      input:
+        # "Relative path is not allowed to refer to a directory outside its parent"
+        url: ./.github/
+        copyWithoutTemplating:
+          - .github/workflows/deploy.yaml
+        values: {}
+        targetPath: workflow/.github
     - id: publish
       name: Publishing to the Source Code Repository
       action: publish:github
       input:
+        repoVisibility: public
         allowedHosts: ['github.com']
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
         sourcePath: workflow
-        secrets: {
-          K8S_CLUSTER_TOKEN: sha256~tXQGi5DD4ZXuAltohOEP2utzW1uNw99eyToG27kFWjk,
-          K8S_CLUSTER_URL: https://api.cluster-jkrpp.dynamic.redhatworkshops.io:6443
-        }
     - id: create-webhook
+      if: ${{ parameters.ci == 'tekton' }}
       name: Create webhook to trigger the pipeline
       action: github:webhook
       # https://github.com/backstage/backstage/blob/master/plugins/scaffolder-backend-module-github/src/actions/githubWebhook.ts
@@ -172,8 +215,16 @@ spec:
       # See https://docs.github.com/en/rest/repos/webhooks?apiVersion=2022-11-28#create-a-repository-webhook
       input:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
-        webhookUrl: https://${{ parameters.workflowId }}-sonataflow-infra.apps.cluster-jkrpp.dynamic.redhatworkshops.io/
+        webhookUrl: https://webhook-${{ parameters.workflowId }}-el-${{ parameters.namespace }}.apps.${{ parameters.clusterDomain }}/
         contentType: json
+    - id: deployTrigger
+      if: ${{ parameters.ci == 'tekton' }}
+      name: Deploy pipeline triggers
+      action: github:actions:dispatch
+      input:
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        workflowId: deploy.yaml
+        branchOrTagName: main
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register
@@ -181,27 +232,13 @@ spec:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
     - id: configCodeTemplate
-      name: Generating the Config Code Component
+      name: Generating the Config Code Component and Catalog Info Component
       action: fetch:template
       input:
         url: https://github.com/parodos-dev/workflow-kustomize-template.git
-        # TBD: what can we replace at this time?
         values:
-          orgName: ${{ parameters.orgName }}
-          repoName: ${{ parameters.repoName }}
-          owner: ${{ parameters.owner }}
-          system: ${{ parameters.system }}
-          applicationType: workflow-project
-          description: ${{ parameters.description }}
-          sourceControl: github.com
-          lifecycle: development
-        targetPath: config
-    - id: catalogConfigTemplate
-      name: Generating the Config Catalog Info Component
-      action: fetch:template
-      input:
-        url: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/tree/main/skeletons/catalog-info/
-        values:
+          workflowId: ${{ parameters.workflowId }}
+          namespace: ${{ parameters.namespace }}
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}-config
           owner: ${{ parameters.owner }}
@@ -210,7 +247,6 @@ spec:
           description: ${{ parameters.description }}
           sourceControl: github.com
           lifecycle: development
-          dependsOn: "component:${{ parameters.repoName }}"
         targetPath: config
     - id: publishConfig
       name: Publishing to the Config Code Repository
@@ -227,8 +263,6 @@ spec:
       input:
         repoContentsUrl: ${{ steps.publishConfig.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
-
-
   output:
     links:
       - title: Open the Source Code Repository
