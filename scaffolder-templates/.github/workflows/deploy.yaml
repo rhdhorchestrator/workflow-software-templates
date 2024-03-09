@@ -28,6 +28,7 @@ jobs:
             tekton/eventlistener.yaml
             tekton/trigger.yaml
             tekton/route.yaml
+            argocd/application.yaml
       
       # To be reviewed: needs a private repo to skip the need of a PR 
       # - name: Commit a change to trigger the webhook
