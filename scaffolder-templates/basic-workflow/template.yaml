@@ -212,7 +212,7 @@ spec:
         # "Relative path is not allowed to refer to a directory outside its parent"
         url: ../.github/
         copyWithoutTemplating:
-          - .github/workflows/deploy.yaml
+          - workflows/deploy.yaml
         values: {}
         targetPath: workflow/.github
     - id: publish

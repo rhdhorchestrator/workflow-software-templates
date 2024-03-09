@@ -3,18 +3,19 @@ kind: Application
 metadata:
   name: test-app
   namespace: ${{ values.argocdNamespace }}
-destination:
-  namespace: ${{ values.namespace }}
-  server: https://kubernetes.default.svc
-project: orchestrator
-source:
-  path: ./kustomize/base
-  repoURL: ${{ values.gitConfigUrl }}
-  targetRevision: HEAD
-  kustomize:
-    commonAnnotations:
-      argocd/app-name: ${{ values.workflowId }}
-syncPolicy:
-  automated:
-    prune: true
-    selfHeal: true
+spec:
+  destination:
+    namespace: ${{ values.namespace }}
+    server: https://kubernetes.default.svc
+  project: orchestrator
+  source:
+    path: ./kustomize/base
+    repoURL: ${{ values.gitConfigUrl }}
+    targetRevision: HEAD
+    kustomize:
+      commonAnnotations:
+        argocd/app-name: ${{ values.workflowId }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
