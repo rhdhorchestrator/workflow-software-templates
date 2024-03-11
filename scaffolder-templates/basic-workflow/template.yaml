@@ -244,8 +244,9 @@ spec:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         workflowId: deploy.yaml
         branchOrTagName: main
-        tektonNamespace: ${{ parameters.namespace }}
-        argocdNamespace: ${{ parameters.argocdNamespace }}
+        workflowInputs:
+          tektonNamespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register
