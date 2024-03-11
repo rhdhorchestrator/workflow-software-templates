@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: test-app
+  name: ${{ values.workflowId }}
   namespace: ${{ values.argocdNamespace }}
 spec:
   destination:
