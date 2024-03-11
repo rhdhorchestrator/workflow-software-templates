@@ -7,6 +7,14 @@ name: Deploy the Pipeline trigger manifests workflow
 on:
   workflow_dispatch:
     inputs:
+      workflowId:
+        description: 'Workflow Id'
+        required: true
+        type: string
+      gitConfigUrl:
+        description: 'URL of git config repo'
+        required: true
+        type: string
       tektonNamespace:
         description: 'Namespace of Tekton resources'
         required: true
@@ -25,26 +33,32 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Set the Kubernetes context
-        uses: azure/k8s-set-context@v2
+      - name: Log in and set context
+        uses: redhat-actions/oc-login@v1
         with:
-          method: service-account
-          k8s-url: ${{ secrets.K8S_CLUSTER_URL }}
-          k8s-secret: ${{ secrets.K8S_SECRET }}
+          openshift_server_url: ${{ secrets.OPENSHIFT_SERVER }}
+          openshift_token: ${{ secrets.OPENSHIFT_TOKEN }}
+          namespace: default
+          insecure_skip_tls_verify: true
+
       - name: Deploy Tekton trigger to the Kubernetes cluster
-        uses: azure/k8s-deploy@v1
-        with:
-          namespace: ${{ inputs.tektonNamespace }}
-          manifests: |
-            tekton/eventlistener.yaml
-            tekton/trigger.yaml
-            tekton/route.yaml
+        run: |
+          oc apply -n ${{ inputs.tektonNamespace }} -f tekton
+      
       - name: Deploy ArgoCD application to the Kubernetes cluster
-        uses: azure/k8s-deploy@v1
-        with:
-          namespace: ${{ inputs.argocdNamespace }}
-          manifests: |
-            argocd/application.yaml
+        run: |
+          oc apply -n ${{ inputs.argocdNamespace }} -f argocd
+      - name: Create ArgoCD repository
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > sshPrivateKey
+          cat sshPrivateKey
+          oc create secret -n ${{ inputs.argocdNamespace }} generic "${{ inputs.workflowId }}-repo" \
+            --from-literal name=${{ inputs.workflowId }} \
+            --from-literal project=orchestrator \
+            --from-literal type=git \
+            --from-literal url=${{ inputs.gitConfigUrl }} \
+            --from-file=sshPrivateKey
+          oc label secret -n ${{ inputs.argocdNamespace }} "${{ inputs.workflowId }}-repo" argocd.argoproj.io/secret-type=repository
       
       # To be reviewed: needs a private repo to skip the need of a PR 
       # - name: Commit a change to trigger the webhook
