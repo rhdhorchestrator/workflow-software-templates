@@ -6,6 +6,17 @@ name: Deploy the Pipeline trigger manifests workflow
 
 on:
   workflow_dispatch:
+    inputs:
+      tektonNamespace:
+        description: 'Namespace of Tekton resources'
+        required: true
+        type: string
+        default: 'sonataflow-infra'
+      argocdNamespace:
+        description: 'Namespace of ArgoCD resources'
+        required: true
+        type: string
+        default: 'argocd'
 jobs:
   deploy:
     name: Deploy
@@ -20,15 +31,16 @@ jobs:
           method: service-account
           k8s-url: ${{ secrets.K8S_CLUSTER_URL }}
           k8s-secret: ${{ secrets.K8S_SECRET }}
-      - name: Deploy to the Kubernetes cluster
+      - name: Deploy Tekton trigger to the Kubernetes cluster
         uses: azure/k8s-deploy@v1
         with:
-          namespace: sonataflow-infra
-          manifests: |
-            tekton/eventlistener.yaml
-            tekton/trigger.yaml
-            tekton/route.yaml
-            argocd/application.yaml
+          namespace: ${{ inputs.tektonNamespace }}
+          manifests: 'tekton/*.*'
+      - name: Deploy ArgoCD application to the Kubernetes cluster
+        uses: azure/k8s-deploy@v1
+        with:
+          namespace: ${{ inputs.argocdNamespace }}
+          manifests: 'argocd/*.*'
       
       # To be reviewed: needs a private repo to skip the need of a PR 
       # - name: Commit a change to trigger the webhook
