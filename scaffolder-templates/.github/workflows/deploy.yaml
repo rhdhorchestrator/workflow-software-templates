@@ -35,12 +35,16 @@ jobs:
         uses: azure/k8s-deploy@v1
         with:
           namespace: ${{ inputs.tektonNamespace }}
-          manifests: 'tekton/*.*'
+          manifests: |
+            tekton/eventlistener.yaml
+            tekton/trigger.yaml
+            tekton/route.yaml
       - name: Deploy ArgoCD application to the Kubernetes cluster
         uses: azure/k8s-deploy@v1
         with:
           namespace: ${{ inputs.argocdNamespace }}
-          manifests: 'argocd/*.*'
+          manifests: |
+            argocd/application.yaml
       
       # To be reviewed: needs a private repo to skip the need of a PR 
       # - name: Commit a change to trigger the webhook
