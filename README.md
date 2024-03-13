@@ -10,36 +10,30 @@ This repository is a collection of software and documentation templates for the 
 
 The documentation templates provide recommended structure and integration documentation with the Orchestrator deployment.
 
-## pre-requisites
+## Prerequisites
 ### GitHub secrets
-In case of `Tekton` CI pipeline, the secrets `K8S_CLUSTER_URL` and `K8S_SECRET` are used by the GitHub action that deploys the Tekton
+In case of `Tekton` CI pipeline, the secrets `OPENSHIFT_SERVER` and `OPENSHIFT_TOKEN` are used by the GitHub action that deploys the Tekton
 resources. Please provide organization-level configuration for these secrets and ensure that they can be managed by the newly created repositories according to the visibility options (currently set to `public`).
 
-The value of the `K8S_SECRET` secret must comply with the specification provided in [Service account approach](https://github.com/Azure/k8s-set-context/tree/releases/v1?tab=readme-ov-file#service-account-approach) for the `azure/k8s-set-context` action.
+The value of the `OPENSHIFT_TOKEN` secret must provide the permissions to create resources in multiple namesapces, so we provide a simple procedure to
+bind it to the `cluster-admin` role, but we recommend to configure a new role with only the required privileges instead.
 
-You can follow these steps to generate the secret:
+You can follow these steps to generate the token:
 ```
 [update current `oc project` to an existing namespace like `orchestrator`]
 oc create sa orchestrator
 oc adm policy add-cluster-role-to-user cluster-admin -z orchestrator
-oc get $(oc get secret -o name | grep orchestrator-token) -o yaml > token.yaml
+oc get $(oc get secret -o name | grep orchestrator-token) -o yaml | yq '.data.token' | sed 's/"//g' | base64 -d
 ```
-Finally, the `K8S_SECRET` must be set to the full content of `token.yaml`.
+Finally, put the output of the last command in the `OPENSHIFT_TOKEN` secret.
 
-### Tekton resources
-The Tekton trigger requires to install the pipeline resources that are referenced by the `TriggerTemplate`.
-
-Follow this section to install the required [Prerequisites](https://github.com/parodos-dev/workflows-tekton-pipeline?tab=readme-ov-file#prerequisites).
-
-The next step is to create the [docker credentials](https://github.com/parodos-dev/workflows-tekton-pipeline?tab=readme-ov-file#installing-docker-credentials)
-to push the image artifacts on Quay and [Define the SSH credentials](https://github.com/parodos-dev/workflows-tekton-pipeline?tab=readme-ov-file#define-the-ssh-credentials)
-to push the deployment configuration to the source repository.
-
-Once this is done, you can create the Tekton pipeline resources by applying the associated manifests: 
-```bash
-git clone https://github.com/parodos-dev/workflows-tekton-pipeline.git
-cd workflows-tekton-pipeline
-kustomize build kustomize/base | oc apply -f -
-```
-
-**Note**: do not apply the manifests in the `kustomize/run` folder, as they refer to the same trigger resources that are automatically added by this software template.
+## Generated artifacts
+The execution of the software template produces the following output:
+* A workflow repository with a sample Serverless Workflow
+  * Including manifests to configure the Tekton trigger and ArgoCD application
+  * Includes a GH action to deploy the Tekton trigger and ArgoCD application: the action is automatically executed to start the deployment by the template
+  * A Github webhook is automatically created to activate the Tekton trigger
+* A config repository with initial configuration of a kustomize project to deploy the application
+  * Uses properties file to allow setting user-specific configuration for the workflow (assuming that the workflow `application.properties` are using
+  env variables to specify the values)
+* Registers the workflow and workflow-config repositories in Backstage as `Component`s
