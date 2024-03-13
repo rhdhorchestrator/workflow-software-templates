@@ -39,15 +39,14 @@ jobs:
 
       - name: Deploy Tekton trigger to the Kubernetes cluster
         run: |
-          oc apply -n ${{ inputs.tektonNamespace }} -f tekton
+          oc apply -n ${{ inputs.tektonNamespace }} -f tekton/
       
       - name: Deploy ArgoCD application to the Kubernetes cluster
         run: |
-          oc apply -n ${{ inputs.argocdNamespace }} -f argocd
+          oc apply -n ${{ inputs.argocdNamespace }} -f argocd/
       - name: Create ArgoCD repository
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > sshPrivateKey
-          cat sshPrivateKey
           oc create secret -n ${{ inputs.argocdNamespace }} generic "${{ inputs.workflowId }}-repo" \
             --from-literal name=${{ inputs.workflowId }} \
             --from-literal project=orchestrator \

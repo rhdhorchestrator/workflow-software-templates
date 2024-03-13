@@ -32,8 +32,8 @@ The execution of the software template produces the following output:
 * A workflow repository with a sample Serverless Workflow
   * Including manifests to configure the Tekton trigger and ArgoCD application
   * Includes a GH action to deploy the Tekton trigger and ArgoCD application: the action is automatically executed to start the deployment by the template
-  * A webHook is automatically created to activate the Tekton trigger
+  * A Github webhook is automatically created to activate the Tekton trigger
 * A config repository with initial configuration of a kustomize project to deploy the application
   * Uses properties file to allow setting user-specific configuration for the workflow (assuming that the workflow `application.properties` are using
   env variables to specify the values)
-* Both the workflow and the config repos are defined as `Component` entities in Backstage
+* Registers the workflow and workflow-config repositories in Backstage as `Component`s
