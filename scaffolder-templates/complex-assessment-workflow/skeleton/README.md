@@ -60,11 +60,11 @@ Response:
 
 # Dev UI Tools
 Use the `Serverless Workflow Tools` to manage and monitor the published workflows:
-```bash
-open -t http://localhost:8080/q/dev/org.kie.kogito.kogito-quarkus-serverless-workflow-devui/workflowInstances
+```
+http://localhost:8080/q/dev-v1/org.kie.kogito.kogito-quarkus-serverless-workflow-devui/workflowInstances
 ```
 
 Use the `Data Index GraphQL UI` to query the state of the [Data Index service](https://sonataflow.org/serverlessworkflow/main/data-index/data-index-core-concepts.html):
-```bash
-open -t http://localhost:8080/q/dev/org.kie.kogito.kogito-addons-quarkus-data-index-inmemory/dataindex
+```
+http://localhost:8080/q/dev-v1/org.kie.kogito.kogito-addons-quarkus-data-index-inmemory/dataindex
 ```
