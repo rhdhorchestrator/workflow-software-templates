@@ -208,7 +208,7 @@ spec:
       action: argocd:create-resources
       input:
         appName: ${{ parameters.workflowId }}
-        argoInstance: argocd
+        argoInstance: main
         namespace: ${{ parameters.argocdNamespace }}
         repoUrl: ${{ steps.publish.output.remoteUrl }}
         labelValue: ${{ parameters.workflowId }}
