@@ -196,7 +196,7 @@ spec:
       name: Publishing to the Source Code Repository
       action: publish:github
       input:
-        # repoVisibility: public
+        repoVisibility: public
         allowedHosts: ['github.com']
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
