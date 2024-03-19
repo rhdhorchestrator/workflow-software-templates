@@ -1,0 +1,19 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.workflowId }}-config
+  description: ${{ values.description }}
+  annotations:
+    argocd/app-name: ${{ values.workflowId }}
+    backstage.io/kubernetes-label-selector: 'app=${{ values.workflowId }},sonataflow.org/workflow-app=${{ values.workflowId }}'
+    backstage.io/kubernetes-namespace: ${{ values.namespace }}
+    backstage.io/kubernetes-id: ${{ values.workflowId }}
+    backstage.io/techdocs-ref: dir:.
+    github.com/project-slug: ${{ values.orgName }}/${{ values.repoName }}
+spec:
+  type: ${{ values.applicationType }}
+  system: ${{ values.system }}
+  lifecycle: ${{ values.lifecycle }}
+  owner: ${{ values.owner }}
+  dependsOn:
+    - component:${{ values.workflowId }}
