@@ -104,7 +104,6 @@ spec:
       required:
         - cicd
         # TODO: make the following optional in case None is selected
-        - clusterDomain
         - namespace
         - argocdNamespace
       properties:
@@ -119,10 +118,6 @@ spec:
           enumNames:
             - None
             - Tekton with ArgoCD
-        clusterDomain:
-          title: Cluster domain
-          type: string
-          description: Host domain of the cluster to deploy the Tekton trigger 
         namespace:
           title: Namespace
           type: string
