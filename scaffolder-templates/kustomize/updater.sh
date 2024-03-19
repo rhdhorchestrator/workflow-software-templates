@@ -10,8 +10,8 @@ for file in $files; do
     yaml_entries+="  - $file\n"
 done
 
-# NOte: replace <sed -i ...>  with <sed -i '' ...> on MacOS
-sed -i "s|__RESOURCES__|$yaml_entries|" kustomize/base/kustomization.yaml
+# Note: replace <sed -i ...>  with <sed -i '' ...> on MacOS
+sed "s|__RESOURCES__|$yaml_entries|" kustomize/base/kustomization-template.yaml > kustomize/base/kustomization.yaml
 sed -i "s|__IMAGE_TAG__|$IMAGE_TAG|" kustomize/base/kustomization.yaml
 
 cat kustomize/base/kustomization.yaml
