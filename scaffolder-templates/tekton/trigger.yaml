@@ -1,4 +1,4 @@
-# From https://github.com/parodos-dev/red-hat-developer-hub-software-templates/blob/tekton-demo/skeletons/tekton/tekton/eventlistener.yaml
+# From https://github.com/redhat-developer/red-hat-developer-hub-software-templates/blob/main/skeletons/tekton/tekton/triggertemplate.yaml
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
