@@ -179,76 +179,40 @@ spec:
         files:
           - workflow/src/main/resources/assessment-template.sw.yaml
           - workflow/src/main/resources/infrastructure-template.sw.yaml
-    - id: tektonTemplate
+    - id: automationTemplate
       if: ${{ parameters.cicd == 'tekton_argocd' }}
-      name: Generating the manifests of Tekton trigger
+      name: Generating the manifests of workflow automation
       action: fetch:template
       input:
-        url: ../tekton/
-        values:
-          namespace: ${{ parameters.namespace }}
-          repoName: ${{ parameters.repoName }}
-          workflowId: ${{ parameters.workflowId }}
-          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
-        targetPath: workflow/tekton
-    - id: argocdTemplate
-      if: ${{ parameters.cicd == 'tekton_argocd' }}
-      name: Generating the manifests of ArgoCD application
-      action: fetch:template
-      input:
-        url: ../argocd/
+        url: ../automation/
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
           workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
           gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
-        targetPath: workflow/argocd
-    - id: gitHubTektonTemplate
-      if: ${{ parameters.cicd == 'tekton_argocd' }}
-      name: Generating the GitHub action to deploy the Tekton trigger and the ArgoCD application
-      action: fetch:template
-      input:
-        # "Relative path is not allowed to refer to a directory outside its parent"
-        url: ../.github/
-        copyWithoutTemplating:
-          - workflows/deploy.yaml
-        values: {}
-        targetPath: workflow/.github
+        targetPath: workflow/automation
     - id: publish
       name: Publishing to the Source Code Repository
       action: publish:github
       input:
-        repoVisibility: public
+        # repoVisibility: public
         allowedHosts: ['github.com']
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
         sourcePath: workflow
-    - id: create-webhook
+    - id: createArgocdResources
       if: ${{ parameters.cicd == 'tekton_argocd' }}
-      name: Create webhook to trigger the pipeline
-      action: github:webhook
-      # https://github.com/backstage/backstage/blob/master/plugins/scaffolder-backend-module-github/src/actions/githubWebhook.ts
-      # Note: `Resource not accessible by personal access token`
-      # See https://docs.github.com/en/rest/repos/webhooks?apiVersion=2022-11-28#create-a-repository-webhook
+      name: Create the ArgoCD Resources
+      action: argocd:create-resources
       input:
-        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
-        webhookUrl: https://webhook-${{ parameters.workflowId }}-el-${{ parameters.namespace }}.apps.${{ parameters.clusterDomain }}/
-        contentType: json
-    - id: deployTrigger
-      if: ${{ parameters.cicd == 'tekton_argocd' }}
-      name: Deploy pipeline triggers
-      action: github:actions:dispatch
-      input:
-        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
-        workflowId: deploy.yaml
-        branchOrTagName: main
-        workflowInputs:
-          workflowId: ${{ parameters.workflowId }}
-          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
-          tektonNamespace: ${{ parameters.namespace }}
-          argocdNamespace: ${{ parameters.argocdNamespace }}
+        appName: ${{ parameters.workflowId }}
+        argoInstance: argocd
+        namespace: ${{ parameters.argocdNamespace }}
+        repoUrl: ${{ steps.publish.output.remoteUrl }}
+        labelValue: ${{ parameters.workflowId }}
+        path: automation
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register

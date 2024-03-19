@@ -1,8 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${{ values.workflowId }}
+  name: ${{ values.workflowId }}-deployer
   namespace: ${{ values.argocdNamespace }}
+  labels:
+    application-type: workflow
 spec:
   destination:
     namespace: ${{ values.namespace }}

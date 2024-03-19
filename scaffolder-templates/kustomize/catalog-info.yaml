@@ -4,7 +4,7 @@ metadata:
   name: ${{ values.workflowId }}-config
   description: ${{ values.description }}
   annotations:
-    argocd/app-name: ${{ values.workflowId }}
+    argocd/app-name: ${{ values.workflowId }}-deployer
     backstage.io/kubernetes-label-selector: 'app=${{ values.workflowId }},sonataflow.org/workflow-app=${{ values.workflowId }}'
     backstage.io/kubernetes-namespace: ${{ values.namespace }}
     backstage.io/kubernetes-id: ${{ values.workflowId }}

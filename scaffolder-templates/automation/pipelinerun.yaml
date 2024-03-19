@@ -1,0 +1,44 @@
+# From https://github.com/redhat-developer/red-hat-developer-hub-software-templates/blob/main/skeletons/tekton/tekton/pipelinerun.yaml
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: ${{ values.workflowId }}-pipeline-$(uid)
+  namespace: ${{ values.namespace }}
+  labels:
+    backstage.io/kubernetes-id: ${{ values.workflowId }}-ci
+spec:
+  params:
+    - name: gitUrl
+      value: ${{ values.gitUrl }}
+    - name: gitConfigUrl
+      value: ${{ values.gitConfigUrl }}
+    - name: workflowId
+      value: ${{ values.workflowId }}
+    - name: convertToFlat
+      value: 'true'
+  pipelineRef:
+    name: workflow-deployment
+  workspaces:
+    - name: workflow-source
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    - name: workflow-config
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    - name: docker-credentials
+      secret:
+        secretName: docker-credentials
+    - name: ssh-creds
+      secret:
+        secretName: git-ssh-credentials
