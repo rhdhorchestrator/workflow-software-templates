@@ -1,0 +1,18 @@
+apiVersion: sonataflow.org/v1alpha08
+kind: SonataFlow
+metadata:
+  name: m2k
+  annotations:
+    sonataflow.org/profile: prod
+  labels:
+    backstage.io/kubernetes-id: ${{ values.workflowId }}
+spec:
+  podTemplate:
+    container:
+      image: serverless-workflow-${{ values.workflowId }}
+      envFrom:
+      - configMapRef:
+          name: ${{ values.workflowId }}-config
+      - secretRef:
+          name: ${{ values.workflowId }}-secret
+      resources: {}

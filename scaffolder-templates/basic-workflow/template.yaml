@@ -259,7 +259,7 @@ spec:
       name: Generating the Config Code Component and Catalog Info Component
       action: fetch:template
       input:
-        url: https://github.com/parodos-dev/workflow-kustomize-template.git
+        url: ../kustomize/
         values:
           workflowId: ${{ parameters.workflowId }}
           namespace: ${{ parameters.namespace }}
