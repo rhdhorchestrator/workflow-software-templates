@@ -206,7 +206,7 @@ spec:
         argoInstance: main
         namespace: ${{ parameters.argocdNamespace }}
         repoUrl: ${{ steps.publish.output.remoteUrl }}
-        projectName: orchestrator
+        projectName: orchestrator1
         labelValue: ${{ parameters.workflowId }}
         path: automation
     - id: register
