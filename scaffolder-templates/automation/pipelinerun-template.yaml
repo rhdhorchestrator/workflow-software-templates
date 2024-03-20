@@ -12,7 +12,7 @@ spec:
     - name: gitUrl
       value: ${{ values.gitUrl }}
     - name: gitConfigUrl
-      value: ${{ values.gitConfigUrl }}
+      value: ${{ values.gitConfigSshUrl }}
     - name: workflowId
       value: ${{ values.workflowId }}
     - name: convertToFlat

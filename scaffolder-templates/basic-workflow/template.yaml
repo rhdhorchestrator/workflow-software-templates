@@ -185,8 +185,8 @@ spec:
           argocdNamespace: ${{ parameters.argocdNamespace }}
           workflowId: ${{ parameters.workflowId }}
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          # gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
-          gitConfigUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+          gitConfigHttpsUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+          gitConfigSshUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
         targetPath: workflow/automation
     - id: publish
       name: Publishing to the Source Code Repository
