@@ -185,7 +185,8 @@ spec:
           argocdNamespace: ${{ parameters.argocdNamespace }}
           workflowId: ${{ parameters.workflowId }}
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+          # gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+          gitConfigUrl: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
         targetPath: workflow/automation
     - id: publish
       name: Publishing to the Source Code Repository
@@ -197,18 +198,6 @@ spec:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
         sourcePath: workflow
-    - id: createArgocdResources
-      if: ${{ parameters.cicd == 'tekton_argocd' }}
-      name: Create the ArgoCD Resources
-      action: argocd:create-resources
-      input:
-        appName: ${{ parameters.workflowId }}
-        argoInstance: main
-        namespace: ${{ parameters.argocdNamespace }}
-        repoUrl: ${{ steps.publish.output.remoteUrl }}
-        projectName: orchestrator1
-        labelValue: ${{ parameters.workflowId }}
-        path: automation
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register
@@ -248,6 +237,18 @@ spec:
       input:
         repoContentsUrl: ${{ steps.publishConfig.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
+    - id: createArgocdResources
+      if: ${{ parameters.cicd == 'tekton_argocd' }}
+      name: Create the ArgoCD Resources
+      action: argocd:create-resources
+      input:
+        appName: ${{ parameters.workflowId }}
+        argoInstance: main
+        namespace: ${{ parameters.argocdNamespace }}
+        repoUrl: ${{ steps.publish.output.remoteUrl }}
+        projectName: orchestrator-bootstrap
+        labelValue: ${{ parameters.workflowId }}
+        path: automation
   output:
     links:
       - title: Open the Source Code Repository
