@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${{ values.workflowId }}-gitops
+  name: ${{ values.workflowId }}
   namespace: ${{ values.argocdNamespace }}
   labels:
-    app-type: workflow
+    app-type: bootstrap
     app: ${{ values.workflowId }}
 spec:
   destination:
@@ -12,8 +12,8 @@ spec:
     server: https://kubernetes.default.svc
   project: orchestrator-gitops
   source:
-    path: ./kustomize/base
-    repoURL: ${{ values.gitConfigUrl }}
+    path: ./automation
+    repoURL: ${{ values.gitUrl }}
     targetRevision: HEAD
   syncPolicy:
     automated:
