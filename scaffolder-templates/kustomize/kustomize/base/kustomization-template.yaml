@@ -6,7 +6,7 @@ __RESOURCES__
 namespace: sonataflow-infra
 
 configurations:
-- config/image-gitopsuration.yaml
+- config/image-configuration.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
