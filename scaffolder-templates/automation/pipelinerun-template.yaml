@@ -3,7 +3,8 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: ${{ values.workflowId }}-
+  # TBD
+  name: ${{ values.workflowId }}-run
   namespace: ${{ values.argocdNamespace }}
   labels:
     backstage.io/kubernetes-id: ${{ values.workflowId }}-ci
