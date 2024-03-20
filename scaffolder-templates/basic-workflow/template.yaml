@@ -239,6 +239,8 @@ spec:
         values:
           argocdNamespace: ${{ parameters.argocdNamespace }}
           workflowId: ${{ parameters.workflowId }}
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}-gitops
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
           gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           ## TODO: how to get it from env variables of plugin config or ... but not here!
@@ -273,11 +275,11 @@ spec:
     #     path: automation
   output:
     links:
+      - title: Instal bootstrap application
+        url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
       - title: Open the Source Code Repository
         url: ${{ steps.publish.output.remoteUrl }}
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-      - title: Instal bootstrap application
-        url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
 
