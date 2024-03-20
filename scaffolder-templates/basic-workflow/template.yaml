@@ -176,7 +176,7 @@ spec:
           - workflow/src/main/resources/infrastructure-template.sw.yaml
     - id: automationTemplate
       if: ${{ parameters.cicd == 'tekton_argocd' }}
-      name: Generating the manifests of workflow automation
+      name: Generating the manifests for workflow automation
       action: fetch:template
       input:
         url: ../automation/
@@ -236,6 +236,7 @@ spec:
       name: Publishing to the Config Code Repository
       action: publish:github
       input:
+        repoVisibility: public
         allowedHosts: ['github.com']
         description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-config
