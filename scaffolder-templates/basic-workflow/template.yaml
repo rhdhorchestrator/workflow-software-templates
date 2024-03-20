@@ -119,7 +119,7 @@ spec:
             - None
             - Tekton with ArgoCD
         namespace:
-          title: Namespace
+          title: Workflow Namespace
           type: string
           default: sonataflow-infra
           description: Deployment namespace for workflow applications
@@ -137,6 +137,7 @@ spec:
         url: ./skeleton/
         values:
           namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}
           owner: ${{ parameters.owner }}
