@@ -4,7 +4,7 @@ apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   generateName: ${{ values.workflowId }}-
-  namespace: ${{ values.namespace }}
+  namespace: ${{ values.argocdNamespace }}
   labels:
     backstage.io/kubernetes-id: ${{ values.workflowId }}-ci
 spec:
@@ -12,7 +12,7 @@ spec:
     - name: gitUrl
       value: ${{ values.gitUrl }}
     - name: gitConfigUrl
-      value: ${{ values.gitConfigSshUrl }}
+      value: ${{ values.gitConfigUrl }}
     - name: workflowId
       value: ${{ values.workflowId }}
     - name: convertToFlat

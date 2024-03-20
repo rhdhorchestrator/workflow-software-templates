@@ -12,7 +12,7 @@ spec:
   project: orchestrator
   source:
     path: ./kustomize/base
-    repoURL: ${{ values.gitConfigHttpsUrl }}
+    repoURL: ${{ values.gitConfigUrl }}
     targetRevision: HEAD
     kustomize:
       commonAnnotations:

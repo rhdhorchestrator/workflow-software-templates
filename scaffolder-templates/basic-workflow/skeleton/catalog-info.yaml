@@ -4,7 +4,7 @@ metadata:
   name: ${{ values.workflowId }}
   description: ${{ values.description }}
   annotations:
-    backstage.io/kubernetes-namespace: ${{ values.namespace }}
+    backstage.io/kubernetes-namespace: ${{ values.argocdNamespace }}
     backstage.io/kubernetes-id: ${{ values.workflowId }}-ci
     janus-idp.io/tekton: ${{ values.workflowId }}
     backstage.io/techdocs-ref: dir:.

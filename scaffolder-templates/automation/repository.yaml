@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repository
+  name: ${{ values.workflowId }}-repo
+  namespace: ${{ values.argocdNamespace }}
+stringData:
+  name: ${{ values.workflowId }}
+  project: orchestrator
+  type: git
+  url: ${{ values.gitUrl }}
+data:
+  sshPrivateKey: ${{ values.sshPrivateKey}}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repository
+  name: ${{ values.workflowId }}-config-repo
+  namespace: ${{ values.argocdNamespace }}
+stringData:
+  name: ${{ values.workflowId }}-config
+  project: orchestrator
+  type: git
+  url: ${{ values.gitConfigUrl }}
+data:
+  sshPrivateKey: ${{ values.sshPrivateKey}}
