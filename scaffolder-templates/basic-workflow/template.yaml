@@ -111,7 +111,7 @@ spec:
           title: Select a CI/CD method
           type: string
           description: This action will create a CI pipeline for your application based on chosen method
-          default: tekton
+          default: tekton_argocd
           enum:
             - none
             - tekton_argocd
