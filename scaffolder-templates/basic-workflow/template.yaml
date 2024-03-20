@@ -186,7 +186,7 @@ spec:
           - workflow/src/main/resources/assessment-template.sw.yaml
           - workflow/src/main/resources/infrastructure-template.sw.yaml
     - id: automationTemplate
-      if: ${{ parameters.cicd == 'tekton_argocd' }}
+      if: ${{ parameters.CI == 'tekton_argocd' }}
       name: Generating the manifests for workflow automation
       action: fetch:template
       input:
@@ -249,7 +249,7 @@ spec:
         repoContentsUrl: ${{ steps.publishConfig.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
     - id: createArgocdResources
-      if: ${{ parameters.cicd == 'tekton_argocd' }}
+      if: ${{ parameters.CI == 'tekton_argocd' }}
       name: Create the ArgoCD Resources
       action: argocd:create-resources
       input:
