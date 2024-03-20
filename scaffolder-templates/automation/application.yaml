@@ -9,7 +9,7 @@ spec:
   destination:
     namespace: ${{ values.namespace }}
     server: https://kubernetes.default.svc
-  project: orchestrator
+  project: orchestrator-gitops
   source:
     path: ./kustomize/base
     repoURL: ${{ values.gitConfigUrl }}
