@@ -28,7 +28,7 @@ spec:
           resources:
             requests:
               storage: 1Gi
-    - name: workflow-config
+    - name: workflow-gitops
       volumeClaimTemplate:
         spec:
           accessModes:

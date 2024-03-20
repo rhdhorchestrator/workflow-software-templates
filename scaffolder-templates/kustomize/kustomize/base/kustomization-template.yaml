@@ -6,7 +6,7 @@ __RESOURCES__
 namespace: sonataflow-infra
 
 configurations:
-- config/image-configuration.yaml
+- config/image-gitopsuration.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
@@ -18,7 +18,7 @@ secretGenerator:
 configMapGenerator:
   - envs:
       - config.properties
-    name: ${{ values.workflowId }}-config
+    name: ${{ values.workflowId }}-gitops
 
 # Replace dev profile in SonataFlow instance(s), add image and envFrom
 patches:

@@ -18,10 +18,10 @@ kind: Secret
 metadata:
   labels:
     argocd.argoproj.io/secret-type: repository
-  name: ${{ values.workflowId }}-config-repo
+  name: ${{ values.workflowId }}-gitops-repo
   namespace: ${{ values.argocdNamespace }}
 stringData:
-  name: ${{ values.workflowId }}-config
+  name: ${{ values.workflowId }}-gitops
   project: orchestrator
   type: git
   url: ${{ values.gitConfigUrl }}

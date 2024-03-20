@@ -102,12 +102,9 @@ spec:
           description: Maven version, also used to tag the generated artifacts
     - title: Provide information about the Build environment
       required:
-        - cicd
-        # TODO: make the following optional in case None is selected
-        - namespace
-        - argocdNamespace
+        - CI
       properties:
-        cicd:
+        CI:
           title: Select a CI/CD method
           type: string
           description: This action will create a CI pipeline for your application based on chosen method
@@ -118,16 +115,29 @@ spec:
           enumNames:
             - None
             - Tekton with ArgoCD
-        namespace:
-          title: Workflow Namespace
-          type: string
-          default: sonataflow-infra
-          description: Deployment namespace for workflow applications
-        argocdNamespace:
-          title: GitOps Namespace
-          type: string
-          default: orchestrator-gitops
-          description: Deployment namespace for ArgoCD and Tekton resources
+      # See: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/blob/3019e781b988e0548eb987eed3e522854ed8c52f/templates/github/quarkus-backend/template.yaml#L101
+      dependencies:
+        CI:
+          oneOf:
+            - properties:
+                CI:
+                  const: none
+            - properties:
+                CI:
+                  const: tekton_argocd
+                namespace:
+                  title: Workflow Namespace
+                  type: string
+                  default: sonataflow-infra
+                  description: Deployment namespace for workflow applications
+                argocdNamespace:
+                  title: GitOps Namespace
+                  type: string
+                  default: orchestrator-gitops
+                  description: Deployment namespace for ArgoCD and Tekton resources
+              required:
+                - namespace
+                - argocdNamespace
   steps:
     - id: sourceCodeTemplate
       name: Generating the Source Code  and Catalog Info Component
@@ -150,7 +160,7 @@ spec:
           workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           applicationType: workflow-project
           lifecycle: development
         targetPath: workflow
@@ -186,13 +196,13 @@ spec:
           argocdNamespace: ${{ parameters.argocdNamespace }}
           workflowId: ${{ parameters.workflowId }}
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-config.git
+          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           ## TODO: how to get it from env variables of plugin config or ... but not here!
           sshPrivateKey: 'LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnphQzFyWlhrdGRqRUFBQUFBQkc1dmJtVUFBQUFFYm05dVpRQUFBQUFBQUFBQkFBQUNGd0FBQUFkemMyZ3RjbgpOaEFBQUFBd0VBQVFBQUFnRUF4aU9wSVFyUkpsS3lwS1RJc0o5amVRMGZlVkV3SThRQ1lUNEZCQ3d2eGRzMlVOWTRFQy9iCkYzYkp1aVE0a0pvejB3czNSVFJpUGtEOUlsb3VwVWtQckw5WnJSRTRFQ3UzblZxR2ovUm4rQWlRTXNzcFNwTmZSMk1EWUsKeHdWZjk4SXBHQmhEVnduS0ZGZnNwRTF6WklPOXB4bFUyVitJak9aNWppNzVpcGJESk5BZEIxb0krUFJnM21MaXcrT2Z0TgpBTDIxTk1Id2FUakdTNWw5ZGY3TW9VTFRRRzYrNlZ1UXBRSVU2K1M2YWJGUkRzZnNLako0eDZWTklQZzQrWEthbmo0SWNiCjBVRmF5cjgrUElmYmx4MG1WL1ZCWld6UWxDcHNrcHZXSlRXK3VFTUdteVJxYVlOODg0QWcxd2wzSDBYbWpwb0FyZXMvcmUKRVFoeWVHUGVVQnNGQ1E0RzFzQjg1cTFYTE9TYVZxQWpGRkhKM2JLWWFFTWJ0Wk9sRytwZTRmRVcwSjdVcjlRemlKTG5pbAorL0xjQ3h4bjlIVFNTbjNRU3J4anZHMStvbk5sUlVmbDFzdDdWZms1NUFCODEvNTRoY2V3endkSitiV0c5ZVJuR3g4OFdUCnJBZ0VxWDU5dGxmb1dONlplL3ZaQzRWQ0szK0R4TGdkY0lPM0NDY2QwTmdZUTRlL21RN1RNQm5hWXl2YjdUT2plbnp5MUMKdHBWd2oyM0Jya1dkaTBGR2hZQWs1RjF4NHcvQ2NUaEgvQis4ck8wTzNDR3hnbmFjbWxFSmVMVEtUYk1lVTFlU2k1NVhtbAozdUZURnRoRW54dTlOMkVzNm4xbEU2Q2lBZmVRTkJheHpWMVlVYlV2eG5PNFJWcExDQ0IzR3dZWVltZUUxNmQyTHlNWE9yCmNBQUFkSUpZZXd1eVdIc0xzQUFBQUhjM05vTFhKellRQUFBZ0VBeGlPcElRclJKbEt5cEtUSXNKOWplUTBmZVZFd0k4UUMKWVQ0RkJDd3Z4ZHMyVU5ZNEVDL2JGM2JKdWlRNGtKb3owd3MzUlRSaVBrRDlJbG91cFVrUHJMOVpyUkU0RUN1M25WcUdqLwpSbitBaVFNc3NwU3BOZlIyTURZS3h3VmY5OElwR0JoRFZ3bktGRmZzcEUxelpJTzlweGxVMlYrSWpPWjVqaTc1aXBiREpOCkFkQjFvSStQUmczbUxpdytPZnROQUwyMU5NSHdhVGpHUzVsOWRmN01vVUxUUUc2KzZWdVFwUUlVNitTNmFiRlJEc2ZzS2oKSjR4NlZOSVBnNCtYS2FuajRJY2IwVUZheXI4K1BJZmJseDBtVi9WQlpXelFsQ3Bza3B2V0pUVyt1RU1HbXlScWFZTjg4NApBZzF3bDNIMFhtanBvQXJlcy9yZUVRaHllR1BlVUJzRkNRNEcxc0I4NXExWExPU2FWcUFqRkZISjNiS1lhRU1idFpPbEcrCnBlNGZFVzBKN1VyOVF6aUpMbmlsKy9MY0N4eG45SFRTU24zUVNyeGp2RzErb25ObFJVZmwxc3Q3VmZrNTVBQjgxLzU0aGMKZXd6d2RKK2JXRzllUm5HeDg4V1RyQWdFcVg1OXRsZm9XTjZaZS92WkM0VkNLMytEeExnZGNJTzNDQ2NkME5nWVE0ZS9tUQo3VE1CbmFZeXZiN1RPamVuenkxQ3RwVndqMjNCcmtXZGkwRkdoWUFrNUYxeDR3L0NjVGhIL0IrOHJPME8zQ0d4Z25hY21sCkVKZUxUS1RiTWVVMWVTaTU1WG1sM3VGVEZ0aEVueHU5TjJFczZuMWxFNkNpQWZlUU5CYXh6VjFZVWJVdnhuTzRSVnBMQ0MKQjNHd1lZWW1lRTE2ZDJMeU1YT3JjQUFBQURBUUFCQUFBQ0FRRENDaWhXc0pZMHRxWTJjUjROUW5xVEVOUHk1aHlEMmpBTwpkVU5LVzgrSkwyM1k2b0ZLOE9MWjdyNE5xZTB2UjZSYkdNL08yVWNnK2xvc0t5OGxOUkRCdHo4bUt3ZkJabDdTSGRaTDRpCmx6a1VkT1J3R3dBL1U2SHZBdTI1REQxNGtFL1lSZUtrdVhTS1NiVDVEdFJqNmxSdjhYSFQweWdSL0orc0s3cThDM3NlY1MKVU1qeExjWTg3OTJzK0MwVWNWTnUxMW8vU1hLY1NUcUF6TmMrR0FMa0ptSmw1azdXajVKdTFrUVE1QlhlN2dTWXVoZEJGOQo2S2ZncXpzQU56M3RVbkJVOFZ1L3FRWTJLZVhVTjZSSU1BYmQrdFJKZExBcmVnU0w2MHRqYzJmTVllOTFQY3RzZTVXQmpjCmdiYnl5V2xzajhmRHNRRjZOc01FNFVYaE9zUjU2anozcGtGUWl5V2JjSFVISzNPMjhBWUxFcFFsc3hwTEFjYkw2ME5KdCsKN0F3aVFrMkcyU0dzaG9VSC8rNCtBTkYwNlQvbFdDa3djSE1NNTdkT0FvSFhtK05aQnUxbG9RQXgwMFVXUXFmT29FM0FTVwo3UTU4QkJHSUtuTlR1Y21YY1VYcmZjN01rR2UybUtJQXBScnhQNnZBUWF6WU9uNHV2UGFpazl1MlIzWFpxeXN4QzhLLzRvCmp6c09NblBNSm4yWGo2SHJ4bHBwcURQSC9ZZGlGK2lWc1FkU1MvZDFvZHdzbTlmUDRnajRaS1pyY1pYWThKNjRBOTYybkkKWDZLUTdjUk90Y0J4WCtmcElTNjllY25xejFlejY4bWR0cE9KQXVVZGw5WmJRclE0YmJYMk9uSXRBZWtneStiYm5nZkgrcwpNK1RpQS9UcmpOU2hxQnFqQUhHUUFBQVFCWHJwbFc1OVVEbmx1WDVwRUlBYTVvRm1weU9ZWmxNa2J2N282TWhEY1dpK3huCnJCLzFXazRUQUh5cXQ1cXNiUkhOY0NudFZMeHBoS1lzdnlBWjVBM1BoN2RBVnFZZVRjbysvVHU3R3VISklhanoyMm1RRXkKM1dtZlhUNXFBUXhQKys1U04vR1VOS1A1engxbFFOYWdidXNoSkRDcGpsQlhMTldPU0RuQnU0MFVZOWhDeGRSS3RMdGtFbAo5UmpaRDNHcUczVlhyRS9IMGFFZU1mdVNqYTZvcHlLM3Z1eTU5Wi9LWS9CUXZmK2k1WHZRZ01EMXVvaEs5NTIzZ1gzczJXCmZjWENqODRjUHBMVllRSVhoajlIbXg4R1Z5R0ZCb0pOSkdiRTk4WW9RblJ3OG1TRFo4M2krZHZpSHJMT0FoVVRFYWVnQnYKbHE3R1NpcmlUSzF1RXZYZUFBQUJBUUR5VmV4UFlJeEU1dkQvRHhVL0dHR2dyNExuYjN1TnFHdEVGTU5EM2toQ1VueWM3cApTOEZtYmxtMEtJUUN6SWY2U2Z5WkJ1a0hsU2tBUkZZVldrVFhObGRFWllGRVhEQmNjNnhZU0hGVGdNNzltRzNFdGF0dGh4CnJqSzhVZWl1VkVMQVlVWnBjYnVuZjdaaG5VVUY4blpCcFk4cW16VnQyVzRBWDNtN1BYKzZPSHUwNTJPek4zQ0syZlBQVi8KbGc2SHNMSzZhTkUrS3B1ZUZ5QnVmMU95ckRsYnpFcHM0NlptOS9NaDVZbEpTY01xaHYyZzZNMmg4aFpVcTM2V0ZJWmFEaQoxZHk2WldOQkJsS3FYanQxWDhyZEZka1lXdkFrM1BpMnVjSW1aSzJqQmRsZDBVS1YyZk5td28xNk5yUmkxZFBJbk45RU0rCjNzdFpTZEhPQTJ1UUdkQUFBQkFRRFJUOFUzSXhBWkdJRVA5YUdOK0g0QzYvU0dVQ2U2ZnBpMUlnWHVrUmRBbkc4R2xzUHcKUzVsZkFMdlpTODZWY2cyTWNidXA3MURubnpIc2R0NTl6L091MVJjUjBMZ0dETkVaVlA4ZEFUbkNsRGhITmJTR3BJVDVqVwpLWmFDZHFtSVFsMHJsMm9UY1ZkMldDYnozOGw2b1ZoZGxma3VrSldPWnZTUlNVc3pPR1dPckxUTTk3Q3JITFRPNE9sRnlyCmxNTmxsWHhTYWdNMVlXcXNKQm8xSXlUeW9Dd0NqaHF3WkVYRjcza05lYXQwc2FvdmluYXRrVmpyT2V1K2Fmb0xUSjFTUnEKSlVLdElKSHk1V1krZGZFOFErZUdtRVVDalZNdXVRVzdtMCtEeUdlelZzaHdrVm5YVnBwQ0huWE9GRW1pREVzeUsvSkZnMgpPQnIyVDNMNGVKZGpBQUFBRG1kcGRFQm5hWFJvZFdJdVkyOXRBUUlEQkE9PQotLS0tLUVORCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0='
         targetPath: workflow/automation
     - id: publish
       name: Publishing to the Source Code Repository
-      action: publish:github
+      action: publish:github  
       input:
         repoVisibility: public
         allowedHosts: ['github.com']
@@ -215,7 +225,7 @@ spec:
           workflowId: ${{ parameters.workflowId }}
           namespace: ${{ parameters.namespace }}
           orgName: ${{ parameters.orgName }}
-          repoName: ${{ parameters.repoName }}-config
+          repoName: ${{ parameters.repoName }}-gitops
           owner: ${{ parameters.owner }}
           system: ${{ parameters.system }}
           applicationType: workflow-project
@@ -229,7 +239,7 @@ spec:
       input:
         allowedHosts: ['github.com']
         description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
-        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-config
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: main
         sourcePath: config
     - id: registerConfig

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ${{ values.workflowId }}-deployer
+  name: ${{ values.workflowId }}-gitops
   namespace: ${{ values.argocdNamespace }}
   labels:
     application-type: workflow
