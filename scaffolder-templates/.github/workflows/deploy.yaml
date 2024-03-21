@@ -7,7 +7,7 @@ on:
         description: 'Workflow Id'
         required: true
         type: string
-      gitConfigUrl:
+      gitOpsUrl:
         description: 'URL of git config repo'
         required: true
         type: string
@@ -51,7 +51,7 @@ jobs:
             --from-literal name=${{ inputs.workflowId }} \
             --from-literal project=orchestrator \
             --from-literal type=git \
-            --from-literal url=${{ inputs.gitConfigUrl }} \
+            --from-literal url=${{ inputs.gitOpsUrl }} \
             --from-file=sshPrivateKey
           oc label secret -n ${{ inputs.argocdNamespace }} "${{ inputs.workflowId }}-repo" argocd.argoproj.io/secret-type=repository
       
