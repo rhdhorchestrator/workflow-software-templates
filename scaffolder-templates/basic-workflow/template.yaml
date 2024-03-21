@@ -167,7 +167,7 @@ spec:
           workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           applicationType: workflow-project
           lifecycle: development
         targetPath: workflow
@@ -192,19 +192,6 @@ spec:
         files:
           - workflow/src/main/resources/assessment-template.sw.yaml
           - workflow/src/main/resources/infrastructure-template.sw.yaml
-    - id: automationTemplate
-      if: ${{ parameters.CI == 'tekton_argocd' }}
-      name: Generating the manifests for workflow automation
-      action: fetch:template
-      input:
-        url: ../automation/
-        values:
-          namespace: ${{ parameters.namespace }}
-          argocdNamespace: ${{ parameters.argocdNamespace }}
-          workflowId: ${{ parameters.workflowId }}
-          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
-        targetPath: workflow/automation
     - id: publish
       name: Publishing to the Source Code Repository
       action: publish:github  
@@ -221,13 +208,15 @@ spec:
         repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
     - id: configCodeTemplate
-      name: Generating the Config Code Component and Catalog Info Component
+      name: Generating the GitOps Component and Catalog Info Component
       action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../kustomize/
+        url: ../gitops
         values:
           workflowId: ${{ parameters.workflowId }}
           namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}-gitops
           owner: ${{ parameters.owner }}
@@ -236,36 +225,24 @@ spec:
           description: ${{ parameters.description }}
           sourceControl: github.com
           lifecycle: development
-        targetPath: config
-    - id: secretsTemplate
-      if: ${{ parameters.CI == 'tekton_argocd' }}
-      name: Generating the manifests for automatin secrets
-      action: fetch:template
-      input:
-        url: ../bootstrap/
-        values:
-          argocdNamespace: ${{ parameters.argocdNamespace }}
-          workflowId: ${{ parameters.workflowId }}
-          orgName: ${{ parameters.orgName }}
-          repoName: ${{ parameters.repoName }}
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           sshPrivateKey: ${{ parameters.sshPrivateKey }}
-        targetPath: config/bootstrap
-    - id: publishConfig
-      name: Publishing to the Config Code Repository
+        targetPath: gitops
+    - id: publishGitOps
+      name: Publishing to the GitOps Code Repository
       action: publish:github
       input:
         allowedHosts: ['github.com']
         description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: main
-        sourcePath: config
-    - id: registerConfig
-      name: Registering the Config Catalog Info Component
+        sourcePath: gitops
+    - id: registerGitOps
+      name: Registering the GitOps Catalog Info Component
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publishConfig.output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps.publishGitOps.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
     # - id: createArgocdResources
     #   if: ${{ parameters.CI == 'tekton_argocd' }}
@@ -278,7 +255,7 @@ spec:
     #     repoUrl: ${{ steps.publish.output.remoteUrl }}
     #     projectName: orchestrator
     #     labelValue: ${{ parameters.workflowId }}
-    #     path: automation
+    #     path: build
   output:
     links:
       - title: Instal bootstrap application

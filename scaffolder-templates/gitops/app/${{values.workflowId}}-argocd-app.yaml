@@ -13,7 +13,7 @@ spec:
   project: orchestrator-gitops
   source:
     path: ./kustomize/base
-    repoURL: ${{ values.gitConfigUrl }}
+    repoURL: ${{ values.gitOpsUrl }}
     targetRevision: HEAD
   syncPolicy:
     automated:

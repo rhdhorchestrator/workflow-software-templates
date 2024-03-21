@@ -12,8 +12,8 @@ spec:
     server: https://kubernetes.default.svc
   project: orchestrator-gitops
   source:
-    path: ./automation
-    repoURL: ${{ values.gitUrl }}
+    path: ./build
+    repoURL: ${{ values.gitOpsUrl }}
     targetRevision: HEAD
   syncPolicy:
     automated:

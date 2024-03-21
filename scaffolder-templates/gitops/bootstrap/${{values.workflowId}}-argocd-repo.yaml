@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    argocd.argoproj.io/secret-type: repository
+  name: ${{ values.workflowId }}-gitops-repo
+  namespace: ${{ values.argocdNamespace }}
+stringData:
+  name: ${{ values.workflowId }}-gitops
+  project: orchestrator-gitops
+  type: git
+  url: ${{ values.gitOpsUrl }}
+data:
+  sshPrivateKey: ${{ values.sshPrivateKey}}
