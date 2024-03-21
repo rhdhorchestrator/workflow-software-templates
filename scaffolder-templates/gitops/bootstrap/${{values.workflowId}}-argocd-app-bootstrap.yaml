@@ -11,13 +11,10 @@ spec:
     namespace: ${{ values.namespace }}
     server: https://kubernetes.default.svc
   project: orchestrator-gitops
-  sources:
-    - path: argocd/build
-      repoURL: ${{ values.gitOpsUrl }}
-      targetRevision: HEAD
-    - path: argocd/app
-      repoURL: ${{ values.gitOpsUrl }}
-      targetRevision: HEAD
+  source:
+    path: argocd
+    repoURL: ${{ values.gitUrl }}
+    targetRevision: HEAD
   syncPolicy:
     automated:
       prune: true

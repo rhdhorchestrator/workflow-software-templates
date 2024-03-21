@@ -146,8 +146,8 @@ spec:
                 - argocdNamespace
                 - sshPrivateKey
   steps:
-    - id: sourceCodeTemplate
-      name: Generating the Source Code  and Catalog Info Component
+    - id: workflowCodeTemplate
+      name: Generating the Workflow Source Code and Catalog Info Component
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
@@ -166,8 +166,6 @@ spec:
           workflowId: ${{ parameters.workflowId }}
           workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
-          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           applicationType: workflow-project
           lifecycle: development
         targetPath: workflow
@@ -192,8 +190,22 @@ spec:
         files:
           - workflow/src/main/resources/assessment-template.sw.yaml
           - workflow/src/main/resources/infrastructure-template.sw.yaml
-    - id: publish
-      name: Publishing to the Source Code Repository
+    - id: buildCodeTemplate
+      name: Generating the Build Code for the Workflow
+      action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      input:
+        url: ./build/
+        values:
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
+          orgName: ${{ parameters.orgName }}
+          workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+        targetPath: workflow
+    - id: publishWorkflow
+      name: Publishing to the Workflow Repository
       action: publish:github  
       input:
         allowedHosts: ['github.com']
@@ -205,9 +217,9 @@ spec:
       name: Registering the Catalog Info Component
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps.publishWorkflow.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
-    - id: configCodeTemplate
+    - id: gitopsCodeTemplate
       name: Generating the GitOps Component and Catalog Info Component
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
@@ -252,16 +264,17 @@ spec:
     #     appName: ${{ parameters.workflowId }}
     #     argoInstance: main
     #     namespace: ${{ parameters.argocdNamespace }}
-    #     repoUrl: ${{ steps.publish.output.remoteUrl }}
+    #     repoUrl: ${{ steps.publishWorkflow.output.remoteUrl }}
     #     projectName: orchestrator
     #     labelValue: ${{ parameters.workflowId }}
     #     path: argocd/build
   output:
     links:
-      - title: Instal bootstrap application
-        url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/argocd/bootstrap
+      - if: ${{ parameters.CI == 'tekton_argocd' }}
+        title: Bootstrap the GitOps Resources
+        url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
       - title: Open the Source Code Repository
-        url: ${{ steps.publish.output.remoteUrl }}
+        url: ${{ steps.publishWorkflow.output.remoteUrl }}
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
