@@ -259,7 +259,7 @@ spec:
   output:
     links:
       - title: Instal bootstrap application
-        url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
+        url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/argocd/bootstrap
       - title: Open the Source Code Repository
         url: ${{ steps.publish.output.remoteUrl }}
       - title: Open the Catalog Info Component

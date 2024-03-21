@@ -1,7 +1,7 @@
 apiVersion: sonataflow.org/v1alpha08
 kind: SonataFlow
 metadata:
-  name: m2k
+  name: ${{ values.workflowId }}
   annotations:
     sonataflow.org/profile: prod
   labels:
