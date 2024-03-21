@@ -151,7 +151,7 @@ spec:
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
-        url: ./skeleton/
+        url: ./skeleton
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
@@ -195,7 +195,7 @@ spec:
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ./build/
+        url: ../build
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
