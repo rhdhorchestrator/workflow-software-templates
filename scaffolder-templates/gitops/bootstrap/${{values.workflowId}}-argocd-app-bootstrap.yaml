@@ -17,5 +17,6 @@ spec:
     targetRevision: HEAD
   syncPolicy:
     automated:
-      prune: true
+      # Keep history of pipeline runs
+      prune: false
       selfHeal: true
