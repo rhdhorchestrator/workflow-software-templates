@@ -3,7 +3,6 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  # TBD
   name: ${{ values.workflowId }}-__COMMIT_ID__
   namespace: ${{ values.argocdNamespace }}
   labels:
