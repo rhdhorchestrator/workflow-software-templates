@@ -196,6 +196,8 @@ spec:
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
         url: ../build
+        copyWithoutTemplating:
+          - .github/workflows/update_pipelinerun.yaml
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
