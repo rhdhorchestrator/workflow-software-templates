@@ -130,12 +130,12 @@ spec:
                   type: string
                   default: sonataflow-infra
                   description: Deployment namespace for workflow applications
-                argoCD_Namespace:
+                argocdNamespace:
                   title: GitOps Namespace
                   type: string
                   default: orchestrator-gitops
                   description: Deployment namespace for ArgoCD and Tekton resources
-                SSH_PrivateKey:
+                sshPrivateKey:
                   title: SSH private key
                   type: string
                   description: Private SSH key associated with the GitHub account - Use Base64 encoding
@@ -143,8 +143,8 @@ spec:
                   ui:options: 'rows: 10'
               required:
                 - namespace
-                - argoCD_Namespace
-                - SSH_PrivateKey
+                - argocdNamespace
+                - sshPrivateKey
   steps:
     - id: sourceCodeTemplate
       name: Generating the Source Code  and Catalog Info Component
@@ -154,7 +154,7 @@ spec:
         url: ./skeleton/
         values:
           namespace: ${{ parameters.namespace }}
-          argocdNamespace: ${{ parameters.argoCD_Namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}
           owner: ${{ parameters.owner }}
@@ -200,7 +200,7 @@ spec:
         url: ../automation/
         values:
           namespace: ${{ parameters.namespace }}
-          argocdNamespace: ${{ parameters.argoCD_Namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
           workflowId: ${{ parameters.workflowId }}
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
           gitConfigUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
@@ -244,7 +244,7 @@ spec:
       input:
         url: ../bootstrap/
         values:
-          argocdNamespace: ${{ parameters.argoCD_Namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
           workflowId: ${{ parameters.workflowId }}
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}
@@ -274,7 +274,7 @@ spec:
     #   input:
     #     appName: ${{ parameters.workflowId }}
     #     argoInstance: main
-    #     namespace: ${{ parameters.argoCD_Namespace }}
+    #     namespace: ${{ parameters.argocdNamespace }}
     #     repoUrl: ${{ steps.publish.output.remoteUrl }}
     #     projectName: orchestrator
     #     labelValue: ${{ parameters.workflowId }}
