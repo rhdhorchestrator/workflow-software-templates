@@ -174,12 +174,6 @@ spec:
       name: Rename files
       input:
         files:
-          - from: workflow/src/main/resources/schemas/input-schema.json
-            to: workflow/src/main/resources/schemas/${{ parameters.artifactId }}-input-schema.json
-            overwrite: true
-          - from: workflow/src/main/resources/schemas/template__sub_schema__sample_section.json
-            to: workflow/src/main/resources/schemas/${{ parameters.artifactId }}__sub_schema__sample_section.json
-            overwrite: true
           - from: workflow/src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
             to: workflow/src/main/resources/${{ parameters.artifactId }}.sw.yaml
             overwrite: false
@@ -258,18 +252,6 @@ spec:
       input:
         repoContentsUrl: ${{ steps.publishGitOps.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
-    # - id: createArgocdResources
-    #   if: ${{ parameters.CI == 'tekton_argocd' }}
-    #   name: Create the ArgoCD Resources
-    #   action: argocd:create-resources
-    #   input:
-    #     appName: ${{ parameters.workflowId }}
-    #     argoInstance: main
-    #     namespace: ${{ parameters.argocdNamespace }}
-    #     repoUrl: ${{ steps.publishWorkflow.output.remoteUrl }}
-    #     projectName: orchestrator
-    #     labelValue: ${{ parameters.workflowId }}
-    #     path: argocd/build
   output:
     links:
       - if: ${{ parameters.CI == 'tekton_argocd' }}
