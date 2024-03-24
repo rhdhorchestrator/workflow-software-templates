@@ -1,10 +1,10 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: ${{ values.workflowId }}-config
+  name: ${{ values.workflowId }}-gitops
   description: ${{ values.description }}
   annotations:
-    argocd/app-name: ${{ values.workflowId }}
+    argocd/app-name: ${{ values.workflowId }}-gitops
     backstage.io/kubernetes-label-selector: 'app=${{ values.workflowId }},sonataflow.org/workflow-app=${{ values.workflowId }}'
     backstage.io/kubernetes-namespace: ${{ values.namespace }}
     backstage.io/kubernetes-id: ${{ values.workflowId }}

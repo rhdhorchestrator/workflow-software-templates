@@ -3,19 +3,20 @@ kind: Application
 metadata:
   name: ${{ values.workflowId }}
   namespace: ${{ values.argocdNamespace }}
+  labels:
+    app-type: bootstrap
+    app: ${{ values.workflowId }}
 spec:
   destination:
     namespace: ${{ values.namespace }}
     server: https://kubernetes.default.svc
-  project: orchestrator
+  project: orchestrator-gitops
   source:
-    path: ./kustomize/base
-    repoURL: ${{ values.gitConfigUrl }}
+    path: argocd
+    repoURL: ${{ values.gitUrl }}
     targetRevision: HEAD
-    kustomize:
-      commonAnnotations:
-        argocd/app-name: ${{ values.workflowId }}
   syncPolicy:
     automated:
-      prune: true
+      # Keep history of pipeline runs
+      prune: false
       selfHeal: true

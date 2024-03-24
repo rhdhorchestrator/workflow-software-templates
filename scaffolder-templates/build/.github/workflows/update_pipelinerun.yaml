@@ -1,0 +1,24 @@
+name: Update PipelineRun name with Commit ID
+on:
+  push:
+    branches:
+      - main
+jobs:
+  updater:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Run script
+      run: |
+        COMMIT_ID=$(git rev-parse --short HEAD)
+
+        git config --global user.email "${{ github.event.head_commit.author.email }}"
+        git config --global user.name ${{ github.event.head_commit.author.name }}
+
+        cd argocd
+        sed "s/__COMMIT_ID__/$COMMIT_ID/g" pipelinerun.template > pipelinerun.yaml
+        git add pipelinerun.yaml
+        git commit -m "Updated PipelineRun with commit id $COMMIT_ID"
+        git push origin
+

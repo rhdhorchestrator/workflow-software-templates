@@ -1,7 +1,7 @@
 apiVersion: sonataflow.org/v1alpha08
 kind: SonataFlow
 metadata:
-  name: m2k
+  name: ${{ values.workflowId }}
   annotations:
     sonataflow.org/profile: prod
   labels:
@@ -12,7 +12,7 @@ spec:
       image: serverless-workflow-${{ values.workflowId }}
       envFrom:
       - configMapRef:
-          name: ${{ values.workflowId }}-config
+          name: ${{ values.workflowId }}-gitops
       - secretRef:
           name: ${{ values.workflowId }}-secret
       resources: {}

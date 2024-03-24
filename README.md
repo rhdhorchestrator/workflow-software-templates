@@ -19,8 +19,8 @@ The value of the `OPENSHIFT_TOKEN` secret must provide the permissions to create
 bind it to the `cluster-admin` role, but we recommend to configure a new role with only the required privileges instead.
 
 You can follow these steps to generate the token:
-```
 [update current `oc project` to an existing namespace like `orchestrator`]
+```
 oc create sa orchestrator
 oc adm policy add-cluster-role-to-user cluster-admin -z orchestrator
 oc get $(oc get secret -o name | grep orchestrator-token) -o yaml | yq '.data.token' | sed 's/"//g' | base64 -d
@@ -36,4 +36,12 @@ The execution of the software template produces the following output:
 * A config repository with initial configuration of a kustomize project to deploy the application
   * Uses properties file to allow setting user-specific configuration for the workflow (assuming that the workflow `application.properties` are using
   env variables to specify the values)
-* Registers the workflow and workflow-config repositories in Backstage as `Component`s
+* Registers the workflow and workflow-gitops repositories in Backstage as `Component`s
+
+# Associated issues:
+* [An action to create an ArgoCD repository](https://github.com/RoadieHQ/roadie-backstage-plugins/issues/1298)
+* [Template review page should not invent the parameter names](https://github.com/backstage/backstage/issues/23794)
+
+# Possible improvements:
+* [Allow using env variables in scaffolder](https://github.com/backstage/backstage/issues/17208#issuecomment-1497474223): 
+  to avoid passing the SSH private key in the template parameters (a picker could be used in case of multiple keys)
