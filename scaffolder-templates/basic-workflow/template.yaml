@@ -140,7 +140,7 @@ spec:
                             title: PostgreSQL Secret Name
                             type: string
                             default: postgres-secrets
-                            description: Name of the secret in which the PostgreSQL secrets are stored.
+                            description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
                           persistencePSQLUserKey:
                             title: PostgreSQL User key from secret
                             type: string
@@ -152,7 +152,7 @@ spec:
                             description: The key name in which the PostgreSQL password is stored.
                             default: POSTGRES_PASSWORD
                           persistencePSQLServiceName:
-                            title: PostgreSQL Service Name
+                            title: PostgreSQL K8s Service Name
                             type: string
                             default: postgres
                             description: Name of the service running the PostgreSQL instance.
