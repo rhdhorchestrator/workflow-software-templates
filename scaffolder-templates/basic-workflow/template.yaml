@@ -141,10 +141,62 @@ spec:
                   description: Private SSH key associated with the GitHub account - Use Base64 encoding
                   ui:widget: password
                   ui:options: 'rows: 10'
+                persistenceEnabled:
+                  title: Enable Persistance
+                  type: boolean
+                  description: Indicates whether the workflow shall have persistence enabled.
+                  default: false
               required:
                 - namespace
                 - argocdNamespace
                 - sshPrivateKey
+                - persistenceEnabled
+              dependencies:
+                persistenceEnabled:
+                  oneOf:
+                      - properties:
+                          persistenceEnabled:
+                            const: false
+                      - properties:
+                          persistenceEnabled:
+                            const: true
+                          persistencePSQLSecretName:
+                            title: PostgreSQL Secret Name
+                            type: string
+                            default: postgres-secrets
+                            description: Name of the secret in which the PostgreSQL secrets are stored.
+                          persistencePSQLUserKey:
+                            title: PostgreSQL User key from secret
+                            type: string
+                            description: The key name in which the PostgreSQL user is stored.
+                            default: POSTGRES_USER
+                          persistencePSQLPasswordKey:
+                            title: PostgreSQL Password key from secret
+                            type: string
+                            description: The key name in which the PostgreSQL password is stored.
+                            default: POSTGRES_PASSWORD
+                          persistencePSQLServiceName:
+                            title: PostgreSQL Service Name
+                            type: string
+                            default: postgres
+                            description: Name of the service running the PostgreSQL instance.
+                          persistencePSQLServicePort:
+                            title: PostgreSQL Port
+                            type: integer
+                            default: 5432
+                            description: Port on which the PostgreSQL instance is running.
+                          persistencePSQLDatabaseName:
+                            title: PostgreSQL Database Name
+                            type: string
+                            description: Name of the database to use for persistence.
+                            default: sonataflow
+                        required:
+                          - persistencePSQLSecretName
+                          - persistencePSQLUserKey
+                          - persistencePSQLPasswordKey
+                          - persistencePSQLServiceName
+                          - persistencePSQLServicePort
+                          - persistencePSQLDatabaseName         
   steps:
     - id: workflowCodeTemplate
       name: Generating the Workflow Source Code and Catalog Info Component
@@ -236,7 +288,30 @@ spec:
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
           gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           sshPrivateKey: ${{ parameters.sshPrivateKey }}
+          persistencePSQLSecretName: ${{ parameters.persistencePSQLSecretName }}
+          persistencePSQLUserKey: ${{ parameters.persistencePSQLUserKey }}
+          persistencePSQLPasswordKey: ${{ parameters.persistencePSQLPasswordKey }}
+          persistencePSQLServiceName: ${{ parameters.persistencePSQLServiceName }}
+          persistencePSQLServicePort: ${{ parameters.persistencePSQLServicePort }}
+          persistencePSQLDatabaseName: ${{ parameters.persistencePSQLDatabaseName }}
+          persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
         targetPath: gitops
+    - id: renameFilesForPersistence
+      action: fs:rename
+      if: ${{ parameters.persistenceEnabled == true }}
+      name: Rename files for persistence
+      input:
+        files:
+          - from: gitops/kustomize/base/sonataflow-patch-persistence.yaml
+            to: gitops/kustomize/base/sonataflow-patch.yaml
+            overwrite: true
+    - id: cleanFilesForPersistence
+      action: fs:delete
+      if: ${{ parameters.persistenceEnabled == false }}
+      name: Clean persistence files
+      input:
+        files:
+          - gitops/kustomize/base/sonataflow-patch-persistence.yaml
     - id: publishGitOps
       name: Publishing to the GitOps Code Repository
       action: publish:github
