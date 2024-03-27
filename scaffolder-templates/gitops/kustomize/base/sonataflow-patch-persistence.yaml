@@ -1,0 +1,29 @@
+apiVersion: sonataflow.org/v1alpha08
+kind: SonataFlow
+metadata:
+  name: ${{ values.workflowId }}
+  annotations:
+    sonataflow.org/profile: prod
+  labels:
+    backstage.io/kubernetes-id: ${{ values.workflowId }}
+spec:
+  persistence:
+    postgresql:
+      secretRef:
+        name:  ${{ values.persistencePSQLSecretName }}
+        userKey: ${{ values.persistencePSQLUserKey }}
+        passwordKey: ${{ values.persistencePSQLPasswordKey }}
+      serviceRef:
+        name: ${{ values.persistencePSQLServiceName }}
+        port: ${{ values.persistencePSQLServicePort }}
+        databaseName: ${{ values.persistencePSQLDatabaseName }}
+        databaseSchema: ${{ values.persistencePSQLDatabaseSchema }}
+  podTemplate:
+    container:
+      image: serverless-workflow-${{ values.workflowId }}
+      envFrom:
+      - configMapRef:
+          name: ${{ values.workflowId }}-gitops
+      - secretRef:
+          name: ${{ values.workflowId }}-secret
+      resources: {}
