@@ -76,30 +76,6 @@ spec:
             catalogFilter:
               kind:
                 - System
-    - title: Provide information about the Maven software project
-      required:
-        - groupId
-        - artifactId
-        - version
-      properties:
-        groupId:
-          title: Group ID
-          type: string
-          default: io.janus.workflow
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-._][a-zA-Z0-9]+)*$'
-          description: Maven Group ID eg (io.janus.workflow)
-          ui:autofocus: true
-        artifactId:
-          title: Artifact ID
-          type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-._][a-zA-Z0-9]+)*$'
-          description: Maven Artifact ID
-          default: onboarding
-        version:
-          title: Project version
-          type: string
-          default: 1.0.0-SNAPSHOT
-          description: Maven version, also used to tag the generated artifacts
     - title: Provide information about the Build environment
       required:
         - CI
@@ -212,9 +188,9 @@ spec:
           owner: ${{ parameters.owner }}
           system: ${{ parameters.system }}
           description: ${{ parameters.description }}
-          groupId: ${{ parameters.groupId }}
-          artifactId: ${{ parameters.artifactId }}
-          version: ${{ parameters.version }}
+          groupId: io.janus.workflow
+          artifactId: ${{ parameters.workflowId }}
+          version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
           workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
@@ -227,7 +203,7 @@ spec:
       input:
         files:
           - from: workflow/src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
-            to: workflow/src/main/resources/${{ parameters.artifactId }}.sw.yaml
+            to: workflow/src/main/resources/${{ parameters.workflowId }}.sw.yaml
             overwrite: false
     - id: deleteFiles
       action: fs:delete
