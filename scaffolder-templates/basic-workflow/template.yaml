@@ -196,6 +196,7 @@ spec:
           sourceControl: github.com
           applicationType: workflow-project
           lifecycle: development
+          persistenceEnabled: ${{ parameters.persistenceEnabled }}
         targetPath: workflow
     - id: renameFiles
       action: fs:rename
@@ -271,6 +272,7 @@ spec:
           persistencePSQLServicePort: ${{ parameters.persistencePSQLServicePort }}
           persistencePSQLDatabaseName: ${{ parameters.persistencePSQLDatabaseName }}
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
+          persistenceEnabled: ${{ parameters.persistenceEnabled }}
         targetPath: gitops
     - id: renameFilesForPersistence
       action: fs:rename
