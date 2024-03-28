@@ -139,22 +139,22 @@ spec:
                           persistencePSQLSecretName:
                             title: PostgreSQL Secret Name
                             type: string
-                            default: postgres-secrets
+                            default: sonataflow-psql-postgresql
                             description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
                           persistencePSQLUserKey:
                             title: PostgreSQL User key from secret
                             type: string
                             description: The key name in which the PostgreSQL user is stored.
-                            default: POSTGRES_USER
+                            default: postgres-username
                           persistencePSQLPasswordKey:
                             title: PostgreSQL Password key from secret
                             type: string
                             description: The key name in which the PostgreSQL password is stored.
-                            default: POSTGRES_PASSWORD
+                            default: postgres-password
                           persistencePSQLServiceName:
                             title: PostgreSQL K8s Service Name
                             type: string
-                            default: postgres
+                            default: sonataflow-psql-postgresql
                             description: Name of the service running the PostgreSQL instance.
                           persistencePSQLServicePort:
                             title: PostgreSQL Port
@@ -196,6 +196,7 @@ spec:
           sourceControl: github.com
           applicationType: workflow-project
           lifecycle: development
+          persistenceEnabled: ${{ parameters.persistenceEnabled }}
         targetPath: workflow
     - id: renameFiles
       action: fs:rename
@@ -271,6 +272,7 @@ spec:
           persistencePSQLServicePort: ${{ parameters.persistencePSQLServicePort }}
           persistencePSQLDatabaseName: ${{ parameters.persistencePSQLDatabaseName }}
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
+          persistenceEnabled: ${{ parameters.persistenceEnabled }}
         targetPath: gitops
     - id: renameFilesForPersistence
       action: fs:rename
