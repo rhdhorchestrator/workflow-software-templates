@@ -10,7 +10,7 @@ git clone https://github.com/${{ values.orgName }}/${{ values.repoName }}.git
 cd ${{ values.repoName }}/bootstrap
 
 # Optionally, if edited the file manually
-SSH_PRIVATE_KEY=$(oc get secrets -n orchestrator-gitops git-ssh-credentials -o jsonpath='{.data.id_rsa}' | base64 -d)
+SSH_PRIVATE_KEY=$(oc get secrets -n orchestrator-gitops git-ssh-credentials -o jsonpath='{.data.id_rsa}')
 sed -i "s/__REPLACE_SSH_PRIVATE_KEY__/$SSH_PRIVATE_KEY/" ${{values.workflowId}}-argocd-repo.yaml
 
 kubectl apply -f .
