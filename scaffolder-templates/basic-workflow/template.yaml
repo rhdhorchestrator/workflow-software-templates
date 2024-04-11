@@ -20,7 +20,7 @@ spec:
 
   parameters:
     - title: Provide information about the workflow software project
-      description: Configure the github repository where the Maven software project is located 
+      description: Configure the github repository where the Maven software project is located
       required:
         - orgName
         - repoName
@@ -111,12 +111,6 @@ spec:
                   type: string
                   default: orchestrator-gitops
                   description: Deployment namespace for ArgoCD and Tekton resources
-                sshPrivateKey:
-                  title: SSH private key
-                  type: string
-                  description: Private SSH key associated with the GitHub account - Use Base64 encoding
-                  ui:widget: password
-                  ui:options: 'rows: 10'
                 persistenceEnabled:
                   title: Enable Persistance
                   type: boolean
@@ -125,54 +119,53 @@ spec:
               required:
                 - namespace
                 - argocdNamespace
-                - sshPrivateKey
                 - persistenceEnabled
               dependencies:
                 persistenceEnabled:
                   oneOf:
-                      - properties:
-                          persistenceEnabled:
-                            const: false
-                      - properties:
-                          persistenceEnabled:
-                            const: true
-                          persistencePSQLSecretName:
-                            title: PostgreSQL Secret Name
-                            type: string
-                            default: sonataflow-psql-postgresql
-                            description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
-                          persistencePSQLUserKey:
-                            title: PostgreSQL User key from secret
-                            type: string
-                            description: The key name in which the PostgreSQL user is stored.
-                            default: postgres-username
-                          persistencePSQLPasswordKey:
-                            title: PostgreSQL Password key from secret
-                            type: string
-                            description: The key name in which the PostgreSQL password is stored.
-                            default: postgres-password
-                          persistencePSQLServiceName:
-                            title: PostgreSQL K8s Service Name
-                            type: string
-                            default: sonataflow-psql-postgresql
-                            description: Name of the service running the PostgreSQL instance.
-                          persistencePSQLServicePort:
-                            title: PostgreSQL Port
-                            type: integer
-                            default: 5432
-                            description: Port on which the PostgreSQL instance is running.
-                          persistencePSQLDatabaseName:
-                            title: PostgreSQL Database Name
-                            type: string
-                            description: Name of the database to use for persistence.
-                            default: sonataflow
-                        required:
-                          - persistencePSQLSecretName
-                          - persistencePSQLUserKey
-                          - persistencePSQLPasswordKey
-                          - persistencePSQLServiceName
-                          - persistencePSQLServicePort
-                          - persistencePSQLDatabaseName         
+                    - properties:
+                        persistenceEnabled:
+                          const: false
+                    - properties:
+                        persistenceEnabled:
+                          const: true
+                        persistencePSQLSecretName:
+                          title: PostgreSQL Secret Name
+                          type: string
+                          default: sonataflow-psql-postgresql
+                          description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
+                        persistencePSQLUserKey:
+                          title: PostgreSQL User key from secret
+                          type: string
+                          description: The key name in which the PostgreSQL user is stored.
+                          default: postgres-username
+                        persistencePSQLPasswordKey:
+                          title: PostgreSQL Password key from secret
+                          type: string
+                          description: The key name in which the PostgreSQL password is stored.
+                          default: postgres-password
+                        persistencePSQLServiceName:
+                          title: PostgreSQL K8s Service Name
+                          type: string
+                          default: sonataflow-psql-postgresql
+                          description: Name of the service running the PostgreSQL instance.
+                        persistencePSQLServicePort:
+                          title: PostgreSQL Port
+                          type: integer
+                          default: 5432
+                          description: Port on which the PostgreSQL instance is running.
+                        persistencePSQLDatabaseName:
+                          title: PostgreSQL Database Name
+                          type: string
+                          description: Name of the database to use for persistence.
+                          default: sonataflow
+                      required:
+                        - persistencePSQLSecretName
+                        - persistencePSQLUserKey
+                        - persistencePSQLPasswordKey
+                        - persistencePSQLServiceName
+                        - persistencePSQLServicePort
+                        - persistencePSQLDatabaseName
   steps:
     - id: workflowCodeTemplate
       name: Generating the Workflow Source Code and Catalog Info Component
@@ -264,7 +257,6 @@ spec:
           lifecycle: development
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
           gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
-          sshPrivateKey: ${{ parameters.sshPrivateKey }}
           persistencePSQLSecretName: ${{ parameters.persistencePSQLSecretName }}
           persistencePSQLUserKey: ${{ parameters.persistencePSQLUserKey }}
           persistencePSQLPasswordKey: ${{ parameters.persistencePSQLPasswordKey }}
