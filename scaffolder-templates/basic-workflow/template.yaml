@@ -111,6 +111,14 @@ spec:
                   type: string
                   default: orchestrator-gitops
                   description: Deployment namespace for ArgoCD and Tekton resources
+                quayOrgName:
+                  title: Quay Organization Name
+                  type: string
+                  description: The Quay Organization Name of the published workflow
+                quayRepoName:
+                  title: Quay Repository Name
+                  type: string
+                  description: The Quay Repository Name of the published workflow. The repository must exist before deploying the gitops.
                 persistenceEnabled:
                   title: Enable Persistance
                   type: boolean
@@ -119,6 +127,8 @@ spec:
               required:
                 - namespace
                 - argocdNamespace
+                - quayOrgName
+                - quayRepoName
                 - persistenceEnabled
               dependencies:
                 persistenceEnabled:
@@ -190,6 +200,8 @@ spec:
           applicationType: workflow-project
           lifecycle: development
           persistenceEnabled: ${{ parameters.persistenceEnabled }}
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
         targetPath: workflow
     - id: renameFiles
       action: fs:rename
@@ -265,6 +277,8 @@ spec:
           persistencePSQLDatabaseName: ${{ parameters.persistencePSQLDatabaseName }}
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
           persistenceEnabled: ${{ parameters.persistenceEnabled }}
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
         targetPath: gitops
     - id: renameFilesForPersistence
       action: fs:rename

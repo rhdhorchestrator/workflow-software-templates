@@ -28,5 +28,5 @@ patches:
     name: ${{ values.workflowId }}
 images:
 - name: serverless-workflow-${{ values.workflowId }}
-  newName: quay.io/orchestrator/serverless-workflow-${{ values.workflowId }}
+  newName: quay.io/${{ values.quayOrgName }}/${{ values.quayRepoName }}
   newTag: __IMAGE_TAG__
