@@ -118,8 +118,7 @@ spec:
                 quayRepoName:
                   title: Quay Repository Name
                   type: string
-                  default: serverless-workflow-${{ parameters.workflowId }}
-                  description: The Quay Repository Name of the published workflow
+                  description: The Quay Repository Name of the published workflow. The repository must exist before deploying the gitops.
                 persistenceEnabled:
                   title: Enable Persistance
                   type: boolean
