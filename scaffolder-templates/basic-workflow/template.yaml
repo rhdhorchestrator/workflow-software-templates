@@ -233,6 +233,8 @@ spec:
           workflowId: ${{ parameters.workflowId }}
           gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
           gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
         targetPath: workflow
     - id: publishWorkflow
       name: Publishing to the Workflow Repository
