@@ -47,7 +47,7 @@ spec:
         workflowId:
           title: Workflow ID
           type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-.]?[a-zA-Z0-9]+)*$'
+          pattern: "^([a-zA-Z][a-zA-Z0-9]*)([-.]?[a-zA-Z0-9]+)*$"
           description: Unique identifier of the workflow in SonataFlow
           default: onboarding
         workflowType:
@@ -237,9 +237,9 @@ spec:
         targetPath: workflow
     - id: publishWorkflow
       name: Publishing to the Workflow Repository
-      action: publish:github  
+      action: publish:github
       input:
-        allowedHosts: ['github.com']
+        allowedHosts: ["github.com"]
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
@@ -279,7 +279,7 @@ spec:
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
           persistenceEnabled: ${{ parameters.persistenceEnabled }}
           quayOrgName: ${{ parameters.quayOrgName }}
-          quayRepoName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
         targetPath: gitops
     - id: renameFilesForPersistence
       action: fs:rename
@@ -301,7 +301,7 @@ spec:
       name: Publishing to the GitOps Code Repository
       action: publish:github
       input:
-        allowedHosts: ['github.com']
+        allowedHosts: ["github.com"]
         description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: main
@@ -322,4 +322,3 @@ spec:
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-
