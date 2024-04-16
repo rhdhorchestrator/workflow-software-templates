@@ -17,6 +17,10 @@ spec:
       value: ${{ values.workflowId }}
     - name: convertToFlat
       value: 'true'
+    - name: quayOrgName
+      value: ${{ values.quayOrgName }}
+    - name: quayRepoName
+      value: ${{ values.quayRepoName }}
   pipelineRef:
     name: workflow-deployment
   workspaces:
