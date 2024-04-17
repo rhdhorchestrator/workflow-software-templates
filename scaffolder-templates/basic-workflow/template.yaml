@@ -299,6 +299,7 @@ spec:
         files:
           - gitops/kustomize/base/sonataflow-patch-persistence.yaml
     - id: publishGitOps
+      if: ${{ parameters.CI == 'tekton_argocd' }}
       name: Publishing to the GitOps Code Repository
       action: publish:github
       input:
@@ -308,6 +309,7 @@ spec:
         defaultBranch: main
         sourcePath: gitops
     - id: registerGitOps
+      if: ${{ parameters.CI == 'tekton_argocd' }}
       name: Registering the GitOps Catalog Info Component
       action: catalog:register
       input:
