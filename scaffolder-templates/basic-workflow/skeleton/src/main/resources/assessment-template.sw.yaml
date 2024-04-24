@@ -21,7 +21,7 @@ states:
     type: operation
     actions: []
     stateDataFilter:
-      output: '. +={workflowOptions: {currentVersion: {id: "${{ values.defaultInfrastructureWorkflowId }}", name: "${{ values.defaultInfrastructureWorkflowId }}"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+      output: '. +={workflowOptions: {currentVersion: {id: "${{ values.defaultInfrastructureWorkflowId }}", name: "${{ values.defaultInfrastructureWorkflowName }}"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
     end: true
   - name: GetEmptyWorkflowOptions
     type: operation
