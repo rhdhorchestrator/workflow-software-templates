@@ -50,7 +50,13 @@ spec:
           title: Default Infrastructure Workflow ID
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-          description: Default Infrastructure Workflow ID
+          description: Default Infrastructure Workflow ID, the unique identifier of the default worklow in SonataFlow
+          default: greeting
+        defaultInfrastructureWorkflowName:
+          title: Default Infrastructure Workflow Name
+          type: string
+          description: Default Infrastructure Workflow Name, the name of the default worklow in SonataFlow
+          default: Greeting workflow
         owner:
           title: Owner
           type: string
