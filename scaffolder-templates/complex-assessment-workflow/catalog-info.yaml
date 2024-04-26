@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.workflowId }}
+  description: ${{ values.description }}
+  annotations:
+    backstage.io/kubernetes-namespace: ${{ values.argocdNamespace }}
+    backstage.io/kubernetes-id: ${{ values.workflowId }}-ci
+    janus-idp.io/tekton: ${{ values.workflowId }}
+    github.com/project-slug: ${{ values.orgName }}/${{ values.repoName }}
+spec:
+  type: ${{ values.applicationType }}
+  system: ${{ values.system }}
+  lifecycle: ${{ values.lifecycle }}
+  owner: ${{ values.owner }}

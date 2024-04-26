@@ -74,112 +74,260 @@ spec:
               kind:
                 - System
     
-    - title: Provide information about the Maven software project
+    - title: Provide information about the Build environment
       required:
-        - groupId
-        - artifactId
-        - version
+        - CI
       properties:
-        groupId:
-          title: Group ID
+        CI:
+          title: Select a CI/CD method
           type: string
-          default: io.janus.workflow
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-._][a-zA-Z0-9]+)*$'
-          description: Maven Group ID eg (io.janus.workflow)
-          ui:autofocus: true
-        artifactId:
-          title: Artifact ID
-          type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-._][a-zA-Z0-9]+)*$'
-          description: Maven Artifact ID
-        version:
-          title: Project version
-          type: string
-          default: 1.0.0-SNAPSHOT
-          description: Maven version, also used to tag the generated artifacts
-  
+          description: This action will create a CI pipeline for your application based on chosen method
+          default: tekton_argocd
+          enum:
+            - none
+            - tekton_argocd
+          enumNames:
+            - None
+            - Tekton with ArgoCD
+      # See: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/blob/3019e781b988e0548eb987eed3e522854ed8c52f/templates/github/quarkus-backend/template.yaml#L101
+      dependencies:
+        CI:
+          oneOf:
+            - properties:
+                CI:
+                  const: none
+            - properties:
+                CI:
+                  const: tekton_argocd
+                namespace:
+                  title: Workflow Namespace
+                  type: string
+                  default: sonataflow-infra
+                  description: Deployment namespace for workflow applications
+                argocdNamespace:
+                  title: GitOps Namespace
+                  type: string
+                  default: orchestrator-gitops
+                  description: Deployment namespace for ArgoCD and Tekton resources
+                quayOrgName:
+                  title: Quay Organization Name
+                  type: string
+                  description: The Quay Organization Name of the published workflow
+                quayRepoName:
+                  title: Quay Repository Name
+                  type: string
+                  description: The Quay Repository Name of the published workflow. The repository must exist before deploying the gitops.
+                persistenceEnabled:
+                  title: Enable Persistance
+                  type: boolean
+                  description: Indicates whether the workflow shall have persistence enabled.
+                  default: false
+              required:
+                - namespace
+                - argocdNamespace
+                - quayOrgName
+                - quayRepoName
+                - persistenceEnabled
+              dependencies:
+                persistenceEnabled:
+                  oneOf:
+                    - properties:
+                        persistenceEnabled:
+                          const: false
+                    - properties:
+                        persistenceEnabled:
+                          const: true
+                        persistencePSQLSecretName:
+                          title: PostgreSQL Secret Name
+                          type: string
+                          default: sonataflow-psql-postgresql
+                          description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
+                        persistencePSQLUserKey:
+                          title: PostgreSQL User key from secret
+                          type: string
+                          description: The key name in which the PostgreSQL user is stored.
+                          default: postgres-username
+                        persistencePSQLPasswordKey:
+                          title: PostgreSQL Password key from secret
+                          type: string
+                          description: The key name in which the PostgreSQL password is stored.
+                          default: postgres-password
+                        persistencePSQLServiceName:
+                          title: PostgreSQL K8s Service Name
+                          type: string
+                          default: sonataflow-psql-postgresql
+                          description: Name of the service running the PostgreSQL instance.
+                        persistencePSQLServicePort:
+                          title: PostgreSQL Port
+                          type: integer
+                          default: 5432
+                          description: Port on which the PostgreSQL instance is running.
+                        persistencePSQLDatabaseName:
+                          title: PostgreSQL Database Name
+                          type: string
+                          description: Name of the database to use for persistence.
+                          default: sonataflow
+                      required:
+                        - persistencePSQLSecretName
+                        - persistencePSQLUserKey
+                        - persistencePSQLPasswordKey
+                        - persistencePSQLServiceName
+                        - persistencePSQLServicePort
+                        - persistencePSQLDatabaseName
   steps:
-    - id: sourceCodeTemplate
-      name: Generating the Source Code Component
+    - id: workflowCodeTemplate
+      name: Generating the Workflow Source Code and Catalog Info Component
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
-        url: ./skeleton/
+        url: ./skeleton
         values:
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
           orgName: ${{ parameters.orgName }}
           repoName: ${{ parameters.repoName }}
           owner: ${{ parameters.owner }}
           system: ${{ parameters.system }}
           description: ${{ parameters.description }}
-          groupId: ${{ parameters.groupId }}
-          artifactId: ${{ parameters.artifactId }}
-          version: ${{ parameters.version }}
+          groupId: io.janus.workflow
+          artifactId: ${{ parameters.workflowId }}
+          version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
-          defaultInfrastructureWorkflowId: ${{ parameters.defaultInfrastructureWorkflowId }}
+          workflowType: ${{ parameters.workflowType }}
           sourceControl: github.com
-    
+          applicationType: workflow-project
+          lifecycle: development
+          persistenceEnabled: ${{ parameters.persistenceEnabled }}
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+        targetPath: workflow
     - id: renameFiles
       action: fs:rename
       name: Rename files
       input:
         files:
           - from: src/main/resources/schemas/input-schema.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}-input-schema.json
+            to: src/main/resources/schemas/${{ parameters.workflowId }}-input-schema.json
             overwrite: true
           - from: src/main/resources/schemas/workflow-option-output-schema.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}-workflow-option-output-schema.json
+            to: src/main/resources/schemas/${{ parameters.workflowId }}-workflow-option-output-schema.json
             overwrite: true
           - from: src/main/resources/schemas/workflow-options-output-schema.json
-            to: src/main/resources/schemas/${{ parameters.artifactId }}-workflow-options-output-schema.json
+            to: src/main/resources/schemas/${{ parameters.workflowId }}-workflow-options-output-schema.json
             overwrite: true
           - from: src/main/resources/specs/dataindex.yaml
-            to: src/main/resources/specs/${{ parameters.artifactId }}-dataindex.yaml
-            overwrite: true
-          - from: src/main/resources/template-default-infrastructure.sw.yaml
-            to: src/main/resources/${{ parameters.defaultInfrastructureWorkflowId }}.sw.yaml
+            to: src/main/resources/specs/${{ parameters.workflowId }}-dataindex.yaml
             overwrite: true
           - from: src/main/resources/precheck.sw.yaml
-            to: src/main/resources/${{ parameters.artifactId }}-precheck.sw.yaml
+            to: src/main/resources/${{ parameters.workflowId }}-precheck.sw.yaml
             overwrite: true
           - from: src/main/resources/template.sw.yaml
-            to: src/main/resources/${{ parameters.artifactId }}.sw.yaml
+            to: src/main/resources/${{ parameters.workflowId }}.sw.yaml
             overwrite: true
-    
-    - id: catalogTemplate
-      name: Generating the Catalog Info Component
+    - id: buildCodeTemplate
+      name: Generating the Build Code for the Workflow
       action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/tree/main/skeletons/catalog-info/
+        url: ../build
+        copyWithoutTemplating:
+          - .github/workflows/update_pipelinerun.yaml
         values:
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
           orgName: ${{ parameters.orgName }}
-          repoName: ${{ parameters.repoName }}
+          workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+        targetPath: workflow
+    - id: publishWorkflow
+      name: Publishing to the Workflow Repository
+      action: publish:github  
+      input:
+        allowedHosts: ['github.com']
+        description: ${{ parameters.description }}
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        defaultBranch: main
+        sourcePath: workflow
+    - id: register
+      name: Registering the Catalog Info Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publishWorkflow.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+    - id: gitopsCodeTemplate
+      name: Generating the GitOps Component and Catalog Info Component
+      action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      input:
+        url: ../gitops
+        values:
+          workflowId: ${{ parameters.workflowId }}
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}-gitops
           owner: ${{ parameters.owner }}
           system: ${{ parameters.system }}
           applicationType: workflow-project
           description: ${{ parameters.description }}
           sourceControl: github.com
           lifecycle: development
-    
-    - id: publish
-      name: Publishing to the Source Code Repository
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          persistencePSQLSecretName: ${{ parameters.persistencePSQLSecretName }}
+          persistencePSQLUserKey: ${{ parameters.persistencePSQLUserKey }}
+          persistencePSQLPasswordKey: ${{ parameters.persistencePSQLPasswordKey }}
+          persistencePSQLServiceName: ${{ parameters.persistencePSQLServiceName }}
+          persistencePSQLServicePort: ${{ parameters.persistencePSQLServicePort }}
+          persistencePSQLDatabaseName: ${{ parameters.persistencePSQLDatabaseName }}
+          persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
+          persistenceEnabled: ${{ parameters.persistenceEnabled }}
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+        targetPath: gitops
+    - id: renameFilesForPersistence
+      action: fs:rename
+      if: ${{ parameters.persistenceEnabled == true }}
+      name: Rename files for persistence
+      input:
+        files:
+          - from: gitops/kustomize/base/sonataflow-patch-persistence.yaml
+            to: gitops/kustomize/base/sonataflow-patch.yaml
+            overwrite: true
+    - id: cleanFilesForPersistence
+      action: fs:delete
+      if: ${{ parameters.persistenceEnabled == false }}
+      name: Clean persistence files
+      input:
+        files:
+          - gitops/kustomize/base/sonataflow-patch-persistence.yaml
+    - id: publishGitOps
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      name: Publishing to the GitOps Code Repository
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        description: ${{ parameters.description }}
-        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: main
-    
-    - id: register
-      name: Registering the Catalog Info Component
+        sourcePath: gitops
+    - id: registerGitOps
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      name: Registering the GitOps Catalog Info Component
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps.publishGitOps.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
-  
   output:
     links:
+      - if: ${{ parameters.CI == 'tekton_argocd' }}
+        title: Bootstrap the GitOps Resources
+        url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
       - title: Open the Source Code Repository
-        url: ${{ steps.publish.output.remoteUrl }}
+        url: ${{ steps.publishWorkflow.output.remoteUrl }}
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}

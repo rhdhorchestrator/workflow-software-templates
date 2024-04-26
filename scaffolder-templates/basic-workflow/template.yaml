@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: basic-workflow-bootstrap
   title: Basic workflow bootstrap project
-  description: Bootstrap project for basic serverless workflows
+  description: Bootstrap project for basic serverless workflow
   tags:
     - orchestrator
     - built-in
@@ -17,7 +17,6 @@ metadata:
 spec:
   owner: janus-orchestrator
   type: basic-workflow-bootstrap
-
   parameters:
     - title: Provide information about the workflow software project
       description: Configure the github repository where the Maven software project is located
@@ -336,4 +335,3 @@ spec:
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-
