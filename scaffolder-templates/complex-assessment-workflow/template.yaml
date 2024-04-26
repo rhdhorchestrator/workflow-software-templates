@@ -25,6 +25,7 @@ spec:
         - repoName
         - workflowId
         - defaultInfrastructureWorkflowId
+        - defaultInfrastructureWorkflowName
         - owner
         - system
       properties:
@@ -45,18 +46,16 @@ spec:
           title: Workflow ID
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-          description: Workflow ID, the unique identifier of the workflow in SonataFlow
+          description: Unique identifier of the workflow in SonataFlow
         defaultInfrastructureWorkflowId:
           title: Default Infrastructure Workflow ID
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-          description: Default Infrastructure Workflow ID, the unique identifier of the default worklow in SonataFlow
-          default: greeting
+          description: Unique identifier of the default infrastructure worklow available in the cluster
         defaultInfrastructureWorkflowName:
           title: Default Infrastructure Workflow Name
           type: string
-          description: Default Infrastructure Workflow Name, the name of the default worklow in SonataFlow
-          default: Greeting workflow
+          description: Default Infrastructure Workflow Name, the name of the default worklow available in the cluster
         owner:
           title: Owner
           type: string
