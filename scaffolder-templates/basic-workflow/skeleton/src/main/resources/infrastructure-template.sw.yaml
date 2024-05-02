@@ -1,8 +1,8 @@
 id: ${{ values.workflowId }}
-version: '${{ values.version}}'
-specVersion: '0.8'
-name: '${{ values.workflowId }}'
-description: '${{ values.description }}'
+version: "${{ values.version}}"
+specVersion: "0.8"
+name: "${{ values.workflowId }}"
+description: "${{ values.description }}"
 annotations:
   - "workflow-type/infrastructure"
 dataInputSchema:
@@ -12,14 +12,14 @@ functions:
   - name: logInfo
     type: custom
     operation: "sysout:INFO"
-start: 'StartState'
+start: "StartState"
 states:
-  - name: 'StartState'
-    type: 'operation'
+  - name: "StartState"
+    type: "operation"
     actions:
       - name: logInput
         functionRef:
           refName: logInfo
           arguments:
-            message: '"You entered " + .someText'
+            message: '"You entered " + inputs.sampleText'
     end: true
