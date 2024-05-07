@@ -14,6 +14,9 @@ metadata:
     - url: https://kiegroup.github.io/kogito-docs/serverlessworkflow/latest/index.html
       title: SonataFlow Guides
       icon: techdocs
+    - url: https://www.parodos.dev/docs/core-concepts/workflow-types/
+      title: Workflow Types
+      icon: techdocs
 spec:
   owner: janus-orchestrator
   type: basic-workflow-bootstrap
@@ -67,7 +70,7 @@ spec:
               kind:
                 - System
     - title: Provide information about the workflow type
-      description: Select the workflow type. For an assessment, provide a default infrastructure workflow option, which should already be set up in your environment
+      description: Select the workflow type. For an assessment, provide an infrastructure workflow option, which should already be set up in your environment
       required:
         - workflowType
       properties:
@@ -77,11 +80,11 @@ spec:
           description: Metadata added to the workflow to distinguish assessment and infrastructure
           ui:widget: radio
           enum:
-            - assessment
             - infrastructure
+            - assessment
           enumNames:
-            - Assessment
             - Infrastructure
+            - Assessment
           default: infrastructure
       dependencies:
         workflowType:
@@ -92,18 +95,13 @@ spec:
             - properties:
                 workflowType:
                   const: assessment
-                defaultInfrastructureWorkflowId:
-                  title: Default Infrastructure Workflow ID
+                infrastructureWorkflowId:
+                  title: Infrastructure Workflow ID
                   type: string
                   pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-                  description: Default Infrastructure Workflow ID, the unique identifier of the default worklow available in the environment
-                defaultInfrastructureWorkflowName:
-                  title: Default Infrastructure Workflow Name
-                  type: string
-                  description: Default Infrastructure Workflow Name, the name of the default worklow available in the environment
+                  description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
               required:
-                - defaultInfrastructureWorkflowId
-                - defaultInfrastructureWorkflowName
+                - infrastructureWorkflowId
     - title: Provide information about the build environment
       required:
         - CI
