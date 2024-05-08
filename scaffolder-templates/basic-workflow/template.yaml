@@ -77,7 +77,7 @@ spec:
         workflowType:
           title: Workflow Type
           type: string
-          description: Metadata added to the workflow to distinguish assessment and infrastructure
+          description: Annotation to be added to the workflow in SonataFlow to specify its type
           ui:widget: radio
           enum:
             - infrastructure
