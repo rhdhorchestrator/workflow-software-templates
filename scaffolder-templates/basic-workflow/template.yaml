@@ -222,8 +222,7 @@ spec:
           version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
           workflowType: ${{ parameters.workflowType }}
-          defaultInfrastructureWorkflowId: ${{ parameters.defaultInfrastructureWorkflowId }}
-          defaultInfrastructureWorkflowName: ${{ parameters.defaultInfrastructureWorkflowName }}
+          infrastructureWorkflowId: ${{ parameters.infrastructureWorkflowId }}
           sourceControl: github.com
           applicationType: workflow-project
           lifecycle: development
