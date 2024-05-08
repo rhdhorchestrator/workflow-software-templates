@@ -14,10 +14,12 @@ metadata:
     - url: https://kiegroup.github.io/kogito-docs/serverlessworkflow/latest/index.html
       title: SonataFlow Guides
       icon: techdocs
+    - url: https://www.parodos.dev/docs/core-concepts/workflow-types/
+      title: Workflow Types
+      icon: techdocs
 spec:
   owner: janus-orchestrator
   type: basic-workflow-bootstrap
-
   parameters:
     - title: Provide information about the workflow software project
       description: Configure the github repository where the Maven software project is located
@@ -25,9 +27,6 @@ spec:
         - orgName
         - repoName
         - workflowId
-        - workflowType
-        - defaultInfrastructureWorkflowId
-        - defaultInfrastructureWorkflowName
         - owner
         - system
       properties:
@@ -52,23 +51,6 @@ spec:
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-.]?[a-zA-Z0-9]+)*$'
           description: Unique identifier of the workflow in SonataFlow
           default: onboarding
-        workflowType:
-          title: Workflow Type
-          type: string
-          description: Metadata added to the workflow to distinguish assessment and infrastructure
-          enum:
-            - assessment
-            - infrastructure
-          default: infrastructure
-        defaultInfrastructureWorkflowId:
-          title: Default Infrastructure Workflow ID
-          type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-          description: Default Infrastructure Workflow ID, the unique identifier of the default worklow available in the cluster
-        defaultInfrastructureWorkflowName:
-          title: Default Infrastructure Workflow Name
-          type: string
-          description: Default Infrastructure Workflow Name, the name of the default worklow available in the cluster
         owner:
           title: Owner
           type: string
@@ -87,7 +69,40 @@ spec:
             catalogFilter:
               kind:
                 - System
-    - title: Provide information about the Build environment
+    - title: Provide information about the workflow type
+      description: Select the workflow type. For an assessment, provide an infrastructure workflow option, which should already be set up in your environment
+      required:
+        - workflowType
+      properties:
+        workflowType:
+          title: Workflow Type
+          type: string
+          description: Annotation to be added to the workflow in SonataFlow to specify its type
+          ui:widget: radio
+          enum:
+            - infrastructure
+            - assessment
+          enumNames:
+            - Infrastructure
+            - Assessment
+          default: infrastructure
+      dependencies:
+        workflowType:
+          oneOf:
+            - properties:
+                workflowType:
+                  const: infrastructure
+            - properties:
+                workflowType:
+                  const: assessment
+                infrastructureWorkflowId:
+                  title: Infrastructure Workflow ID
+                  type: string
+                  pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
+                  description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
+              required:
+                - infrastructureWorkflowId
+    - title: Provide information about the build environment
       required:
         - CI
       properties:
@@ -207,6 +222,7 @@ spec:
           version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
           workflowType: ${{ parameters.workflowType }}
+          infrastructureWorkflowId: ${{ parameters.infrastructureWorkflowId }}
           sourceControl: github.com
           applicationType: workflow-project
           lifecycle: development
@@ -336,4 +352,3 @@ spec:
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-
