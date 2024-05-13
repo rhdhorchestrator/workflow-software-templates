@@ -17,7 +17,7 @@ extensions:
 functions:
   - name: execute
     type: custom
-    operation: "service:java:${{ values.groupId }}.${{ values.artifactId }}.DefaultAssessment::execute"
+    operation: "service:java:${{ values.groupId }}.${{ values.artifactId }}.SampleAssessment::execute"
   - name: logOuput
     type: custom
     operation: "sysout:INFO"
@@ -31,7 +31,7 @@ states:
         functionRef:
           refName: execute
           arguments:
-            userInput: ".userInput"
+            sampleText: ".sampleText"
         actionDataFilter:
           toStateData: ".result"
       - name: preCheck

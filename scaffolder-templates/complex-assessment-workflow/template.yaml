@@ -24,8 +24,7 @@ spec:
         - orgName
         - repoName
         - workflowId
-        - defaultInfrastructureWorkflowId
-        - defaultInfrastructureWorkflowName
+        - infrastructureWorkflowId
         - owner
         - system
       properties:
@@ -47,15 +46,11 @@ spec:
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
           description: Unique identifier of the workflow in SonataFlow
-        defaultInfrastructureWorkflowId:
-          title: Default Infrastructure Workflow ID
+        infrastructureWorkflowId:
+          title: Infrastructure Workflow ID
           type: string
           pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
-          description: Unique identifier of the default infrastructure worklow available in the cluster
-        defaultInfrastructureWorkflowName:
-          title: Default Infrastructure Workflow Name
-          type: string
-          description: Default Infrastructure Workflow Name, the name of the default worklow available in the cluster
+          description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
         owner:
           title: Owner
           type: string
@@ -73,7 +68,6 @@ spec:
             catalogFilter:
               kind:
                 - System
-    
     - title: Provide information about the Build environment
       required:
         - CI
@@ -193,7 +187,7 @@ spec:
           artifactId: ${{ parameters.workflowId }}
           version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
-          workflowType: ${{ parameters.workflowType }}
+          infrastructureWorkflowId: ${{ parameters.infrastructureWorkflowId }}
           sourceControl: github.com
           applicationType: workflow-project
           lifecycle: development
