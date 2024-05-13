@@ -1,8 +1,8 @@
 id: ${{ values.workflowId }}
-version: '${{ values.version}}'
-specVersion: '0.8'
-name: '${{ values.workflowId }}'
-description: '${{ values.description }}'
+version: "${{ values.version}}"
+specVersion: "0.8"
+name: "${{ values.workflowId }}"
+description: "${{ values.description }}"
 annotations:
   - "workflow-type/assessment"
 dataInputSchema:
@@ -13,15 +13,15 @@ states:
   - name: StartState
     type: switch
     dataConditions:
-    - condition: "${ .someText == \"default\" }"
-      transition: GetDefaultWorkflowOptions
+      - condition: ${ .sampleText | length != 0 }
+        transition: GetSampleWorkflowOptions
     defaultCondition:
       transition: GetEmptyWorkflowOptions
-  - name: GetDefaultWorkflowOptions
+  - name: GetSampleWorkflowOptions
     type: operation
     actions: []
     stateDataFilter:
-      output: '. +={workflowOptions: {currentVersion: {id: "${{ values.defaultInfrastructureWorkflowId }}", name: "${{ values.defaultInfrastructureWorkflowName }}"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+      output: '. +={workflowOptions: {currentVersion: {id: "${{ values.infrastructureWorkflowId }}", name: "${{ values.infrastructureWorkflowId }}"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
     end: true
   - name: GetEmptyWorkflowOptions
     type: operation
