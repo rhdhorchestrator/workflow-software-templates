@@ -63,6 +63,7 @@ spec:
               kind:
                 - Group
                 - User
+          default: user:guest
         system:
           title: System
           type: string
