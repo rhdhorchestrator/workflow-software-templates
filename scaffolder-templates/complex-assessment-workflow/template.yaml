@@ -200,23 +200,23 @@ spec:
       name: Rename files
       input:
         files:
-          - from: src/main/resources/schemas/input-schema.json
-            to: src/main/resources/schemas/${{ parameters.workflowId }}-input-schema.json
+          - from: workflow/src/main/resources/schemas/input-schema.json
+            to: workflow/src/main/resources/schemas/${{ parameters.workflowId }}-input-schema.json
             overwrite: true
-          - from: src/main/resources/schemas/workflow-option-output-schema.json
-            to: src/main/resources/schemas/${{ parameters.workflowId }}-workflow-option-output-schema.json
+          - from: workflow/src/main/resources/schemas/workflow-option-output-schema.json
+            to: workflow/src/main/resources/schemas/${{ parameters.workflowId }}-workflow-option-output-schema.json
             overwrite: true
-          - from: src/main/resources/schemas/workflow-options-output-schema.json
-            to: src/main/resources/schemas/${{ parameters.workflowId }}-workflow-options-output-schema.json
+          - from: workflow/src/main/resources/schemas/workflow-options-output-schema.json
+            to: workflow/src/main/resources/schemas/${{ parameters.workflowId }}-workflow-options-output-schema.json
             overwrite: true
-          - from: src/main/resources/specs/dataindex.yaml
-            to: src/main/resources/specs/${{ parameters.workflowId }}-dataindex.yaml
+          - from: workflow/src/main/resources/specs/dataindex.yaml
+            to: workflow/src/main/resources/specs/${{ parameters.workflowId }}-dataindex.yaml
             overwrite: true
-          - from: src/main/resources/precheck.sw.yaml
-            to: src/main/resources/${{ parameters.workflowId }}-precheck.sw.yaml
+          - from: workflow/src/main/resources/precheck.sw.yaml
+            to: workflow/src/main/resources/${{ parameters.workflowId }}-precheck.sw.yaml
             overwrite: true
-          - from: src/main/resources/template.sw.yaml
-            to: src/main/resources/${{ parameters.workflowId }}.sw.yaml
+          - from: workflow/src/main/resources/template.sw.yaml
+            to: workflow/src/main/resources/${{ parameters.workflowId }}.sw.yaml
             overwrite: true
     - id: buildCodeTemplate
       name: Generating the Build Code for the Workflow
