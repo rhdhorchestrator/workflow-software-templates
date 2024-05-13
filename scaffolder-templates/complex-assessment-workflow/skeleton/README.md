@@ -35,7 +35,7 @@ curl -v -H "Content-Type: application/json" http://localhost:8080/management/pro
 Run the following to create an instance of the ${{ values.workflowId }} workflow:
 
 ```shell script
-curl -XPOST -H "Content-Type: application/json" http://localhost:8080/${{ values.workflowId }} -d '{"userInput": "default"}'
+curl -XPOST -H "Content-Type: application/json" http://localhost:8080/${{ values.workflowId }} -d@input.json
 ```
 
 Response:
@@ -45,8 +45,8 @@ Response:
     "workflowdata": {
         "workflowOptions": {
             "currentVersion": {
-                "id": "${{ values.defaultInfrastructureWorkflowId }}",
-                "name": "${{ values.defaultInfrastructureWorkflowId }}"
+                "id": "${{ values.infrastructureWorkflowId }}",
+                "name": "${{ values.infrastructureWorkflowId }}"
             },
             "upgradeOptions": [],
             "migrationOptions": [],

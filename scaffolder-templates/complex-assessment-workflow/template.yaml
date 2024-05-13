@@ -14,6 +14,9 @@ metadata:
     - url: https://kiegroup.github.io/kogito-docs/serverlessworkflow/latest/index.html
       title: SonataFlow Guides
       icon: techdocs
+    - url: https://www.parodos.dev/docs/core-concepts/workflow-types/
+      title: Workflow Types
+      icon: techdocs
 spec:
   owner: janus-orchestrator
   type: complex-assessment-workflow-bootstrap
