@@ -1,8 +1,8 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: complex-assessment-workflow-bootstrap
-  title: Complex assessment workflow bootstrap project
+  name: complex-assessment-workflow-bootstrap-1
+  title: Complex assessment workflow bootstrap project 1
   description: Bootstrap project for complex assessment serverless workflow using custom java code
   tags:
     - orchestrator
