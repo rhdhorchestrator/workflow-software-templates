@@ -27,5 +27,5 @@ states:
     type: operation
     actions: []
     stateDataFilter:
-      output: '. +={workflowOptions: {currentVersion: {}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+      output: '. +={workflowOptions: null}'
     end: true
