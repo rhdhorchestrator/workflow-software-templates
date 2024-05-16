@@ -335,6 +335,19 @@ spec:
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: main
         sourcePath: gitops
+
+    # TODO find out how to skip this if this if the argocd scaffolder plugin isn't installed
+    - id: create-argocd-resources
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      name: Create ArgoCD Resources
+      action: argocd:create-resources
+      input:
+        appName: ${{ parameters.component_id }}-bootstrap
+        argoInstance: main
+        namespace: janus-argocd
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
+        path: 'gitops/'
+
     - id: registerGitOps
       if: ${{ parameters.CI == 'tekton_argocd' }}
       name: Registering the GitOps Catalog Info Component
