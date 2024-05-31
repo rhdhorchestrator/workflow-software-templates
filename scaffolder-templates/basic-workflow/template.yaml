@@ -145,50 +145,47 @@ spec:
                   title: Quay Repository Name
                   type: string
                   description: The Quay Repository Name of the published workflow. The repository must exist before deploying the gitops.
+                persistencePSQLSecretName:
+                  title: PostgreSQL Secret Name
+                  type: string
+                  default: sonataflow-psql-postgresql
+                  description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
+                persistencePSQLUserKey:
+                  title: PostgreSQL User key from secret
+                  type: string
+                  description: The key name in which the PostgreSQL user is stored.
+                  default: postgres-username
+                persistencePSQLPasswordKey:
+                  title: PostgreSQL Password key from secret
+                  type: string
+                  description: The key name in which the PostgreSQL password is stored.
+                  default: postgres-password
+                persistencePSQLServiceName:
+                  title: PostgreSQL K8s Service Name
+                  type: string
+                  default: sonataflow-psql-postgresql
+                  description: Name of the service running the PostgreSQL instance.
+                persistencePSQLServicePort:
+                  title: PostgreSQL Port
+                  type: integer
+                  default: 5432
+                  description: Port on which the PostgreSQL instance is running.
+                persistencePSQLDatabaseName:
+                  title: PostgreSQL Database Name
+                  type: string
+                  description: Name of the database to use for persistence.
+                  default: sonataflow
               required:
                 - namespace
                 - argocdNamespace
                 - quayOrgName
                 - quayRepoName
-              dependencies:
-                - properties:
-                    persistencePSQLSecretName:
-                      title: PostgreSQL Secret Name
-                      type: string
-                      default: sonataflow-psql-postgresql
-                      description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
-                    persistencePSQLUserKey:
-                      title: PostgreSQL User key from secret
-                      type: string
-                      description: The key name in which the PostgreSQL user is stored.
-                      default: postgres-username
-                    persistencePSQLPasswordKey:
-                      title: PostgreSQL Password key from secret
-                      type: string
-                      description: The key name in which the PostgreSQL password is stored.
-                      default: postgres-password
-                    persistencePSQLServiceName:
-                      title: PostgreSQL K8s Service Name
-                      type: string
-                      default: sonataflow-psql-postgresql
-                      description: Name of the service running the PostgreSQL instance.
-                    persistencePSQLServicePort:
-                      title: PostgreSQL Port
-                      type: integer
-                      default: 5432
-                      description: Port on which the PostgreSQL instance is running.
-                    persistencePSQLDatabaseName:
-                      title: PostgreSQL Database Name
-                      type: string
-                      description: Name of the database to use for persistence.
-                      default: sonataflow
-                  required:
-                    - persistencePSQLSecretName
-                    - persistencePSQLUserKey
-                    - persistencePSQLPasswordKey
-                    - persistencePSQLServiceName
-                    - persistencePSQLServicePort
-                    - persistencePSQLDatabaseName
+                - persistencePSQLSecretName
+                - persistencePSQLUserKey
+                - persistencePSQLPasswordKey
+                - persistencePSQLServiceName
+                - persistencePSQLServicePort
+                - persistencePSQLDatabaseName
   steps:
     - id: workflowCodeTemplate
       name: Generating the Workflow Source Code and Catalog Info Component
@@ -302,12 +299,6 @@ spec:
           - from: gitops/kustomize/base/sonataflow-patch-persistence.yaml
             to: gitops/kustomize/base/sonataflow-patch.yaml
             overwrite: true
-    - id: cleanFilesForPersistence
-      action: fs:delete
-      name: Clean persistence files
-      input:
-        files:
-          - gitops/kustomize/base/sonataflow-patch-persistence.yaml
     - id: publishGitOps
       if: ${{ parameters.CI == 'tekton_argocd' }}
       name: Publishing to the GitOps Code Repository
