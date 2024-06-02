@@ -48,7 +48,7 @@ spec:
         workflowId:
           title: Workflow ID
           type: string
-          pattern: '^([a-zA-Z][a-zA-Z0-9]*)([-.]?[a-zA-Z0-9]+)*$'
+          pattern: "^([a-zA-Z][a-zA-Z0-9]*)([-.]?[a-zA-Z0-9]+)*$"
           description: Unique identifier of the workflow in SonataFlow
           default: onboarding
         owner:
@@ -98,7 +98,7 @@ spec:
                 infrastructureWorkflowId:
                   title: Infrastructure Workflow ID
                   type: string
-                  pattern: '^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$'
+                  pattern: "^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$"
                   description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
               required:
                 - infrastructureWorkflowId
@@ -145,63 +145,47 @@ spec:
                   title: Quay Repository Name
                   type: string
                   description: The Quay Repository Name of the published workflow. The repository must exist before deploying the gitops.
-                persistenceEnabled:
-                  title: Enable Persistance
-                  type: boolean
-                  description: Indicates whether the workflow shall have persistence enabled.
-                  default: false
+                persistencePSQLSecretName:
+                  title: PostgreSQL Secret Name
+                  type: string
+                  default: sonataflow-psql-postgresql
+                  description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
+                persistencePSQLUserKey:
+                  title: PostgreSQL User key from secret
+                  type: string
+                  description: The key name in which the PostgreSQL user is stored.
+                  default: postgres-username
+                persistencePSQLPasswordKey:
+                  title: PostgreSQL Password key from secret
+                  type: string
+                  description: The key name in which the PostgreSQL password is stored.
+                  default: postgres-password
+                persistencePSQLServiceName:
+                  title: PostgreSQL K8s Service Name
+                  type: string
+                  default: sonataflow-psql-postgresql
+                  description: Name of the service running the PostgreSQL instance.
+                persistencePSQLServicePort:
+                  title: PostgreSQL Port
+                  type: integer
+                  default: 5432
+                  description: Port on which the PostgreSQL instance is running.
+                persistencePSQLDatabaseName:
+                  title: PostgreSQL Database Name
+                  type: string
+                  description: Name of the database to use for persistence.
+                  default: sonataflow
               required:
                 - namespace
                 - argocdNamespace
                 - quayOrgName
                 - quayRepoName
-                - persistenceEnabled
-              dependencies:
-                persistenceEnabled:
-                  oneOf:
-                    - properties:
-                        persistenceEnabled:
-                          const: false
-                    - properties:
-                        persistenceEnabled:
-                          const: true
-                        persistencePSQLSecretName:
-                          title: PostgreSQL Secret Name
-                          type: string
-                          default: sonataflow-psql-postgresql
-                          description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
-                        persistencePSQLUserKey:
-                          title: PostgreSQL User key from secret
-                          type: string
-                          description: The key name in which the PostgreSQL user is stored.
-                          default: postgres-username
-                        persistencePSQLPasswordKey:
-                          title: PostgreSQL Password key from secret
-                          type: string
-                          description: The key name in which the PostgreSQL password is stored.
-                          default: postgres-password
-                        persistencePSQLServiceName:
-                          title: PostgreSQL K8s Service Name
-                          type: string
-                          default: sonataflow-psql-postgresql
-                          description: Name of the service running the PostgreSQL instance.
-                        persistencePSQLServicePort:
-                          title: PostgreSQL Port
-                          type: integer
-                          default: 5432
-                          description: Port on which the PostgreSQL instance is running.
-                        persistencePSQLDatabaseName:
-                          title: PostgreSQL Database Name
-                          type: string
-                          description: Name of the database to use for persistence.
-                          default: sonataflow
-                      required:
-                        - persistencePSQLSecretName
-                        - persistencePSQLUserKey
-                        - persistencePSQLPasswordKey
-                        - persistencePSQLServiceName
-                        - persistencePSQLServicePort
-                        - persistencePSQLDatabaseName
+                - persistencePSQLSecretName
+                - persistencePSQLUserKey
+                - persistencePSQLPasswordKey
+                - persistencePSQLServiceName
+                - persistencePSQLServicePort
+                - persistencePSQLDatabaseName
   steps:
     - id: workflowCodeTemplate
       name: Generating the Workflow Source Code and Catalog Info Component
@@ -226,7 +210,6 @@ spec:
           sourceControl: github.com
           applicationType: workflow-project
           lifecycle: development
-          persistenceEnabled: ${{ parameters.persistenceEnabled }}
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
         targetPath: workflow
@@ -265,9 +248,9 @@ spec:
         targetPath: workflow
     - id: publishWorkflow
       name: Publishing to the Workflow Repository
-      action: publish:github  
+      action: publish:github
       input:
-        allowedHosts: ['github.com']
+        allowedHosts: ["github.com"]
         description: ${{ parameters.description }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
@@ -305,32 +288,23 @@ spec:
           persistencePSQLServicePort: ${{ parameters.persistencePSQLServicePort }}
           persistencePSQLDatabaseName: ${{ parameters.persistencePSQLDatabaseName }}
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
-          persistenceEnabled: ${{ parameters.persistenceEnabled }}
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
         targetPath: gitops
     - id: renameFilesForPersistence
       action: fs:rename
-      if: ${{ parameters.persistenceEnabled == true }}
       name: Rename files for persistence
       input:
         files:
           - from: gitops/kustomize/base/sonataflow-patch-persistence.yaml
             to: gitops/kustomize/base/sonataflow-patch.yaml
             overwrite: true
-    - id: cleanFilesForPersistence
-      action: fs:delete
-      if: ${{ parameters.persistenceEnabled == false }}
-      name: Clean persistence files
-      input:
-        files:
-          - gitops/kustomize/base/sonataflow-patch-persistence.yaml
     - id: publishGitOps
       if: ${{ parameters.CI == 'tekton_argocd' }}
       name: Publishing to the GitOps Code Repository
       action: publish:github
       input:
-        allowedHosts: ['github.com']
+        allowedHosts: ["github.com"]
         description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
         repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: main
