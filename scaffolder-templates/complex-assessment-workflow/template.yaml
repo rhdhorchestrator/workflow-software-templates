@@ -199,9 +199,6 @@ spec:
           - from: workflow/src/main/resources/specs/dataindex.yaml
             to: workflow/src/main/resources/specs/${{ parameters.workflowId }}-dataindex.yaml
             overwrite: true
-          - from: workflow/src/main/resources/precheck.sw.yaml
-            to: workflow/src/main/resources/${{ parameters.workflowId }}-precheck.sw.yaml
-            overwrite: true
           - from: workflow/src/main/resources/template.sw.yaml
             to: workflow/src/main/resources/${{ parameters.workflowId }}.sw.yaml
             overwrite: true
