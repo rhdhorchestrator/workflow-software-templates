@@ -17,10 +17,18 @@ extensions:
 functions:
   - name: execute
     type: custom
-    operation: "service:java:${{ values.groupId }}.${{ values.artifactId }}.DefaultAssessment::execute"
-  - name: logOuput
+    operation: "service:java:${{ values.groupId }}.${{ values.artifactId }}.SampleAssessment::execute"
+  - name: logOutput
     type: custom
     operation: "sysout:INFO"
+  - name: extract
+    type: expression
+    operation: ".result | flatten | map(.id)"
+  - name: checkProcessDefinitionExistence
+    operation: specs/dataindex.yaml#reactiveGraphQLHandlerPost
+  - name: removeMissingWorkflowsFromOptions
+    type: expression
+    operation: '.missingWorkflows as $f | .result | walk( if type == "object" then select(all($f[] != .id; .)) else . end )'
 states:
   - name: StartState
     type: operation
@@ -31,17 +39,78 @@ states:
         functionRef:
           refName: execute
           arguments:
-            userInput: ".userInput"
+            sampleText: ".sampleText"
         actionDataFilter:
           toStateData: ".result"
-      - name: preCheck
-        subFlowRef:
-          workflowId: "${{ values.workflowId }}PreCheck"
-        actionDataFilter:
-          toStateData: ".preCheck"
-      - name: printAction
+    transition: ExtractWorkflows
+  - name: ExtractWorkflows
+    type: operation
+    actions:
+      - name: ExtractWorkflowsAction
         functionRef:
-          refName: logOuput
+          refName: extract
+        actionDataFilter:
+          toStateData: ".infrasWorkflows"
+    transition: QueryWorkflow
+  - name: QueryWorkflow
+    type: foreach
+    inputCollection: "${ .infrasWorkflows }"
+    outputCollection: "${ .fetchResults }"
+    iterationParam: infrasWorkflow
+    actions:
+    - name: checkAction
+      functionRef:
+        refName: checkProcessDefinitionExistence
+        arguments:
+          query: "query CheckProcessDefQuery($id: String) { ProcessDefinitions  ( where: {id: { equal: $id} } ) { id } }"
+          variables: 
+            id: "${ .infrasWorkflow }"
+          operationName: "CheckProcessDefQuery"
+      actionDataFilter:
+        results: "${ .data.ProcessDefinitions[0].id }"
+    transition: Check
+  - name: Check
+    type: switch
+    dataConditions:
+      - condition: (.infrasWorkflows-.fetchResults | length > 0)
+        transition: PrintError
+    defaultCondition:
+      transition: HandleNoError
+  - name: PrintError
+    type: operation
+    actions:
+    - name: error
+      functionRef:
+        refName: logOutput
+        arguments:
+          message: "\"workflows: \\(.infrasWorkflows-.fetchResults) are not found\""
+    stateDataFilter:
+      output: ". += { missingWorkflows: (.infrasWorkflows - .fetchResults) } | del(.infrasWorkflows, .fetchResults)"
+    transition: HandleError
+  - name: HandleError
+    type: operation
+    actions:
+    - name: error
+      functionRef:
+        refName: removeMissingWorkflowsFromOptions
+      actionDataFilter:
+        toStateData: "${ .validatedResult }"
+    stateDataFilter:
+      output: ".originalResult = .result | del(.result)"
+    transition: printAction
+  - name: HandleNoError
+    type: operation
+    actions: []
+    stateDataFilter:
+      output: ".validatedResult = .result | del(.infrasWorkflows, .fetchResults)"
+    transition: printAction
+  - name: printAction
+    type: operation
+    stateDataFilter:
+      output: '{workflowOptions: .validatedResult}'
+    actions:
+      - functionRef:
+          refName: logOutput
           arguments:
-            message: ".preCheck"
+            message: ".validatedResult"
     end: true

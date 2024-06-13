@@ -3,7 +3,7 @@ kind: Template
 metadata:
   name: basic-workflow-bootstrap
   title: Basic workflow bootstrap project
-  description: Bootstrap project for basic serverless workflows
+  description: Bootstrap project for basic serverless workflow
   tags:
     - orchestrator
     - built-in
