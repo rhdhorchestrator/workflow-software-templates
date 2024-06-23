@@ -266,6 +266,7 @@ spec:
           quayRepoName: ${{ parameters.quayRepoName }}
         targetPath: gitops
     - id: renameFilesForPersistence
+      if: ${{ parameters.CI == 'tekton_argocd' }}    
       action: fs:rename
       name: Rename files for persistence
       input:
