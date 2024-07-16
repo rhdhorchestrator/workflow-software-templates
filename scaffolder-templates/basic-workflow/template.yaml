@@ -245,6 +245,7 @@ spec:
           gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
+          convertToFlat: true
         targetPath: workflow
     - id: publishWorkflow
       name: Publishing to the Workflow Repository

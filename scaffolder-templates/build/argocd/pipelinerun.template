@@ -16,7 +16,7 @@ spec:
     - name: workflowId
       value: ${{ values.workflowId }}
     - name: convertToFlat
-      value: 'true'
+      value: ${{ values.convertToFlat }}
     - name: quayOrgName
       value: ${{ values.quayOrgName }}
     - name: quayRepoName
