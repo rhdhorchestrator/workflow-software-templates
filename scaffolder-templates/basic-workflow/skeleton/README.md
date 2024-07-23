@@ -48,15 +48,3 @@ Use the `Data Index GraphQL UI` to query the state of the [Data Index service](h
 ```
 http://localhost:8080/q/dev-v1/org.kie.kogito.kogito-addons-quarkus-data-index-inmemory/dataindex
 ```
-
-# Next steps
-## Building, deploying and running in cluster environment
-## Developing tests
-:construction:
-# Developer's guide
-## Using subflows
-:construction:
-## Externalizing the configuration
-:construction:
-## Preparing a CI pipeline
-:construction:
