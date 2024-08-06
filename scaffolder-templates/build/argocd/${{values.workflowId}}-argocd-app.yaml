@@ -6,6 +6,7 @@ metadata:
   labels:
     app-type: workflow
     app: ${{ values.workflowId }}
+    rht-gitops.com/janus-argocd: ${{ values.workflowId }}-gitops
 spec:
   destination:
     namespace: ${{ values.namespace }}

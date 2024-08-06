@@ -4,6 +4,7 @@ metadata:
   name: ${{ values.workflowId }}
   description: ${{ values.description }}
   annotations:
+    argocd/app-selector: rht-gitops.com/janus-argocd=${{ values.workflowId }}
     backstage.io/kubernetes-namespace: ${{ values.argocdNamespace }}
     backstage.io/kubernetes-id: ${{ values.workflowId }}-ci
     janus-idp.io/tekton: ${{ values.workflowId }}
