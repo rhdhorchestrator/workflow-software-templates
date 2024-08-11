@@ -22,7 +22,7 @@ spec:
   type: complex-assessment-workflow-bootstrap
   parameters:
     - title: Provide information about the workflow software project
-      description: Configure the github repository where the Maven software project is located 
+      description: Configure the github repository where the Maven software project is located
       required:
         - orgName
         - repoName
@@ -135,6 +135,11 @@ spec:
                   type: string
                   default: sonataflow-psql-postgresql
                   description: Name of the service running the PostgreSQL instance.
+                persistencePSQLServiceNamespace:
+                  title: PostgreSQL K8s Service Namespace
+                  type: string
+                  default: sonataflow-infra
+                  description: Namespace of the service running the PostgreSQL instance.
                 persistencePSQLServicePort:
                   title: PostgreSQL Port
                   type: integer
@@ -154,6 +159,7 @@ spec:
                 - persistencePSQLUserKey
                 - persistencePSQLPasswordKey
                 - persistencePSQLServiceName
+                - persistencePSQLServiceNamespace
                 - persistencePSQLServicePort
                 - persistencePSQLDatabaseName
   steps:
@@ -260,6 +266,7 @@ spec:
           persistencePSQLUserKey: ${{ parameters.persistencePSQLUserKey }}
           persistencePSQLPasswordKey: ${{ parameters.persistencePSQLPasswordKey }}
           persistencePSQLServiceName: ${{ parameters.persistencePSQLServiceName }}
+          persistencePSQLServiceNamespace: ${{ parameters.persistencePSQLServiceNamespace }}
           persistencePSQLServicePort: ${{ parameters.persistencePSQLServicePort }}
           persistencePSQLDatabaseName: ${{ parameters.persistencePSQLDatabaseName }}
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
@@ -267,7 +274,7 @@ spec:
           quayRepoName: ${{ parameters.quayRepoName }}
         targetPath: gitops
     - id: renameFilesForPersistence
-      if: ${{ parameters.CI == 'tekton_argocd' }}    
+      if: ${{ parameters.CI == 'tekton_argocd' }}
       action: fs:rename
       name: Rename files for persistence
       input:
