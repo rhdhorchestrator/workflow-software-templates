@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
 __RESOURCES__
-namespace: sonataflow-infra
+namespace: ${{ values.namespace }}
 
 configurations:
 - config/image-configuration.yaml
