@@ -165,6 +165,11 @@ spec:
                   type: string
                   default: sonataflow-psql-postgresql
                   description: Name of the service running the PostgreSQL instance.
+                persistencePSQLServiceNamespace:
+                  title: PostgreSQL K8s Service Namespace
+                  type: string
+                  default: sonataflow-infra
+                  description: Namespace of the service running the PostgreSQL instance.
                 persistencePSQLServicePort:
                   title: PostgreSQL Port
                   type: integer
@@ -184,6 +189,7 @@ spec:
                 - persistencePSQLUserKey
                 - persistencePSQLPasswordKey
                 - persistencePSQLServiceName
+                - persistencePSQLServiceNamespace
                 - persistencePSQLServicePort
                 - persistencePSQLDatabaseName
   steps:
@@ -286,6 +292,7 @@ spec:
           persistencePSQLUserKey: ${{ parameters.persistencePSQLUserKey }}
           persistencePSQLPasswordKey: ${{ parameters.persistencePSQLPasswordKey }}
           persistencePSQLServiceName: ${{ parameters.persistencePSQLServiceName }}
+          persistencePSQLServiceNamespace: ${{ parameters.persistencePSQLServiceNamespace }}
           persistencePSQLServicePort: ${{ parameters.persistencePSQLServicePort }}
           persistencePSQLDatabaseName: ${{ parameters.persistencePSQLDatabaseName }}
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}

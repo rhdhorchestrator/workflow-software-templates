@@ -10,11 +10,12 @@ spec:
   persistence:
     postgresql:
       secretRef:
-        name:  ${{ values.persistencePSQLSecretName }}
+        name: ${{ values.persistencePSQLSecretName }}
         userKey: ${{ values.persistencePSQLUserKey }}
         passwordKey: ${{ values.persistencePSQLPasswordKey }}
       serviceRef:
         name: ${{ values.persistencePSQLServiceName }}
+        namespace: ${{ values.persistencePSQLServiceNamespace }}
         port: ${{ values.persistencePSQLServicePort }}
         databaseName: ${{ values.persistencePSQLDatabaseName }}
         databaseSchema: ${{ values.persistencePSQLDatabaseSchema }}
@@ -22,8 +23,8 @@ spec:
     container:
       image: serverless-workflow-${{ values.workflowId }}
       envFrom:
-      - configMapRef:
-          name: ${{ values.workflowId }}-gitops
-      - secretRef:
-          name: ${{ values.workflowId }}-secret
+        - configMapRef:
+            name: ${{ values.workflowId }}-gitops
+        - secretRef:
+            name: ${{ values.workflowId }}-secret
       resources: {}
