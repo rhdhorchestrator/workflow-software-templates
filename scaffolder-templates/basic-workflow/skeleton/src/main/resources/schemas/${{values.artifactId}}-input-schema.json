@@ -7,7 +7,8 @@
     "sampleText": {
       "title": "A sample text",
       "type": "string",
-      "description": "Sample text data"
+      "description": "Sample text data",
+      "ui:widget": "textarea"
     }
   }
 }
