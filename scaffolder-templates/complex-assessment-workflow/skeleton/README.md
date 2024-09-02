@@ -58,6 +58,9 @@ Response:
 }
 ```
 
+## Adding UI schema properties
+You can add React UI schema properties to the input schema. See the 'ui:widget' example at [input-schema.json](./src/main/resources/schemas/input-schema.json ).
+
 # Dev UI Tools
 Use the `Serverless Workflow Tools` to manage and monitor the published workflows:
 ```
