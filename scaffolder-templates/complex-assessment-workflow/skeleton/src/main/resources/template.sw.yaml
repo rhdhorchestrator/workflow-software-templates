@@ -23,12 +23,47 @@ functions:
     operation: "sysout:INFO"
   - name: extract
     type: expression
-    operation: ".result | flatten | map(.id)"
+    operation: ".executeResult | flatten | map(.id)"
   - name: checkProcessDefinitionExistence
     operation: specs/${{ values.artifactId }}-dataindex.yaml#reactiveGraphQLHandlerPost
   - name: removeMissingWorkflowsFromOptions
     type: expression
-    operation: '.missingWorkflows as $f | .result | walk( if type == "object" then select(all($f[] != .id; .)) else . end )'
+    operation: '.missingWorkflows as $f | .executeResult | walk( if type == "object" then select(all($f[] != .id; .)) else . end )'
+  - name: assessmentResult
+    type: expression
+    operation: '{
+        "completedWith":"success",
+        "message": "${{ values.workflowId }} completed successfully",
+        "outputs":[
+          {
+            "key": "validatedResult",
+            "value": .validatedResult
+          }
+        ],
+        "nextWorkflows":[
+          {
+              "id": .executeResult.currentVersion.id,
+              "name": .executeResult.currentVersion.name
+          }
+        ]
+      }'
+  - name: errorAssessmentResult
+    type: expression
+    operation: '{
+        "completedWith":"error",
+        "message": "${{ values.workflowId }} completed with error",
+        "outputs":[
+          {
+            "key": "missingWorkflows",
+            "value": (.infrasWorkflows - .fetchResults) } | del(.infrasWorkflows, .fetchResults)
+          }, 
+          {
+            "key": "validatedResult",
+            "value": .validatedResult
+          }
+        ],
+        "nextWorkflows":[]
+      }'
 states:
   - name: StartState
     type: operation
@@ -41,7 +76,7 @@ states:
           arguments:
             sampleText: ".sampleText"
         actionDataFilter:
-          toStateData: ".result"
+          toStateData: ".executeResult"
     transition: ExtractWorkflows
   - name: ExtractWorkflows
     type: operation
@@ -96,13 +131,35 @@ states:
       actionDataFilter:
         toStateData: "${ .validatedResult }"
     stateDataFilter:
-      output: ".originalResult = .result | del(.result)"
+      output: ".originalResult = .executeResult | del(.executeResult)"
+    transition: reportFailure
+  - name: reportFailure
+    type: operation
+    actions:
+      - name: reportFailure
+        functionRef:
+          refName: errorAssessmentResult
+        actionDataFilter:
+          toStateData: ".result"
+    stateDataFilter:
+      output: ". += .result"
     transition: printAction
   - name: HandleNoError
     type: operation
     actions: []
     stateDataFilter:
-      output: ".validatedResult = .result | del(.infrasWorkflows, .fetchResults)"
+      output: ".validatedResult = .executeResult | del(.infrasWorkflows, .fetchResults)"
+    transition: reportNoError
+  - name: reportNoError
+    type: operation
+    actions:
+      - name: reportNoError
+        functionRef:
+          refName: assessmentResult
+        actionDataFilter:
+          toStateData: ".result"
+    stateDataFilter:
+      output: ". += .result"
     transition: printAction
   - name: printAction
     type: operation
