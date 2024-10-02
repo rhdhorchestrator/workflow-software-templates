@@ -8,6 +8,33 @@ annotations:
 dataInputSchema:
   schema: schemas/${{ values.artifactId }}-input-schema.json
   failOnValidationErrors: true
+extensions:
+  - extensionid: workflow-output-schema
+    outputSchema:
+      schema: schemas/${{ values.artifactId }}-workflow-result-schema.json
+      failOnValidationErrors: true
+functions:
+  - name: assessmentResult
+    type: expression
+    operation: '{
+        "completedWith":"success",
+        "message": "${{ values.workflowId }} completed successfully",
+        "outputs":[],
+        "nextWorkflows":[
+          {
+              "id":"${{ values.infrastructureWorkflowId }}",
+              "name":"${{ values.infrastructureWorkflowId }}"
+          }
+        ]
+      }'
+  - name: emptyAssessmentResult
+    type: expression
+    operation: '{
+        "completedWith":"success",
+        "message": "${{ values.workflowId }} completed without sampleText",
+        "outputs":[],
+        "nextWorkflows":[]
+      }'
 start: StartState
 states:
   - name: StartState
@@ -19,13 +46,23 @@ states:
       transition: GetEmptyWorkflowOptions
   - name: GetSampleWorkflowOptions
     type: operation
-    actions: []
+    actions:
+      - name: GetSampleWorkflowOptions
+        functionRef:
+          refName: assessmentResult
+        actionDataFilter:
+          toStateData: ".result"
     stateDataFilter:
-      output: '. +={workflowOptions: {currentVersion: {id: "${{ values.infrastructureWorkflowId }}", name: "${{ values.infrastructureWorkflowId }}"}, "upgradeOptions": [], "migrationOptions": [], "newOptions": [], "continuationOptions": [], "otherOptions": []}}'
+      output: ". += .result"
     end: true
   - name: GetEmptyWorkflowOptions
     type: operation
-    actions: []
+    actions:
+      - name: GetEmptyWorkflowOptions
+        functionRef:
+          refName: emptyAssessmentResult
+        actionDataFilter:
+          toStateData: ".result"
     stateDataFilter:
-      output: '. +={workflowOptions: null}'
+      output: ". += .result"
     end: true

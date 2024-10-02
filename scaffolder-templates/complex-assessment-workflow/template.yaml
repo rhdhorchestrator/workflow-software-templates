@@ -193,15 +193,6 @@ spec:
       name: Rename files
       input:
         files:
-          - from: workflow/src/main/resources/schemas/input-schema.json
-            to: workflow/src/main/resources/schemas/${{ parameters.workflowId }}-input-schema.json
-            overwrite: true
-          - from: workflow/src/main/resources/schemas/workflow-option-output-schema.json
-            to: workflow/src/main/resources/schemas/${{ parameters.workflowId }}-workflow-option-output-schema.json
-            overwrite: true
-          - from: workflow/src/main/resources/schemas/workflow-options-output-schema.json
-            to: workflow/src/main/resources/schemas/${{ parameters.workflowId }}-workflow-options-output-schema.json
-            overwrite: true
           - from: workflow/src/main/resources/specs/dataindex.yaml
             to: workflow/src/main/resources/specs/${{ parameters.workflowId }}-dataindex.yaml
             overwrite: true
