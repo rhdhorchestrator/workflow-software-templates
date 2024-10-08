@@ -34,7 +34,7 @@ functions:
     operation: '{
         result: {
           "completedWith":"success",
-          "message": "${{ values.workflowId }} completed successfully",
+          "message": "The workflow ${{ values.workflowId }} completed successfully",
           "outputs":[
             {
               "key": "Validated Result",
@@ -54,7 +54,7 @@ functions:
     operation: '{
         result: {
           "completedWith":"error",
-          "message": "${{ values.workflowId }} completed with error",
+          "message": "The workflow ${{ values.workflowId }} completed with error",
           "outputs":[
             {
               "key": "Missing Workflows",

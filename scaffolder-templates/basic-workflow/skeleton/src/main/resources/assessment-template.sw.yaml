@@ -19,7 +19,7 @@ functions:
     operation: '{
         result: {
           "completedWith":"success",
-          "message": "${{ values.workflowId }} completed successfully",
+          "message": "The workflow ${{ values.workflowId }} completed successfully",
           "outputs":[],
           "nextWorkflows":[
             {
@@ -34,7 +34,7 @@ functions:
     operation: '{
         result: {
           "completedWith":"success",
-          "message": "${{ values.workflowId }} completed without sampleText",
+          "message": "The workflow ${{ values.workflowId }} completed without sampleText",
           "outputs":[],
           "nextWorkflows":[]
         }

@@ -2,7 +2,9 @@
 
 This repository is a collection of software and documentation templates for the Backstage Orchestrator plugin. The templates are organized into two folders: `scaffolder-templates` for Software Templates and `documentation-templates` for general documentation templates. Contributions are welcome for new and existing templates!
 
-Starting RHDH orchestrator plugin v1.13, the outputs schema is used to improve how the outputs of a workflow are displayed to the user; instead of displaying a JSON of the whole context, only the defined field will be formatted and displayed in an user-friendly way.
+Starting from RHDH Orchestrator Plugin v1.13, the outputs schema enhances the display of workflow outputs. Rather than showing the entire context as a JSON object, only the specified fields are formatted and presented in a more user-friendly manner.
+
+See [the output schema definition and description](https://github.com/parodos-dev/serverless-workflows/blob/main/best-practices.md#workflow-output-schema) for more details.
 
 ## scaffolder-templates
 
