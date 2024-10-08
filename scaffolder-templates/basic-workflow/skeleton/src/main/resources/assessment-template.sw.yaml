@@ -17,23 +17,27 @@ functions:
   - name: assessmentResult
     type: expression
     operation: '{
-        "completedWith":"success",
-        "message": "${{ values.workflowId }} completed successfully",
-        "outputs":[],
-        "nextWorkflows":[
-          {
-              "id":"${{ values.infrastructureWorkflowId }}",
-              "name":"${{ values.infrastructureWorkflowId }}"
-          }
-        ]
+        result: {
+          "completedWith":"success",
+          "message": "${{ values.workflowId }} completed successfully",
+          "outputs":[],
+          "nextWorkflows":[
+            {
+                "id":"${{ values.infrastructureWorkflowId }}",
+                "name":"${{ values.infrastructureWorkflowId }}"
+            }
+          ]
+        }
       }'
   - name: emptyAssessmentResult
     type: expression
     operation: '{
-        "completedWith":"success",
-        "message": "${{ values.workflowId }} completed without sampleText",
-        "outputs":[],
-        "nextWorkflows":[]
+        result: {
+          "completedWith":"success",
+          "message": "${{ values.workflowId }} completed without sampleText",
+          "outputs":[],
+          "nextWorkflows":[]
+        }
       }'
 start: StartState
 states:
@@ -50,10 +54,6 @@ states:
       - name: GetSampleWorkflowOptions
         functionRef:
           refName: assessmentResult
-        actionDataFilter:
-          toStateData: ".result"
-    stateDataFilter:
-      output: ". += .result"
     end: true
   - name: GetEmptyWorkflowOptions
     type: operation
@@ -61,8 +61,4 @@ states:
       - name: GetEmptyWorkflowOptions
         functionRef:
           refName: emptyAssessmentResult
-        actionDataFilter:
-          toStateData: ".result"
-    stateDataFilter:
-      output: ". += .result"
     end: true

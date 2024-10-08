@@ -12,7 +12,7 @@ start: StartState
 extensions:
   - extensionid: workflow-output-schema
     outputSchema:
-      schema: schemas/${{ values.artifactId }}-workflow-options-output-schema.json
+      schema: schemas/${{ values.artifactId }}-workflow-result-schema.json
       failOnValidationErrors: true
 functions:
   - name: execute
@@ -32,37 +32,37 @@ functions:
   - name: assessmentResult
     type: expression
     operation: '{
-        "completedWith":"success",
-        "message": "${{ values.workflowId }} completed successfully",
-        "outputs":[
-          {
-            "key": "validatedResult",
-            "value": .validatedResult
-          }
-        ],
-        "nextWorkflows":[
-          {
-              "id": .executeResult.currentVersion.id,
-              "name": .executeResult.currentVersion.name
-          }
-        ]
+        result: {
+          "completedWith":"success",
+          "message": "${{ values.workflowId }} completed successfully",
+          "outputs":[
+            {
+              "key": "Validated Result",
+              "value": .validatedResult
+            }
+          ],
+          "nextWorkflows":[
+            {
+                "id": .executeResult.currentVersion.id,
+                "name": .executeResult.currentVersion.name
+            }
+          ]
+        }
       }'
   - name: errorAssessmentResult
     type: expression
     operation: '{
-        "completedWith":"error",
-        "message": "${{ values.workflowId }} completed with error",
-        "outputs":[
-          {
-            "key": "missingWorkflows",
-            "value": (.infrasWorkflows - .fetchResults) } | del(.infrasWorkflows, .fetchResults)
-          }, 
-          {
-            "key": "validatedResult",
-            "value": .validatedResult
-          }
-        ],
-        "nextWorkflows":[]
+        result: {
+          "completedWith":"error",
+          "message": "${{ values.workflowId }} completed with error",
+          "outputs":[
+            {
+              "key": "Missing Workflows",
+              "value": (.missingWorkflows | join(","))
+            }
+          ],
+          "nextWorkflows":[]
+        }
       }'
 states:
   - name: StartState
@@ -139,10 +139,6 @@ states:
       - name: reportFailure
         functionRef:
           refName: errorAssessmentResult
-        actionDataFilter:
-          toStateData: ".result"
-    stateDataFilter:
-      output: ". += .result"
     transition: printAction
   - name: HandleNoError
     type: operation
@@ -156,18 +152,12 @@ states:
       - name: reportNoError
         functionRef:
           refName: assessmentResult
-        actionDataFilter:
-          toStateData: ".result"
-    stateDataFilter:
-      output: ". += .result"
     transition: printAction
   - name: printAction
     type: operation
-    stateDataFilter:
-      output: '{workflowOptions: .validatedResult}'
     actions:
       - functionRef:
           refName: logOutput
           arguments:
-            message: ".validatedResult"
+            message: ".result"
     end: true
