@@ -13,12 +13,15 @@
     <compiler-plugin.version>3.10.1</compiler-plugin.version>
     <kogito.bom.artifact-id>kogito-bom</kogito.bom.artifact-id>
     <kogito.bom.group-id>org.kie.kogito</kogito.bom.group-id>
-    <kogito.bom.version>2.44.0.Alpha</kogito.bom.version>
+    <kogito.bom.version>9.101.0.redhat-00007</kogito.bom.version>
+    <sonataflow-quarkus-devui.bom.artifact-id>sonataflow-quarkus-devui-bom</sonataflow-quarkus-devui.bom.artifact-id>
+    <sonataflow-quarkus-devui.bom.group-id>org.apache.kie.sonataflow</sonataflow-quarkus-devui.bom.group-id>
+    <sonataflow-quarkus-devui.bom.version>9.101.0.redhat-00007</sonataflow-quarkus-devui.bom.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-    <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>3.2.9.Final</quarkus.platform.version>
+    <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
+    <quarkus.platform.version>3.8.6.redhat-00004</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.0.0-M7</surefire-plugin.version>
   </properties>
@@ -38,28 +41,35 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>${sonataflow-quarkus-devui.bom.group-id}</groupId>
+        <artifactId>${sonataflow-quarkus-devui.bom.artifact-id}</artifactId>
+        <version>${sonataflow-quarkus-devui.bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-quarkus-serverless-workflow</artifactId>
+      <groupId>org.apache.kie.sonataflow</groupId>
+      <artifactId>sonataflow-quarkus</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-smallrye-health</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-addons-quarkus-source-files</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-addons-quarkus-source-files</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-quarkus-serverless-workflow-devui</artifactId>
+      <groupId>org.apache.kie.sonataflow</groupId>
+      <artifactId>sonataflow-quarkus-devui</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.kie.kogito</groupId>
-      <artifactId>kogito-addons-quarkus-process-management</artifactId>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-addons-quarkus-process-management</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -70,7 +80,7 @@
       <artifactId>quarkus-arc</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.kie.kogito</groupId>
+      <groupId>org.kie</groupId>
       <artifactId>kogito-addons-quarkus-data-index-inmemory</artifactId>
     </dependency>
     <dependency>
@@ -153,8 +163,8 @@
   <!-- Temporary hack to use latest SonataFlow platform artifacts-->
   <repositories>
     <repository>
-      <id>apache-repository-snapshots</id>
-      <url>https://repository.apache.org/content/repositories/snapshots/</url>
+      <id>redhat-mvn-ga</id>
+      <url>https://maven.repository.redhat.com/ga</url>
       <layout>default</layout>
       <releases>
         <enabled>true</enabled>
@@ -165,4 +175,18 @@
       </snapshots>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>daily</updatePolicy>
+      </snapshots>
+      <id>redhat-mvn-ga</id>
+      <name>Red Hat Maven Plugin Repository</name>
+      <url>https://maven.repository.redhat.com/ga</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>

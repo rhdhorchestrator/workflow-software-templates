@@ -44,10 +44,10 @@ You can add React UI schema properties to the input schema. See the 'ui:widget' 
 # Dev UI Tools
 Use the `Serverless Workflow Tools` to manage and monitor the published workflows:
 ```
-http://localhost:8080/q/dev-v1/org.kie.kogito.kogito-quarkus-serverless-workflow-devui/workflowInstances
+http://localhost:8080/q/dev-v1/org.apache.kie.sonataflow.sonataflow-quarkus-devui/workflowInstances
 ```
 
 Use the `Data Index GraphQL UI` to query the state of the [Data Index service](https://sonataflow.org/serverlessworkflow/main/data-index/data-index-core-concepts.html):
 ```
-http://localhost:8080/q/dev-v1/org.kie.kogito.kogito-addons-quarkus-data-index-inmemory/dataindex
+http://localhost:8080/q/dev-v1/org.kie.kogito-addons-quarkus-data-index-inmemory/dataindex
 ```
