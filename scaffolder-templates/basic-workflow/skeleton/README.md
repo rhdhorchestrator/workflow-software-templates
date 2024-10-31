@@ -38,9 +38,6 @@ instance of the ${{ values.workflowId }} workflow:
 curl -v -X POST -H "Content-Type: application/json" http://localhost:8080/${{ values.workflowId }} -d@input.json
 ```
 
-## Adding UI schema properties
-You can add React UI schema properties to the input schema. See the 'ui:widget' example at [${{ values.artifactId }}-schema.json](./src/main/resources/schemas/${{ values.artifactId }}-schema.json ).
-
 # Dev UI Tools
 Use the `Serverless Workflow Tools` to manage and monitor the published workflows:
 ```
