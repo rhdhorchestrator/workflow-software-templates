@@ -3,7 +3,7 @@ kind: SonataFlow
 metadata:
   name: ${{ values.workflowId }}
   annotations:
-    sonataflow.org/profile: prod
+    sonataflow.org/profile: gitops
   labels:
     backstage.io/kubernetes-id: ${{ values.workflowId }}
 spec:
