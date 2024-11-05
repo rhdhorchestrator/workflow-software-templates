@@ -37,8 +37,24 @@ functions:
           "message": "The workflow ${{ values.workflowId }} completed successfully",
           "outputs":[
             {
-              "key": "Validated Result",
-              "value": .validatedResult
+              "key": "Validated Result - new options",
+              "value": (.validatedResult.newOptions | join(","))
+            },
+            {
+              "key": "Validated Result - other options",
+              "value": (.validatedResult.otherOptions | join(","))
+            },
+            {
+              "key": "Validated Result - upgrade options",
+              "value": (.validatedResult.upgradeOptions | join(","))
+            },
+            {
+              "key": "Validated Result - migration options",
+              "value": (.validatedResult.migrationOptions | join(","))
+            },
+            {
+              "key": "Validated Result - continuation options",
+              "value": (.validatedResult.continuationOptions | join(","))
             }
           ],
           "nextWorkflows":[
