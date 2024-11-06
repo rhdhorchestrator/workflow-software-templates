@@ -19,6 +19,9 @@ The documentation templates provide recommended structure and integration docume
 In case of `Tekton` CI pipeline, the secrets `OPENSHIFT_SERVER` and `OPENSHIFT_TOKEN` are used by the GitHub action that deploys the Tekton
 resources. Please provide organization-level configuration for these secrets and ensure that they can be managed by the newly created repositories according to the visibility options (currently set to `public`).
 
+If you wish to create a new Quay repository, you would need to possess an API token for your Quay organization, and pass it when prompted. 
+After successfully creating a new Quay repository, the user would have to configure a robot user with write permissions to continue the repository fo their CI/CD process. 
+
 The value of the `OPENSHIFT_TOKEN` secret must provide the permissions to create resources in multiple namesapces, so we provide a simple procedure to
 bind it to the `cluster-admin` role, but we recommend to configure a new role with only the required privileges instead.
 

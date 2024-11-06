@@ -21,7 +21,7 @@ spec:
   owner: janus-orchestrator
   type: basic-workflow-bootstrap
   parameters:
-    - title: Provide information about the workflow software project
+    - title: Workflow Software Project
       description: Configure the github repository where the Maven software project is located
       required:
         - orgName
@@ -69,7 +69,7 @@ spec:
             catalogFilter:
               kind:
                 - System
-    - title: Provide information about the workflow type
+    - title: Workflow Type
       description: Select the workflow type. For an assessment, provide an infrastructure workflow option, which should already be set up in your environment
       required:
         - workflowType
@@ -102,7 +102,7 @@ spec:
                   description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
               required:
                 - infrastructureWorkflowId
-    - title: Provide information about the build environment
+    - title: Build Environment
       required:
         - CI
       properties:
@@ -144,7 +144,7 @@ spec:
                 quayRepoName:
                   title: Quay Repository Name
                   type: string
-                  description: The Quay Repository Name of the published workflow. The repository must exist before deploying the gitops.
+                  description: The Quay Repository Name of the published workflow. If non existent, a new quay repository can be created with this name.
                 persistencePSQLSecretName:
                   title: PostgreSQL Secret Name
                   type: string
@@ -192,7 +192,74 @@ spec:
                 - persistencePSQLServiceNamespace
                 - persistencePSQLServicePort
                 - persistencePSQLDatabaseName
+    - title: Create Quay Repository
+      required:
+        - quayCreateNewRepo
+      properties:
+        quayCreateNewRepo:
+          title: Create a new Quay repository with the provided name? (You must select a CI/CD Method in the Build Environment)
+          type: string
+          default: "Yes"
+          enum:
+            - "Yes"
+            - "No"
+      dependencies:
+        quayCreateNewRepo:
+          oneOf:
+            - properties:
+                quayCreateNewRepo:
+                  const: "No"
+            - properties:
+                quayCreateNewRepo:
+                  const: "Yes"
+                token:
+                  title: Quay AuthToken
+                  type: string
+                  description: Bearer token used for authorization
+                  ui:widget: password
+                visibility:
+                  title: New quay Repository Visiblity
+                  type: string
+                  description: Visibility setting for the created repository, either public or private
+                  ui:widget: select
+                  enum: ["public", "private"]
+                repoKind:
+                  title: New Quay Repository Kind
+                  type: string
+                  description: The created repository kind either image, application or none
+                  ui:widget: select
+                  enum: ["image", "application"]
+                newRepoDescription:
+                  title: New Quay Repository Description
+                  type: string
+                  description: The repository desription
+                baseUrl:
+                  title: Quay Base URL
+                  type: string
+                  description: URL of your quay instance, set to "https://quay.io" by default
+                quayNamespace:
+                  title: Quay Namespace
+                  type: string
+                  description: Quay Namespace. Defaults to the namespace of the token.
+              required:
+                - visibility
+                - newRepoDescription
+                - quayNamespace
+                - token
   steps:
+    - id: createQuayRepository
+      name: Create Quay Repository
+      action: quay:create-repository
+      if: ${{ parameters.quayCreateNewRepo == 'Yes' }}
+      input:
+        baseUrl: ${{ parameters.baseUrl }}
+        token: ${{ parameters.token }}
+        name: ${{ parameters.quayRepoName }}
+        visibility: ${{ parameters.visibility }}
+        description: ${{ parameters.newRepoDescription }}
+        repoKind: ${{ parameters.repoKind }}
+        namespace: ${{ parameters.quayNamespace }}
+
     - id: workflowCodeTemplate
       name: Generating the Workflow Source Code and Catalog Info Component
       action: fetch:template
@@ -329,9 +396,15 @@ spec:
     links:
       - if: ${{ parameters.CI == 'tekton_argocd' }}
         title: Bootstrap the GitOps Resources
+        icon: github
         url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
       - title: Open the Source Code Repository
+        icon: github
         url: ${{ steps.publishWorkflow.output.remoteUrl }}
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
+      - if: ${{ parameters.quayCreateNewRepo == 'Yes' }}
+        title: Quay Repository
+        icon: dashboard
+        url: ${{ steps['createQuayRepository'].output.repositoryUrl }}

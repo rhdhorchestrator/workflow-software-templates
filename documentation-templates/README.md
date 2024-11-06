@@ -31,9 +31,9 @@ The assessment workflow project generated from the basic-workflow template is a 
 ### basic-workflow as infrastructure
 The infrastructure workflow project generated from the basic-workflow template is a simple workflow that prints out the workflow's data input.
 
-## complex-assessment-workflow
-This template allows the user to generate a complex assessment workflow project from the user's inputs collected. It includes:
-1. **custom java code** to perform complex operations on the user's inputs. In this case, it evaluates the user's input as string by comparing it to the word `default` to print out the default workflow options or an empty workflow options list from the java code.
+## advanced-workflow
+This template allows the user to generate an advanced assessment workflow project from the user's inputs collected. It includes:
+1. **custom java code** to perform advanced operations on the user's inputs. In this case, it evaluates the user's input as string by comparing it to the word `default` to print out the default workflow options or an empty workflow options list from the java code.
 2. **pre-check subflow** to validate whether the workflows in the returned assessment workflow options exist in the workflows service. If there are non-existed workflows in the options, then it removes them from the options and outputs the remaining valid ones to the user.
 3. **data output schema validation** to ensure that the returned assessment workflow options list aligns with the expected schema to render options correctly in the UI.
 4. **README file** with the prerequisites and instructions to run and test the generated assessment workflow.
