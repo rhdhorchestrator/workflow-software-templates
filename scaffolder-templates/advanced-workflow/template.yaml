@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: Advanced-Workflow-Bootstrap
+  name: advanced-workflow-bootstrap
   title: Advanced workflow bootstrap project
   description: Bootstrap project for an advanced assessment serverless workflow using custom java code
   tags:
@@ -19,7 +19,7 @@ metadata:
       icon: techdocs
 spec:
   owner: janus-orchestrator
-  type: Advanced-Workflow-Bootstrap
+  type: advanced-workflow-bootstrap
   parameters:
     - title: Workflow Software Project
       description: Configure the github repository where the Maven software project is located
@@ -27,6 +27,7 @@ spec:
         - orgName
         - repoName
         - workflowId
+        - description
         - infrastructureWorkflowId
         - owner
         - system
@@ -107,54 +108,44 @@ spec:
                   type: string
                   default: orchestrator-gitops
                   description: Deployment namespace for ArgoCD and Tekton resources
-                quayOrgName:
-                  title: Quay Organization Name
-                  type: string
-                  description: The Quay Organization Name of the published workflow
-                quayRepoName:
-                  title: Quay Repository Name
-                  type: string
-                  description: The Quay Repository Name of the published workflow. If non existent, a new quay repository can be created with this name.
                 persistencePSQLSecretName:
                   title: PostgreSQL Secret Name
                   type: string
                   default: sonataflow-psql-postgresql
-                  description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow.
+                  description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow
                 persistencePSQLUserKey:
                   title: PostgreSQL User key from secret
                   type: string
-                  description: The key name in which the PostgreSQL user is stored.
+                  description: The key name in which the PostgreSQL user is stored
                   default: postgres-username
                 persistencePSQLPasswordKey:
                   title: PostgreSQL Password key from secret
                   type: string
-                  description: The key name in which the PostgreSQL password is stored.
+                  description: The key name in which the PostgreSQL password is stored
                   default: postgres-password
                 persistencePSQLServiceName:
                   title: PostgreSQL K8s Service Name
                   type: string
                   default: sonataflow-psql-postgresql
-                  description: Name of the service running the PostgreSQL instance.
+                  description: Name of the service running the PostgreSQL instance
                 persistencePSQLServiceNamespace:
                   title: PostgreSQL K8s Service Namespace
                   type: string
                   default: sonataflow-infra
-                  description: Namespace of the service running the PostgreSQL instance.
+                  description: Namespace of the service running the PostgreSQL instance
                 persistencePSQLServicePort:
                   title: PostgreSQL Port
                   type: integer
                   default: 5432
-                  description: Port on which the PostgreSQL instance is running.
+                  description: Port on which the PostgreSQL instance is running
                 persistencePSQLDatabaseName:
                   title: PostgreSQL Database Name
                   type: string
-                  description: Name of the database to use for persistence.
+                  description: Name of the database to use for persistence
                   default: sonataflow
               required:
                 - namespace
                 - argocdNamespace
-                - quayOrgName
-                - quayRepoName
                 - persistencePSQLSecretName
                 - persistencePSQLUserKey
                 - persistencePSQLPasswordKey
@@ -162,66 +153,93 @@ spec:
                 - persistencePSQLServiceNamespace
                 - persistencePSQLServicePort
                 - persistencePSQLDatabaseName
-    - title: Create Quay Repository
+    - title: Quay Configuration
       required:
-        - quayCreateNewRepo
-        - CI
+        - quayConfig
       properties:
-        quayCreateNewRepo:
-          title: Create a new Quay repository with the provided name? (You must select a CI/CD Method in the Build Environment)
+        quayConfig:
+          title: Create a new Quay repository with the provided name?
           type: string
-          default: "Yes"
+          default: "Use Existing Repository"
           enum:
-            - "Yes"
-            - "No"
+            - "Use Existing Repository"
+            - "Create New Repository"
+            - "No Quay Config Needed"
       dependencies:
-        quayCreateNewRepo:
+        quayConfig:
           oneOf:
             - properties:
-                quayCreateNewRepo:
-                  const: "No"
+                quayConfig:
+                  const: "No Quay Config Needed"
             - properties:
-                quayCreateNewRepo:
-                  const: "Yes"
+                quayConfig:
+                  const: "Use Existing Repository"
+                quayOrgName:
+                  title: Quay Organization Name
+                  type: string
+                  description: The Quay organization name of the published workflow
+                quayRepoName:
+                  title: Quay Repository Name
+                  type: string
+                  description: The Quay repository Name of the published workflow. The repository must exist before deploying the gitops
+              required:
+                - quayOrgName
+                - quayRepoName
+            - properties:
+                quayConfig:
+                  const: "Create New Repository"
+                quayOrgName:
+                  title: Quay Organization Name
+                  type: string
+                  description: The Quay Organization Name of the published workflow
+                quayRepoName:
+                  title: Quay Repository Name
+                  type: string
+                  description: A name to create a new Quay repository of the published workflow
                 token:
                   title: Quay AuthToken
                   type: string
-                  description: Bearer token used for authorization
+                  description: Quay organization bearer token used for authorization
                   ui:widget: password
                 visibility:
-                  title: New quay Repository Visiblity
+                  title: Quay Repository Visiblity
                   type: string
                   description: Visibility setting for the created repository, either public or private
                   ui:widget: select
                   enum: ["public", "private"]
+                  default: public
                 repoKind:
-                  title: New Quay Repository Kind
+                  title: Quay Repository Kind
                   type: string
-                  description: The created repository kind either image, application or none
+                  description: The created repository kind, either image or application
                   ui:widget: select
                   enum: ["image", "application"]
+                  default: image
                 newRepoDescription:
-                  title: New Quay Repository Description
+                  title: Quay Repository Description
                   type: string
-                  description: The repository desription
+                  description: The repository description
                 baseUrl:
                   title: Quay Base URL
                   type: string
-                  description: URL of your quay instance, set to "https://quay.io" by default
+                  description: URL of your Quay instance, set to "https://quay.io" by default
+                  default: "https://quay.io"
                 quayNamespace:
                   title: Quay Namespace
                   type: string
-                  description: Quay Namespace. Defaults to the namespace of the token.
+                  description: The Quay namespace of the published workflow
               required:
                 - visibility
                 - newRepoDescription
                 - quayNamespace
                 - token
+                - quayOrgName
+                - quayRepoName
   steps:
     - id: createQuayRepository
       name: Create Quay Repository
       action: quay:create-repository
-      if: ${{ parameters.quayCreateNewRepo == 'Yes' }}
+      if: ${{ parameters.quayConfig == 'Create New Repository' }}
       input:
         baseUrl: ${{ parameters.baseUrl }}
         token: ${{ parameters.token }}
@@ -359,8 +377,7 @@ spec:
         catalogInfoPath: /catalog-info.yaml
   output:
     links:
-      - if: ${{ parameters.CI == 'tekton_argocd' }}
-        title: Bootstrap the GitOps Resources
+      - title: Bootstrap the GitOps Resources
         icon: github
         url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
       - title: Open the Source Code Repository
@@ -369,7 +386,7 @@ spec:
       - title: Open the Catalog Info Component
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-      - if: ${{ parameters.quayCreateNewRepo == 'Yes' }}
-        title: Quay Repository
+      # If quayConfig is not populated, the Quay URL link will not appear.
+      - title: Quay Repository
         icon: dashboard
         url: ${{ steps['createQuayRepository'].output.repositoryUrl }}
