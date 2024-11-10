@@ -145,7 +145,7 @@ spec:
                   default: sonataflow
                 quayConfig:
                   title: Quay Configuration
-                  description: Choose between creating a new Quay repository or using an existing one.
+                  description: Choose between creating a new Quay repository or using an existing one
                   type: string
                   default: "Use Existing Repository"
                   enum:
@@ -183,7 +183,7 @@ spec:
                         token:
                           title: Quay AuthToken
                           type: string
-                          description: Quay rganization bearer token used for authorization
+                          description: Quay organization bearer token used for authorization
                           ui:widget: password
                         visibility:
                           title: Quay Repository Visiblity
