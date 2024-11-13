@@ -184,7 +184,7 @@ spec:
                           title: Quay AuthToken
                           type: string
                           description: Quay organization bearer token used for authorization
-                          ui:widget: password
+                          ui:field: Secret
                         visibility:
                           title: Quay Repository Visiblity
                           type: string
