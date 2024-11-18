@@ -1,0 +1,64 @@
+id: ${{ values.workflowId }}
+version: "${{ values.version}}"
+specVersion: "0.8"
+name: "${{ values.workflowId }}"
+description: "${{ values.description }}"
+annotations:
+  - "workflow-type/assessment"
+dataInputSchema:
+  schema: schemas/${{ values.artifactId }}-input-schema.json
+  failOnValidationErrors: true
+extensions:
+  - extensionid: workflow-output-schema
+    outputSchema:
+      schema: schemas/${{ values.artifactId }}-workflow-result-schema.json
+      failOnValidationErrors: true
+functions:
+  - name: assessmentResult
+    type: expression
+    operation: '{
+        result: {
+          "completedWith":"success",
+          "message": "The workflow ${{ values.workflowId }} completed successfully",
+          "outputs":[],
+          "nextWorkflows":[
+            {
+                "id":"${{ values.infrastructureWorkflowId }}",
+                "name":"${{ values.infrastructureWorkflowId }}"
+            }
+          ]
+        }
+      }'
+  - name: emptyAssessmentResult
+    type: expression
+    operation: '{
+        result: {
+          "completedWith":"success",
+          "message": "The workflow ${{ values.workflowId }} completed without sampleText",
+          "outputs":[],
+          "nextWorkflows":[]
+        }
+      }'
+start: StartState
+states:
+  - name: StartState
+    type: switch
+    dataConditions:
+      - condition: ${ .sampleText | length != 0 }
+        transition: GetSampleWorkflowOptions
+    defaultCondition:
+      transition: GetEmptyWorkflowOptions
+  - name: GetSampleWorkflowOptions
+    type: operation
+    actions:
+      - name: GetSampleWorkflowOptions
+        functionRef:
+          refName: assessmentResult
+    end: true
+  - name: GetEmptyWorkflowOptions
+    type: operation
+    actions:
+      - name: GetEmptyWorkflowOptions
+        functionRef:
+          refName: emptyAssessmentResult
+    end: true
