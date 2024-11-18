@@ -283,7 +283,7 @@ spec:
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
-        url: ./skeleton
+        url: ../basic-workflow/skeleton
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
