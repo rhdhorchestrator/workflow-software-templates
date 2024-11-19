@@ -3,13 +3,11 @@ stages:
 
 update_pipelinerun:
   tags:
-    - shared-podman # Change to whatever tag your Gitlab runner is set to 
+    - shared-podman # Change to whatever tag your Gitlab runner is set to
   stage: update
   image: ubuntu:latest
   script: |
     apt-get update && apt-get install -y git
-    apt-get install apt-transport-https ca-certificates -y 
-    update-ca-certificates
     git config --global http.sslVerify "false"
     COMMIT_AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae')
     COMMIT_AUTHOR_NAME=$(git log -1 --pretty=format:'%an')
@@ -22,4 +20,4 @@ update_pipelinerun:
     sed "s/__COMMIT_ID__/$COMMIT_ID/g" pipelinerun.template > pipelinerun.yaml
     git add pipelinerun.yaml
     git commit -m "Updated PipelineRun with commit id $COMMIT_ID"
-    git push origin HEAD:main -o ci.skip 
+    git push origin HEAD:main -o ci.skip

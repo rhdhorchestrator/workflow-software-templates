@@ -448,4 +448,3 @@ spec:
       - title: Quay Repository
         icon: dashboard
         url: ${{ steps['createQuayRepository'].output.repositoryUrl }}
-      - title: Project Token
