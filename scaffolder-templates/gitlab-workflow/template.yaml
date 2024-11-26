@@ -437,7 +437,7 @@ spec:
     links:
       - title: Bootstrap the GitOps Resources
         icon: github
-        url: ${{ parameters.gitlabHost }}/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
+        url: ${{ steps.publishWorkflow.output.remoteUrl }}-gitops/tree/main/bootstrap
       - title: Open the Source Code Repository
         icon: github
         url: ${{ steps.publishWorkflow.output.remoteUrl }}
