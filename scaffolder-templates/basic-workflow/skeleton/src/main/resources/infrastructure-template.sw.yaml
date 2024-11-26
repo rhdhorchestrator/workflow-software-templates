@@ -12,6 +12,15 @@ functions:
   - name: logInfo
     type: custom
     operation: "sysout:INFO"
+  - name: infrastructureResult
+    type: expression
+    operation: '{
+      result: {
+      "completedWith":"success",
+      "message": "The workflow ${{ values.workflowId }} completed successfully",
+      "outputs":[]
+      }
+      }'
 start: "StartState"
 states:
   - name: "StartState"
@@ -22,4 +31,11 @@ states:
           refName: logInfo
           arguments:
             message: '"You entered " + .sampleText'
+    transition: GetResults
+  - name: GetResults
+    type: operation
+    actions:
+      - name: GetResults
+        functionRef:
+          refName: infrastructureResult
     end: true
