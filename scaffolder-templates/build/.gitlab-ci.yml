@@ -1,5 +1,14 @@
 stages:
+  - wait
   - update
+
+wait_for_value:
+  tags:
+    - shared-podman
+  stage: wait
+  image: ubuntu:latest
+  script: |
+    sleep 5
 
 update_pipelinerun:
   tags:
@@ -14,15 +23,8 @@ update_pipelinerun:
     COMMIT_ID=$(git rev-parse --short HEAD)
     git config --global user.email "$COMMIT_AUTHOR_EMAIL"
     git config --global user.name "$COMMIT_AUTHOR_NAME"
-
-    while [ -z "$PROJECT_ACCESS_TOKEN" ]; do
-      echo "Waiting for PROJECT_ACCESS_TOKEN to be set..."
-      sleep 10
-    done
     echo "PROJECT_ACCESS_TOKEN is set to: $PROJECT_ACCESS_TOKEN"
-
     git remote set-url origin https://token:$PROJECT_ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
-
     cd argocd
     sed "s/__COMMIT_ID__/$COMMIT_ID/g" pipelinerun.template > pipelinerun.yaml
     git add pipelinerun.yaml

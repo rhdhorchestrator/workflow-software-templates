@@ -392,7 +392,7 @@ spec:
           system: ${{ parameters.system }}
           applicationType: workflow-project
           description: ${{ parameters.description }}
-          sourceControl: gitlab.com # CHECK if not cee redhat
+          sourceControl: gitlab.com
           lifecycle: development
           gitUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}.git
           gitOpsUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
