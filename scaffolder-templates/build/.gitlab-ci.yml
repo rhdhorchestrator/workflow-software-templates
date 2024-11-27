@@ -26,6 +26,7 @@ update_pipelinerun:
     echo "PROJECT_ACCESS_TOKEN is set to: $PROJECT_ACCESS_TOKEN"
     git remote set-url origin https://token:$PROJECT_ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
     cd argocd
+    sed -i "s/git-ssh-credentials/gitlab-ssh-credentials/g" pipelinerun.template
     sed "s/__COMMIT_ID__/$COMMIT_ID/g" pipelinerun.template > pipelinerun.yaml
     git add pipelinerun.yaml
     git commit -m "Updated PipelineRun with commit id $COMMIT_ID"

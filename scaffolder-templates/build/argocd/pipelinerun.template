@@ -45,5 +45,4 @@ spec:
         secretName: docker-credentials
     - name: ssh-creds
       secret:
-        secretName: | 
-          $( values.gitOpsUrl | contains("gitlab") ? gitlab-ssh-credentials : git-ssh-credentials)
+        secretName: git-ssh-credentials
