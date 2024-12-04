@@ -2,17 +2,18 @@ stages:
   - wait
   - update
 
-wait_for_value:
-  tags:
-    - shared-podman
+wait_for_populated_variable:
+  # A tag can be set according to your Gitlab runner configuration, for example:
+  # tags:
+  #  - shared-podman 
   stage: wait
   image: ubuntu:latest
   script: |
     sleep 5
 
 update_pipelinerun:
-  tags:
-    - shared-podman # Change to whatever tag your Gitlab runner is set to
+  # tags:
+  #  - shared-podman 
   stage: update
   image: ubuntu:latest
   script: |
@@ -26,7 +27,6 @@ update_pipelinerun:
     echo "PROJECT_ACCESS_TOKEN is set to: $PROJECT_ACCESS_TOKEN"
     git remote set-url origin https://token:$PROJECT_ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
     cd argocd
-    sed -i "s/git-ssh-credentials/gitlab-ssh-credentials/g" pipelinerun.template
     sed "s/__COMMIT_ID__/$COMMIT_ID/g" pipelinerun.template > pipelinerun.yaml
     git add pipelinerun.yaml
     git commit -m "Updated PipelineRun with commit id $COMMIT_ID"

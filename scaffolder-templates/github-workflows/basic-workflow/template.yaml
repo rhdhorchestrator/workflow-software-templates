@@ -1,0 +1,441 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: basic-workflow-bootstrap
+  title: Basic workflow bootstrap project
+  description: Bootstrap project for basic serverless workflow
+  tags:
+    - orchestrator
+    - built-in
+  links:
+    - url: https://openshift-knative.github.io/docs/docs/latest/serverless-logic/about.html
+      title: About OpenShift Serverless Logic
+      icon: techdocs
+    - url: https://kiegroup.github.io/kogito-docs/serverlessworkflow/latest/index.html
+      title: SonataFlow Guides
+      icon: techdocs
+    - url: https://www.parodos.dev/docs/core-concepts/workflow-types/
+      title: Workflow Types
+      icon: techdocs
+spec:
+  owner: janus-orchestrator
+  type: basic-workflow-bootstrap
+  parameters:
+    - title: Workflow Software Project
+      description: Configure the github repository where the Maven software project is located
+      required:
+        - orgName
+        - repoName
+        - workflowId
+        - description
+        - owner
+        - system
+      properties:
+        orgName:
+          title: Organization Name
+          type: string
+          ui:autofocus: true
+          description: Github Organization Name
+        repoName:
+          title: Repository Name
+          type: string
+          description: Github repository name
+          default: onboarding
+        description:
+          title: Description
+          type: string
+          description: Description added to the README file
+          default: A workflow for onboarding applications to OCP cluster
+        workflowId:
+          title: Workflow ID
+          type: string
+          pattern: "^([a-zA-Z][a-zA-Z0-9]*)([.]?[a-zA-Z0-9]+)*$" # hypens '-' are not allowed to not mess with java package
+          description: Unique identifier of the workflow in SonataFlow
+          default: onboarding
+        owner:
+          title: Owner
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind:
+                - Group
+                - User
+          default: user:guest
+        system:
+          title: System
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind:
+                - System
+    - title: Workflow Type
+      description: Select the workflow type. For an assessment, provide an infrastructure workflow option, which should already be set up in your environment
+      required:
+        - workflowType
+      properties:
+        workflowType:
+          title: Workflow Type
+          type: string
+          description: Annotation to be added to the workflow in SonataFlow to specify its type
+          ui:widget: radio
+          enum:
+            - infrastructure
+            - assessment
+          enumNames:
+            - Infrastructure
+            - Assessment
+          default: infrastructure
+      dependencies:
+        workflowType:
+          oneOf:
+            - properties:
+                workflowType:
+                  const: infrastructure
+            - properties:
+                workflowType:
+                  const: assessment
+                infrastructureWorkflowId:
+                  title: Infrastructure Workflow ID
+                  type: string
+                  pattern: "^([a-zA-Z][a-zA-Z0-9]*)([.]?[a-zA-Z0-9]+)*$" # hypens '-' are not allowed to not mess with java package
+                  description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
+              required:
+                - infrastructureWorkflowId
+    - title: Build Environment
+      required:
+        - CI
+      properties:
+        CI:
+          title: Select a CI/CD method
+          type: string
+          description: This action will create a CI pipeline for your application based on chosen method
+          default: tekton_argocd
+          enum:
+            - none
+            - tekton_argocd
+          enumNames:
+            - None
+            - Tekton with ArgoCD
+      # See: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/blob/3019e781b988e0548eb987eed3e522854ed8c52f/templates/github/quarkus-backend/template.yaml#L101
+      dependencies:
+        CI:
+          oneOf:
+            - properties:
+                CI:
+                  const: none
+            - properties:
+                CI:
+                  const: tekton_argocd
+                namespace:
+                  title: Workflow Namespace
+                  type: string
+                  default: sonataflow-infra
+                  description: Deployment namespace for workflow applications
+                argocdNamespace:
+                  title: GitOps Namespace
+                  type: string
+                  default: orchestrator-gitops
+                  description: Deployment namespace for ArgoCD and Tekton resources
+                persistencePSQLSecretName:
+                  title: PostgreSQL Secret Name
+                  type: string
+                  default: sonataflow-psql-postgresql
+                  description: Name of the secret in which the PostgreSQL secrets are stored. Shall be in the same namespace as the workflow
+                persistencePSQLUserKey:
+                  title: PostgreSQL User key from secret
+                  type: string
+                  description: The key name in which the PostgreSQL user is stored
+                  default: postgres-username
+                persistencePSQLPasswordKey:
+                  title: PostgreSQL Password key from secret
+                  type: string
+                  description: The key name in which the PostgreSQL password is stored
+                  default: postgres-password
+                persistencePSQLServiceName:
+                  title: PostgreSQL K8s Service Name
+                  type: string
+                  default: sonataflow-psql-postgresql
+                  description: Name of the service running the PostgreSQL instance
+                persistencePSQLServiceNamespace:
+                  title: PostgreSQL K8s Service Namespace
+                  type: string
+                  default: sonataflow-infra
+                  description: Namespace of the service running the PostgreSQL instance
+                persistencePSQLServicePort:
+                  title: PostgreSQL Port
+                  type: integer
+                  default: 5432
+                  description: Port on which the PostgreSQL instance is running
+                persistencePSQLDatabaseName:
+                  title: PostgreSQL Database Name
+                  type: string
+                  description: Name of the database to use for persistence
+                  default: sonataflow
+                quayConfig:
+                  title: Quay Configuration
+                  description: Choose between creating a new Quay repository or using an existing one
+                  type: string
+                  default: "Use Existing Repository"
+                  enum:
+                    - "Use Existing Repository"
+                    - "Create New Repository"
+                  ui:widget: radio
+              dependencies:
+                quayConfig:
+                  oneOf:
+                    - properties:
+                        quayConfig:
+                          const: "Use Existing Repository"
+                        quayOrgName:
+                          title: Quay Organization Name
+                          type: string
+                          description: The Quay organization name of the published workflow
+                        quayRepoName:
+                          title: Quay Repository Name
+                          type: string
+                          description: The Quay repository name of the published workflow. The repository must exist before deploying the gitops
+                      required:
+                        - quayOrgName
+                        - quayRepoName
+                    - properties:
+                        quayConfig:
+                          const: "Create New Repository"
+                        quayOrgName:
+                          title: Quay Organization Name
+                          type: string
+                          description: The Quay Organization Name of the published workflow
+                        quayRepoName:
+                          title: Quay Repository Name
+                          type: string
+                          description: A name to create a new Quay Repository of the published workflow
+                        token:
+                          title: Quay AuthToken
+                          type: string
+                          description: Quay organization bearer token used for authorization
+                          ui:field: Secret
+                        visibility:
+                          title: Quay Repository Visiblity
+                          type: string
+                          description: Visibility setting for the created repository, either public or private
+                          ui:widget: select
+                          enum: ["public", "private"]
+                          default: public
+                        repoKind:
+                          title: Quay Repository Kind
+                          type: string
+                          description: The created Quay repository kind, either image or application
+                          ui:widget: select
+                          enum: ["image", "application"]
+                          default: image
+                        newRepoDescription:
+                          title: Quay Repository Description
+                          type: string
+                          description: The Quay repository description
+                        baseUrl:
+                          title: Quay Base URL
+                          type: string
+                          description: URL of your Quay instance
+                          default: "https://quay.io"
+                        quayNamespace:
+                          title: Quay Namespace
+                          type: string
+                          description: The Quay namespace of the published workflow
+                      required:
+                        - visibility
+                        - newRepoDescription
+                        - quayNamespace
+                        - token
+                        - quayOrgName
+                        - quayRepoName
+              required:
+                - namespace
+                - argocdNamespace
+                - persistencePSQLSecretName
+                - persistencePSQLUserKey
+                - persistencePSQLPasswordKey
+                - persistencePSQLServiceName
+                - persistencePSQLServiceNamespace
+                - persistencePSQLServicePort
+                - persistencePSQLDatabaseName
+  steps:
+    - id: createQuayRepository
+      name: Create Quay Repository
+      action: quay:create-repository
+      if: ${{ parameters.quayConfig == 'Create New Repository' }}
+      input:
+        baseUrl: ${{ parameters.baseUrl }}
+        token: ${{ parameters.token }}
+        name: ${{ parameters.quayRepoName }}
+        visibility: ${{ parameters.visibility }}
+        description: ${{ parameters.newRepoDescription }}
+        repoKind: ${{ parameters.repoKind }}
+        namespace: ${{ parameters.quayNamespace }}
+
+    - id: workflowCodeTemplate
+      name: Generating the Workflow Source Code and Catalog Info Component
+      action: fetch:template
+      input:
+        # "Relative path is not allowed to refer to a directory outside its parent"
+        url: ../../skeletons/basic-workflow-skeleton
+        values:
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          description: ${{ parameters.description }}
+          groupId: io.janus.workflow
+          artifactId: ${{ parameters.workflowId }}
+          version: 1.0.0-SNAPSHOT
+          workflowId: ${{ parameters.workflowId }}
+          workflowType: ${{ parameters.workflowType }}
+          infrastructureWorkflowId: ${{ parameters.infrastructureWorkflowId }}
+          sourceControl: github.com
+          applicationType: workflow-project
+          lifecycle: development
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+        targetPath: workflow
+    - id: renameFiles
+      action: fs:rename
+      name: Rename files
+      input:
+        files:
+          - from: workflow/src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
+            to: workflow/src/main/resources/${{ parameters.workflowId }}.sw.yaml
+            overwrite: false
+    - id: deleteFiles
+      action: fs:delete
+      name: Delete files
+      input:
+        files:
+          - workflow/src/main/resources/assessment-template.sw.yaml
+          - workflow/src/main/resources/infrastructure-template.sw.yaml
+    - id: buildCodeTemplate
+      name: Generating the Build Code for the Workflow
+      action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      input:
+        url: ../../build
+        values:
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
+          orgName: ${{ parameters.orgName }}
+          workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+          convertToFlat: true
+        targetPath: workflow
+    - id: addCIPipeline
+      name: Adding the github pipelinerun
+      action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      input:
+        url: ../build
+        copyWithoutTemplating:
+          - .github/workflows/update_pipelinerun.yaml
+        values:
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
+          orgName: ${{ parameters.orgName }}
+          workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+          convertToFlat: true
+          gitHost: github.com
+        targetPath: workflow
+    - id: publishWorkflow
+      name: Publishing to the Workflow Repository
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        description: ${{ parameters.description }}
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        defaultBranch: main
+        sourcePath: workflow
+    - id: register
+      name: Registering the Catalog Info Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publishWorkflow.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+    - id: gitopsCodeTemplate
+      name: Generating the GitOps Component and Catalog Info Component
+      action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      input:
+        url: ../../gitops
+        values:
+          workflowId: ${{ parameters.workflowId }}
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
+          orgName: ${{ parameters.orgName }}
+          repoName: ${{ parameters.repoName }}-gitops
+          owner: ${{ parameters.owner }}
+          system: ${{ parameters.system }}
+          applicationType: workflow-project
+          description: ${{ parameters.description }}
+          sourceControl: github.com
+          lifecycle: development
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          persistencePSQLSecretName: ${{ parameters.persistencePSQLSecretName }}
+          persistencePSQLUserKey: ${{ parameters.persistencePSQLUserKey }}
+          persistencePSQLPasswordKey: ${{ parameters.persistencePSQLPasswordKey }}
+          persistencePSQLServiceName: ${{ parameters.persistencePSQLServiceName }}
+          persistencePSQLServiceNamespace: ${{ parameters.persistencePSQLServiceNamespace }}
+          persistencePSQLServicePort: ${{ parameters.persistencePSQLServicePort }}
+          persistencePSQLDatabaseName: ${{ parameters.persistencePSQLDatabaseName }}
+          persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+          gitHost: github.com
+        targetPath: gitops
+    - id: renameFilesForPersistence
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      action: fs:rename
+      name: Rename files for persistence
+      input:
+        files:
+          - from: gitops/kustomize/base/sonataflow-patch-persistence.yaml
+            to: gitops/kustomize/base/sonataflow-patch.yaml
+            overwrite: true
+    - id: publishGitOps
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      name: Publishing to the GitOps Code Repository
+      action: publish:github
+      input:
+        allowedHosts: ["github.com"]
+        description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
+        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
+        defaultBranch: main
+        sourcePath: gitops
+    - id: registerGitOps
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      name: Registering the GitOps Catalog Info Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publishGitOps.output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+  output:
+    links:
+      - title: Bootstrap the GitOps Resources
+        icon: github
+        url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
+      - title: Open the Source Code Repository
+        icon: github
+        url: ${{ steps.publishWorkflow.output.remoteUrl }}
+      - title: Open the Catalog Info Component
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}
+      # If quayConfig is not populated, the Quay URL link will not appear.
+      - title: Quay Repository
+        icon: dashboard
+        url: ${{ steps['createQuayRepository'].output.repositoryUrl }}

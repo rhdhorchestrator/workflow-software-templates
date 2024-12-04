@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: basic-workflow-bootstrap
-  title: Basic workflow bootstrap project
-  description: Bootstrap project for basic serverless workflow
+  name: gitlab-advanced-workflow-bootstrap
+  title: Gitlab Advanced workflow bootstrap project
+  description: Bootstrap project for an advanced assessment serverless workflow using custom java code
   tags:
     - orchestrator
     - built-in
@@ -19,7 +19,7 @@ metadata:
       icon: techdocs
 spec:
   owner: janus-orchestrator
-  type: basic-workflow-bootstrap
+  type: advanced-workflow-bootstrap
   parameters:
     - title: Workflow Software Project
       description: Configure the github repository where the Maven software project is located
@@ -28,30 +28,33 @@ spec:
         - repoName
         - workflowId
         - description
+        - infrastructureWorkflowId
         - owner
         - system
       properties:
         orgName:
-          title: Organization Name
+          title: Group Name
           type: string
           ui:autofocus: true
-          description: Github Organization Name
+          description: Gitlab Group Name
         repoName:
-          title: Repository Name
+          title: Project Name
           type: string
-          description: Github repository name
-          default: onboarding
+          description: Gitlab Project name
         description:
           title: Description
           type: string
           description: Description added to the README file
-          default: A workflow for onboarding applications to OCP cluster
         workflowId:
           title: Workflow ID
           type: string
           pattern: "^([a-zA-Z][a-zA-Z0-9]*)([.]?[a-zA-Z0-9]+)*$" # hypens '-' are not allowed to not mess with java package
           description: Unique identifier of the workflow in SonataFlow
-          default: onboarding
+        infrastructureWorkflowId:
+          title: Infrastructure Workflow ID
+          type: string
+          pattern: "^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$" # hypens '-' are not allowed to not mess with java package
+          description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
         owner:
           title: Owner
           type: string
@@ -70,39 +73,6 @@ spec:
             catalogFilter:
               kind:
                 - System
-    - title: Workflow Type
-      description: Select the workflow type. For an assessment, provide an infrastructure workflow option, which should already be set up in your environment
-      required:
-        - workflowType
-      properties:
-        workflowType:
-          title: Workflow Type
-          type: string
-          description: Annotation to be added to the workflow in SonataFlow to specify its type
-          ui:widget: radio
-          enum:
-            - infrastructure
-            - assessment
-          enumNames:
-            - Infrastructure
-            - Assessment
-          default: infrastructure
-      dependencies:
-        workflowType:
-          oneOf:
-            - properties:
-                workflowType:
-                  const: infrastructure
-            - properties:
-                workflowType:
-                  const: assessment
-                infrastructureWorkflowId:
-                  title: Infrastructure Workflow ID
-                  type: string
-                  pattern: "^([a-zA-Z][a-zA-Z0-9]*)([.]?[a-zA-Z0-9]+)*$" # hypens '-' are not allowed to not mess with java package
-                  description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
-              required:
-                - infrastructureWorkflowId
     - title: Build Environment
       required:
         - CI
@@ -138,6 +108,11 @@ spec:
                   type: string
                   default: orchestrator-gitops
                   description: Deployment namespace for ArgoCD and Tekton resources
+                gitlabHost:
+                  title: Gitlab Instance Name
+                  type: string
+                  default: gitlab.cee.redhat.com
+                  description: The name or host of your gitlab instance
                 persistencePSQLSecretName:
                   title: PostgreSQL Secret Name
                   type: string
@@ -272,13 +247,12 @@ spec:
         description: ${{ parameters.newRepoDescription }}
         repoKind: ${{ parameters.repoKind }}
         namespace: ${{ parameters.quayNamespace }}
-
     - id: workflowCodeTemplate
       name: Generating the Workflow Source Code and Catalog Info Component
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
-        url: ./skeleton
+        url: ../../skeletons/advanced-workflow-skeleton
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
@@ -291,7 +265,6 @@ spec:
           artifactId: ${{ parameters.workflowId }}
           version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
-          workflowType: ${{ parameters.workflowType }}
           infrastructureWorkflowId: ${{ parameters.infrastructureWorkflowId }}
           sourceControl: github.com
           applicationType: workflow-project
@@ -304,24 +277,18 @@ spec:
       name: Rename files
       input:
         files:
-          - from: workflow/src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
+          - from: workflow/src/main/resources/specs/dataindex.yaml
+            to: workflow/src/main/resources/specs/${{ parameters.workflowId }}-dataindex.yaml
+            overwrite: true
+          - from: workflow/src/main/resources/template.sw.yaml
             to: workflow/src/main/resources/${{ parameters.workflowId }}.sw.yaml
-            overwrite: false
-    - id: deleteFiles
-      action: fs:delete
-      name: Delete files
-      input:
-        files:
-          - workflow/src/main/resources/assessment-template.sw.yaml
-          - workflow/src/main/resources/infrastructure-template.sw.yaml
+            overwrite: true
     - id: buildCodeTemplate
       name: Generating the Build Code for the Workflow
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../build
-        copyWithoutTemplating:
-          - .github/workflows/update_pipelinerun.yaml
+        url: ../../build
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
@@ -331,29 +298,74 @@ spec:
           gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
-          convertToFlat: true
+          gitHost: ${{ parameters.gitlabHost }}
+          convertToFlat: false
         targetPath: workflow
+    - id: addCIPipeline
+      name: Adding the gitlab pipeline for the Workflow
+      action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      input:
+        url: ../build/
+        copyWithoutTemplating:
+          - .gitlab-ci.yml
+        values:
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
+          orgName: ${{ parameters.orgName }}
+          workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+          convertToFlat: false
+        targetPath: workflow
+
     - id: publishWorkflow
       name: Publishing to the Workflow Repository
-      action: publish:github
+      action: publish:gitlab
       input:
-        allowedHosts: ["github.com"]
+        allowedHosts: ["${{ parameters.gitlabHost }}"]
         description: ${{ parameters.description }}
-        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        repoUrl: ${{ parameters.gitlabHost }}?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
         defaultBranch: main
         sourcePath: workflow
+
+    - id: createProjectAccessToken
+      name: Create a Project Access Token to the workflow Repository
+      action: gitlab:projectAccessToken:create
+      input:
+        projectId: ${{ parameters.orgName }}/${{ parameters.repoName }}
+        repoUrl: ${{ parameters.gitlabHost }}?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        name: PROJECT_ACCESS_TOKEN
+        scopes:
+          [api, read_api, create_runner, read_repository, write_repository]
+
+    - id: createAccessTokenVariable
+      name: Create a Project Variable to hold the Token
+      action: gitlab:projectVariable:create
+      input:
+        repoUrl: ${{ parameters.gitlabHost }}?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
+        projectId: ${{ parameters.orgName }}/${{ parameters.repoName }}
+        key: PROJECT_ACCESS_TOKEN
+        value: ${{ steps.createProjectAccessToken.output.access_token }}
+        variableType: env_var
+        raw: false
+        masked: true
+
     - id: register
       name: Registering the Catalog Info Component
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps.publishWorkflow.output.repoContentsUrl }}
         catalogInfoPath: /catalog-info.yaml
+
     - id: gitopsCodeTemplate
       name: Generating the GitOps Component and Catalog Info Component
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../gitops
+        url: ../../gitops
         values:
           workflowId: ${{ parameters.workflowId }}
           namespace: ${{ parameters.namespace }}
@@ -378,6 +390,7 @@ spec:
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
+          gitHost: ${{ parameters.gitlabHost }}
         targetPath: gitops
     - id: renameFilesForPersistence
       if: ${{ parameters.CI == 'tekton_argocd' }}
@@ -391,11 +404,11 @@ spec:
     - id: publishGitOps
       if: ${{ parameters.CI == 'tekton_argocd' }}
       name: Publishing to the GitOps Code Repository
-      action: publish:github
+      action: publish:gitlab
       input:
-        allowedHosts: ["github.com"]
+        allowedHosts: ["${{ parameters.gitlabHost }}"]
         description: Configuration repository for ${{ parameters.orgName }}/${{ parameters.repoName }}
-        repoUrl: github.com?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
+        repoUrl: ${{ parameters.gitlabHost }}?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}-gitops
         defaultBranch: main
         sourcePath: gitops
     - id: registerGitOps
@@ -409,7 +422,7 @@ spec:
     links:
       - title: Bootstrap the GitOps Resources
         icon: github
-        url: https://github.com/${{ parameters.orgName }}/${{ parameters.repoName }}-gitops/tree/main/bootstrap
+        url: ${{ steps.publishWorkflow.output.remoteUrl }}-gitops/tree/main/bootstrap
       - title: Open the Source Code Repository
         icon: github
         url: ${{ steps.publishWorkflow.output.remoteUrl }}

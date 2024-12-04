@@ -247,7 +247,7 @@ spec:
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
-        url: ./skeleton
+        url: ../../skeletons/advanced-workflow-skeleton
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
@@ -283,9 +283,27 @@ spec:
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
+        url: ../../build
+        values:
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
+          orgName: ${{ parameters.orgName }}
+          workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+          convertToFlat: false
+          gitHost: github.com
+        targetPath: workflow
+    - id: addCIPipeline
+      name: Adding the github pipelinerun
+      action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      input:
         url: ../build
         copyWithoutTemplating:
-          - .github/workflows/update_pipelinerun.yaml
+          - build/.github/workflows/update_pipelinerun.yaml
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
@@ -317,7 +335,7 @@ spec:
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../gitops
+        url: ../../gitops
         values:
           workflowId: ${{ parameters.workflowId }}
           namespace: ${{ parameters.namespace }}
@@ -342,6 +360,7 @@ spec:
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
+          gitHost: github.com
         targetPath: gitops
     - id: renameFilesForPersistence
       if: ${{ parameters.CI == 'tekton_argocd' }}

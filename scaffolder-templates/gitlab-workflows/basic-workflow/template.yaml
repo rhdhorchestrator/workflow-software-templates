@@ -1,8 +1,8 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: gitlab-workflow-bootstrap
-  title: Gitlab workflow bootstrap project
+  name: gitlab-basic-workflow-bootstrap
+  title: Gitlab Basic workflow bootstrap project
   description: Bootstrap project for basic serverless workflow with gitlab
   tags:
     - orchestrator
@@ -37,7 +37,7 @@ spec:
           ui:autofocus: true
           description: Gitlab Group Name
         repoName:
-          title: Repository Name
+          title: Project Name
           type: string
           description: Gitlab Project name
           default: onboarding
@@ -283,7 +283,7 @@ spec:
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
-        url: ../basic-workflow/skeleton
+        url: ../../skeletons/basic-workflow-skeleton
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
@@ -324,7 +324,25 @@ spec:
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../build
+        url: ../../build
+        values:
+          namespace: ${{ parameters.namespace }}
+          argocdNamespace: ${{ parameters.argocdNamespace }}
+          orgName: ${{ parameters.orgName }}
+          workflowId: ${{ parameters.workflowId }}
+          gitUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          quayOrgName: ${{ parameters.quayOrgName }}
+          quayRepoName: ${{ parameters.quayRepoName }}
+          convertToFlat: true
+          gitHost: ${{ parameters.gitlabHost }}
+        targetPath: workflow
+    - id: addCIPipeline
+      name: Adding the gitlab pipeline the Workflow
+      action: fetch:template
+      if: ${{ parameters.CI == 'tekton_argocd' }}
+      input:
+        url: ./
         copyWithoutTemplating:
           - .gitlab-ci.yml
         values:
@@ -381,7 +399,7 @@ spec:
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../gitops
+        url: ../../gitops
         values:
           workflowId: ${{ parameters.workflowId }}
           namespace: ${{ parameters.namespace }}
@@ -406,6 +424,7 @@ spec:
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
+          gitHost: ${{ parameters.gitlabHost }}
         targetPath: gitops
     - id: renameFilesForPersistence
       if: ${{ parameters.CI == 'tekton_argocd' }}
