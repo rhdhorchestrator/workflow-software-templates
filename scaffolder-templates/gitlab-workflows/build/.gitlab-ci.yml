@@ -1,0 +1,33 @@
+stages:
+  - wait
+  - update
+
+wait_for_populated_variable:
+  # A tag can be set according to your Gitlab runner configuration, for example:
+  # tags:
+  #  - shared-podman 
+  stage: wait
+  image: ubuntu:latest
+  script: |
+    sleep 5
+
+update_pipelinerun:
+  # tags:
+  #  - shared-podman 
+  stage: update
+  image: ubuntu:latest
+  script: |
+    apt-get update && apt-get install -y git
+    git config --global http.sslVerify "false"
+    COMMIT_AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae')
+    COMMIT_AUTHOR_NAME=$(git log -1 --pretty=format:'%an')
+    COMMIT_ID=$(git rev-parse --short HEAD)
+    git config --global user.email "$COMMIT_AUTHOR_EMAIL"
+    git config --global user.name "$COMMIT_AUTHOR_NAME"
+    echo "PROJECT_ACCESS_TOKEN is set to: $PROJECT_ACCESS_TOKEN"
+    git remote set-url origin https://token:$PROJECT_ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+    cd argocd
+    sed "s/__COMMIT_ID__/$COMMIT_ID/g" pipelinerun.template > pipelinerun.yaml
+    git add pipelinerun.yaml
+    git commit -m "Updated PipelineRun with commit id $COMMIT_ID"
+    git push origin HEAD:main -o ci.skip

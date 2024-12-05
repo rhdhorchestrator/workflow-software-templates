@@ -22,6 +22,7 @@ resources. Please provide organization-level configuration for these secrets and
 If you wish to create a new Quay repository, you would need to possess an API token for your Quay organization, and pass it when prompted. 
 After successfully creating a new Quay repository, the user would have to configure a robot user with write permissions to continue the repository for their CI/CD process. 
 
+
 The value of the `OPENSHIFT_TOKEN` secret must provide the permissions to create resources in multiple namesapces, so we provide a simple procedure to
 bind it to the `cluster-admin` role, but we recommend to configure a new role with only the required privileges instead.
 
@@ -34,12 +35,22 @@ oc get $(oc get secret -o name | grep orchestrator-token) -o yaml | yq '.data.to
 ```
 Finally, put the output of the last command in the `OPENSHIFT_TOKEN` secret.
 
-## Generated artifacts
+## Generated artifacts in a GitHub pipeline
 The execution of the software template produces the following output:
 * A workflow repository with a sample Serverless Workflow
   * Including manifests to configure the Tekton trigger and ArgoCD application
   * Includes a GH action to deploy the Tekton trigger and ArgoCD application: the action is automatically executed to start the deployment by the template
   * A Github webhook is automatically created to activate the Tekton trigger
+* A config repository with initial configuration of a kustomize project to deploy the application
+  * Uses properties file to allow setting user-specific configuration for the workflow (assuming that the workflow `application.properties` are using
+  env variables to specify the values)
+* Registers the workflow and workflow-gitops repositories in Backstage as `Component`s
+
+## Generated artifacts in a GitLab pipeline
+The execution of the software template produces the following output:
+* A workflow repository with a sample Serverless Workflow
+  * Including manifests to configure the Tekton trigger and ArgoCD application
+  * Includes a GL pipeline to deploy the Tekton trigger and ArgoCD application: the action is executed by a GitLab runner to start the deployment by the template
 * A config repository with initial configuration of a kustomize project to deploy the application
   * Uses properties file to allow setting user-specific configuration for the workflow (assuming that the workflow `application.properties` are using
   env variables to specify the values)
