@@ -1,6 +1,6 @@
 # documentation-templates
 
-The templates available in [scaffolder-templates](https://github.com/parodos-dev/workflow-software-templates/tree/main/scaffolder-templates) are integrated in the Backstage Orchestrator plugin under `locations` in the following deployment manifest [values](https://github.com/parodos-dev/orchestrator-helm-chart/blob/main/charts/orchestrator/templates/rhdh-operator.yaml#L186).
+The templates available in [scaffolder-templates](https://github.com/rhdhorchestrator/workflow-software-templates/tree/main/scaffolder-templates) are integrated in the Backstage Orchestrator plugin under `locations` in the following deployment manifest [values](https://github.com/rhdhorchestrator/orchestrator-helm-chart/blob/main/charts/orchestrator/templates/rhdh-operator.yaml#L186).
 
 ## basic-workflow
 This template allows the user to generate a basic workflow project from the user's inputs collected.
