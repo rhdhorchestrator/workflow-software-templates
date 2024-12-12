@@ -6,5 +6,5 @@ metadata:
 spec:
   type: url
   targets:
-    - https://github.com/parodos-dev/workflow-software-templates/tree/main/entities/system.yaml
-    - https://github.com/parodos-dev/workflow-software-templates/tree/main/entities/group.yaml
+    - https://github.com/rhdhorchestrator/workflow-software-templates/tree/main/entities/system.yaml
+    - https://github.com/rhdhorchestrator/workflow-software-templates/tree/main/entities/group.yaml

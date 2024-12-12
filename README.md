@@ -4,7 +4,7 @@ This repository is a collection of software and documentation templates for the 
 
 Starting from RHDH Orchestrator Plugin v1.13, the outputs schema enhances the display of workflow outputs. Rather than showing the entire context as a JSON object, only the specified fields are formatted and presented in a more user-friendly manner.
 
-See [the output schema definition and description](https://github.com/parodos-dev/serverless-workflows/blob/main/best-practices.md#workflow-output-schema) for more details.
+See [the output schema definition and description](https://github.com/rhdhorchestrator/serverless-workflows/blob/main/best-practices.md#workflow-output-schema) for more details.
 
 ## scaffolder-templates
 
@@ -19,8 +19,8 @@ The documentation templates provide recommended structure and integration docume
 In case of `Tekton` CI pipeline, the secrets `OPENSHIFT_SERVER` and `OPENSHIFT_TOKEN` are used by the GitHub action that deploys the Tekton
 resources. Please provide organization-level configuration for these secrets and ensure that they can be managed by the newly created repositories according to the visibility options (currently set to `public`).
 
-If you wish to create a new Quay repository, you would need to possess an API token for your Quay organization, and pass it when prompted. 
-After successfully creating a new Quay repository, the user would have to configure a robot user with write permissions to continue the repository for their CI/CD process. 
+If you wish to create a new Quay repository, you would need to possess an API token for your Quay organization, and pass it when prompted.
+After successfully creating a new Quay repository, the user would have to configure a robot user with write permissions to continue the repository for their CI/CD process.
 
 
 The value of the `OPENSHIFT_TOKEN` secret must provide the permissions to create resources in multiple namesapces, so we provide a simple procedure to
@@ -61,5 +61,5 @@ The execution of the software template produces the following output:
 * [Template review page should not invent the parameter names](https://github.com/backstage/backstage/issues/23794)
 
 # Possible improvements:
-* [Allow using env variables in scaffolder](https://github.com/backstage/backstage/issues/17208#issuecomment-1497474223): 
+* [Allow using env variables in scaffolder](https://github.com/backstage/backstage/issues/17208#issuecomment-1497474223):
   to avoid passing the SSH private key in the template parameters (a picker could be used in case of multiple keys)
