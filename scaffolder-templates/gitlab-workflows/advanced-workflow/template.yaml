@@ -111,7 +111,7 @@ spec:
                 gitlabHost:
                   title: Gitlab Instance Name
                   type: string
-                  default: gitlab.cee.redhat.com
+                  default: GITLAB_HOST
                   description: The name or host of your gitlab instance
                 persistencePSQLSecretName:
                   title: PostgreSQL Secret Name
