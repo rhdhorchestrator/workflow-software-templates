@@ -141,7 +141,7 @@ spec:
                 gitlabHost:
                   title: Gitlab Instance Name
                   type: string
-                  default: GITLAB_HOST
+                  default: gitlab-host
                   description: The name or host of your gitlab instance
                 persistencePSQLSecretName:
                   title: PostgreSQL Secret Name
