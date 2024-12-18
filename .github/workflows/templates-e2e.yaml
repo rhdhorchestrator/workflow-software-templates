@@ -66,10 +66,10 @@ jobs:
     - name: Register Software Templates
       run: | 
         echo "Registering Advanced Template"
-        curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}' | jq
+        curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/'$GITHUB_REF_NAME'/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}' | jq
         sleep 2
         echo "Registering Basic Template"
-        curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}' | jq
+        curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/'$GITHUB_REF_NAME'/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}' | jq
 
     - name: Launch Advanced Template
       run: | 
@@ -82,7 +82,6 @@ jobs:
       run: | 
         sleep 20
         RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$ADVANCED_TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
-        echo $RESULT
         if [ "$RESULT" = "failed" ]; then 
           echo "The Advanced template launched but failed to complete."
           exit 1
@@ -103,7 +102,6 @@ jobs:
       run: |
         sleep 20
         RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$BASIC_TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
-        echo $RESULT
         if [ "$RESULT" = "failed" ]; then 
           echo "The Basic template launched but failed to complete."
           exit 1
