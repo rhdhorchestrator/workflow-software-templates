@@ -22,6 +22,9 @@ jobs:
 
     - name: Install Operators Support
       run: |
+          echo "DEBUGGING"
+          echo ${{ github.event.pull_request.base.ref }}
+          echo ${{ github.event.pull_request.head.ref }}
           kubectl apply -f https://raw.githubusercontent.com/operator-framework/operator-lifecycle-manager/master/deploy/upstream/quickstart/crds.yaml
           # give the apiserver time
           sleep 5s
@@ -80,6 +83,7 @@ jobs:
         echo "Launch Advanced Template"
         ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"'$GITHUB_ORG'","repoName":"advanced","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"'$PSQL_SECRET'","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"test","system":"Guest"}}' | jq .id | tr -d '"')
         echo "ADVANCED_TASK_ID is $ADVANCED_TASK_ID"
+        if [ -z "$ADVANCED_TASK_ID" ]; then exit 1;
         echo "ADVANCED_TASK_ID=$ADVANCED_TASK_ID" >> $GITHUB_ENV
     
     - name: Validate Advanced Template Successs
@@ -100,6 +104,7 @@ jobs:
         echo "Launch Basic Template"
         BASIC_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/basic-workflow-bootstrap","values":{"owner":"user:guest","orgName":"'$GITHUB_ORG'","repoName":"basic","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","workflowType":"infrastructure", "quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"test","system":"Guest"}}' | jq .id | tr -d '"')
         echo "BASIC_TASK_ID is $BASIC_TASK_ID"
+        if [ -z "$BASIC_TASK_ID" ]; then exit 1;
         echo "BASIC_TASK_ID=$BASIC_TASK_ID" >> $GITHUB_ENV
     
     - name: Validate Basic Template Successs
