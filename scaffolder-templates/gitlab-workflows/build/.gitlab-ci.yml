@@ -3,17 +3,16 @@ stages:
   - update
 
 wait_for_populated_variable:
-  
-  tags:
-    - shared-podman # Change to any tag your organization uses
+  # tags:
+  #  - shared-podman # Change to any tag your organization uses
   stage: wait
   image: ubuntu:latest
   script: |
     sleep 5
 
 update_pipelinerun:
-  tags:
-    - shared-podman # Change to any tag your organization uses
+  # tags:
+  #   - shared-podman # Change to any tag your organization uses
   stage: update
   image: ubuntu:latest
   script: |
