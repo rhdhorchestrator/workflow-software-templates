@@ -1,0 +1,150 @@
+name: Workflow Software Templates End to End CI 
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/templates-e2e.yaml
+      - 'scaffolder-templates/**'
+jobs:
+  run-e2e:
+    env: 
+      GITHUB_TOKEN:  ${{ secrets.GH_TOKEN }}
+      GITHUB_ORG: rhdhorchestrator
+      GIT_BRANCH: ${{ github.event.pull_request.head.ref }}
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Create k8s Kind Cluster
+      uses: helm/kind-action@v1.10.0
+      with:
+        cluster_name: kind
+
+    - name: Install Operators Support
+      run: |
+          kubectl apply -f https://raw.githubusercontent.com/operator-framework/operator-lifecycle-manager/master/deploy/upstream/quickstart/crds.yaml
+          # give the apiserver time
+          sleep 5s
+          kubectl apply -f https://raw.githubusercontent.com/operator-framework/operator-lifecycle-manager/master/deploy/upstream/quickstart/olm.yaml
+
+    - name: Deploy ArgoCD
+      run: |
+          kubectl create namespace argocd
+          kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+          kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+
+    - name: Deploy Orchestrator 
+      run: |
+          helm repo add orchestrator https://rhdhorchestrator.github.io/orchestrator-helm-chart
+          helm install orchestrator orchestrator/orchestrator-k8s --set platform.eventing.broker.name="" 
+
+          kubectl get sfp -A
+          kubectl wait --for=condition=Ready=true pods -l "app.kubernetes.io/name=backstage" --timeout=10m
+          kubectl get pods -o wide
+          kubectl wait --for=condition=Ready=true pods -l "app=sonataflow-platform" --timeout=180s
+
+    - name: Set Configuration and Secrets
+      run: |
+        kubectl get cm orchestrator-backstage-app-config -n default -oyaml > save.yaml
+        sed -i "s/INSERT VALID TOKEN HERE/$GITHUB_TOKEN/g" save.yaml
+        kubectl apply -f save.yaml
+        kubectl rollout restart deployment orchestrator-backstage -n default
+
+        kubectl get sfp -A
+        kubectl wait --for=condition=Ready=true pods -l "app.kubernetes.io/name=backstage" --timeout=10m
+        kubectl get pods -o wide
+        kubectl wait --for=condition=Ready=true pods -l "app=sonataflow-platform" --timeout=180s
+
+        BACKEND_TOKEN=$(kubectl get secret -n default orchestrator-auth -o jsonpath={.data.backend-secret} | base64 -d)
+        echo "BACKEND_TOKEN=$BACKEND_TOKEN" >> $GITHUB_ENV
+        echo "BACKSTAGE_URL=http://localhost:9080" >> $GITHUB_ENV
+        PSQL_SECRET=$(kubectl get secret -n default orchestrator-postgresql -o jsonpath={.data.password} | base64 -d)
+        echo "PSQL_SECRET=$PSQL_SECRET" >> $GITHUB_ENV
+
+        echo "Proxy Janus-idp port ⏳"
+        kubectl port-forward "$(kubectl get svc -l app.kubernetes.io/name=backstage -o name)" 9080:7007 &
+        port_forward_pid="$!"
+        sleep 3
+        echo "Proxy Janus-idp port ✅"
+
+    - name: Register Software Templates
+      run: | 
+        echo "Registering Advanced Template"
+        curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/'$GIT_BRANCH'/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}' | jq
+        sleep 2
+        echo "Registering Basic Template"
+        curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/'$GIT_BRANCH'/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}' | jq
+
+    - name: Launch Advanced Template
+      run: | 
+        echo "Launch Advanced Template"
+        ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"'$GITHUB_ORG'","repoName":"advanced","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"'$PSQL_SECRET'","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"test","system":"Guest"}}' | jq .id | tr -d '"')
+        echo "ADVANCED_TASK_ID is $ADVANCED_TASK_ID"
+        if [ -z "$ADVANCED_TASK_ID" ]; 
+        then
+          exit 1;
+        fi
+        echo "ADVANCED_TASK_ID=$ADVANCED_TASK_ID" >> $GITHUB_ENV
+    
+    - name: Validate Advanced Template Successs
+      run: | 
+        sleep 20
+        RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$ADVANCED_TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
+        if [ "$RESULT" = "failed" ]; then 
+          echo "The Advanced template launched but failed to complete."
+          exit 1
+        fi
+
+        if [ "$RESULT" = "completed" ]; then 
+          echo "The Advanced template was executed successfully."
+        fi
+        
+    - name: Launch Basic Template
+      run: |
+        echo "Launch Basic Template"
+        BASIC_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/basic-workflow-bootstrap","values":{"owner":"user:guest","orgName":"'$GITHUB_ORG'","repoName":"basic","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","workflowType":"infrastructure", "quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"test","system":"Guest"}}' | jq .id | tr -d '"')
+        echo "BASIC_TASK_ID is $BASIC_TASK_ID"
+        if [ -z "$BASIC_TASK_ID" ]; 
+        then
+          exit 1;
+        fi
+        echo "BASIC_TASK_ID=$BASIC_TASK_ID" >> $GITHUB_ENV
+    
+    - name: Validate Basic Template Successs
+      run: |
+        sleep 20
+        RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$BASIC_TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
+        if [ "$RESULT" = "failed" ]; then 
+          echo "The Basic template launched but failed to complete."
+          exit 1
+        fi
+
+        if [ "$RESULT" = "completed" ]; then 
+          echo "The Basic template was executed successfully."
+        fi
+
+    - name: Export kind Logs
+      if: always()
+      run: |
+          kubectl get pod -A
+          kubectl get deploy -A
+          kubectl get sonataflow -A
+          kind export logs ./kind_logs
+
+    - name: Upload Kind Logs
+      uses: actions/upload-artifact@v4
+      # Always run this, even if one of the previous steps failed.
+      if: always()
+      with:
+        name: kind-logs
+        path: ./kind_logs/
+
+    - name: Cleanup
+      if: always()
+      run: |
+        echo "Deleting Created Repositories"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/advanced         -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/basic            -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/advanced-gitops  -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/basic-gitops     -H "Authorization: Bearer $GITHUB_TOKEN"

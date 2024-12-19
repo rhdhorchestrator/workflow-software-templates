@@ -14,7 +14,7 @@ metadata:
     - url: https://kiegroup.github.io/kogito-docs/serverlessworkflow/latest/index.html
       title: SonataFlow Guides
       icon: techdocs
-    - url: https://www.parodos.dev/docs/core-concepts/workflow-types/
+    - url: https://www.rhdhorchestrator.io/main/docs/core-concepts/workflow-types/
       title: Workflow Types
       icon: techdocs
 spec:
@@ -141,7 +141,7 @@ spec:
                 gitlabHost:
                   title: Gitlab Instance Name
                   type: string
-                  default: gitlab.cee.redhat.com
+                  default: gitlab-host
                   description: The name or host of your gitlab instance
                 persistencePSQLSecretName:
                   title: PostgreSQL Secret Name
