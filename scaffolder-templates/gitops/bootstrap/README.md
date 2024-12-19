@@ -18,7 +18,7 @@ SSH_PRIVATE_KEY=$(oc get secrets -n orchestrator-gitops github-ssh-credentials -
 {% else %}
 SSH_PRIVATE_KEY=$(oc get secrets -n orchestrator-gitops gitlab-ssh-credentials -o jsonpath='{.data.id_rsa}') 
 {% endif %}
-sed -i "s/__REPLACE_SSH_PRIVATE_KEY__/$SSH_PRIVATE_KEY/" ${{values.workflowId}}-argocd-repo.yaml
+sed -i "s/__REPLACE_SSH_PRIVATE_KEY__/$SSH_PRIVATE_KEY/" bootstrap/${{values.workflowId}}-argocd-repo.yaml
 
 kubectl apply -f .
 ```
@@ -26,7 +26,7 @@ kubectl apply -f .
 **Note:** If you're not logged into the repository, you need to provide a personal access token (PAT) as part of the clone URL.
 
 ```
-git clone https://<PAT>@${{ values.gitHost }}/${{ values.orgName }}/${{ values.repoName }}.git
+git clone https://token:<PAT>@${{ values.gitHost }}/${{ values.orgName }}/${{ values.repoName }}.git
 ```
 
 Replace `<PAT>` with your personal access token. Ensure the token has the necessary permissions to access the repository.

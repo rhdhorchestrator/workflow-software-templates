@@ -266,7 +266,7 @@ spec:
           version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
           infrastructureWorkflowId: ${{ parameters.infrastructureWorkflowId }}
-          sourceControl: github.com
+          sourceControl: gitlab.com
           applicationType: workflow-project
           lifecycle: development
           quayOrgName: ${{ parameters.quayOrgName }}
@@ -294,8 +294,8 @@ spec:
           argocdNamespace: ${{ parameters.argocdNamespace }}
           orgName: ${{ parameters.orgName }}
           workflowId: ${{ parameters.workflowId }}
-          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          gitUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
           gitHost: ${{ parameters.gitlabHost }}
@@ -314,8 +314,8 @@ spec:
           argocdNamespace: ${{ parameters.argocdNamespace }}
           orgName: ${{ parameters.orgName }}
           workflowId: ${{ parameters.workflowId }}
-          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          gitUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
           convertToFlat: false
@@ -376,10 +376,10 @@ spec:
           system: ${{ parameters.system }}
           applicationType: workflow-project
           description: ${{ parameters.description }}
-          sourceControl: github.com
+          sourceControl: gitlab.com
           lifecycle: development
-          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          gitUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           persistencePSQLSecretName: ${{ parameters.persistencePSQLSecretName }}
           persistencePSQLUserKey: ${{ parameters.persistencePSQLUserKey }}
           persistencePSQLPasswordKey: ${{ parameters.persistencePSQLPasswordKey }}
