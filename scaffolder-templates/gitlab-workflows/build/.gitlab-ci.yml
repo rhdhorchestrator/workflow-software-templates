@@ -3,9 +3,8 @@ stages:
   - update
 
 wait_for_populated_variable:
-  # A tag can be set according to your Gitlab runner configuration, for example:
   # tags:
-  #  - shared-podman 
+  #  - shared-podman # Change to any tag your organization uses
   stage: wait
   image: ubuntu:latest
   script: |
@@ -13,7 +12,7 @@ wait_for_populated_variable:
 
 update_pipelinerun:
   # tags:
-  #  - shared-podman 
+  #   - shared-podman # Change to any tag your organization uses
   stage: update
   image: ubuntu:latest
   script: |

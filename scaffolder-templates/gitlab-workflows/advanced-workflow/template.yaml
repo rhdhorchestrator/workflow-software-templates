@@ -248,7 +248,7 @@ spec:
         repoKind: ${{ parameters.repoKind }}
         namespace: ${{ parameters.quayNamespace }}
     - id: workflowCodeTemplate
-      name: Generating the Workflow Source Code and Catalog Info Component
+      name: Generating Code and Catalog Component
       action: fetch:template
       input:
         # "Relative path is not allowed to refer to a directory outside its parent"
@@ -266,7 +266,7 @@ spec:
           version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
           infrastructureWorkflowId: ${{ parameters.infrastructureWorkflowId }}
-          sourceControl: github.com
+          sourceControl: gitlab.com
           applicationType: workflow-project
           lifecycle: development
           quayOrgName: ${{ parameters.quayOrgName }}
@@ -274,7 +274,7 @@ spec:
         targetPath: workflow
     - id: renameFiles
       action: fs:rename
-      name: Rename files
+      name: Rename Files
       input:
         files:
           - from: workflow/src/main/resources/specs/dataindex.yaml
@@ -284,7 +284,7 @@ spec:
             to: workflow/src/main/resources/${{ parameters.workflowId }}.sw.yaml
             overwrite: true
     - id: buildCodeTemplate
-      name: Generating the Build Code for the Workflow
+      name: Generating Build Code 
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
@@ -294,15 +294,15 @@ spec:
           argocdNamespace: ${{ parameters.argocdNamespace }}
           orgName: ${{ parameters.orgName }}
           workflowId: ${{ parameters.workflowId }}
-          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          gitUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
           gitHost: ${{ parameters.gitlabHost }}
           convertToFlat: false
         targetPath: workflow
     - id: addCIPipeline
-      name: Adding the gitlab pipeline for the Workflow
+      name: Generating CI Workflow
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
@@ -314,15 +314,15 @@ spec:
           argocdNamespace: ${{ parameters.argocdNamespace }}
           orgName: ${{ parameters.orgName }}
           workflowId: ${{ parameters.workflowId }}
-          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          gitUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
           convertToFlat: false
         targetPath: workflow
 
     - id: publishWorkflow
-      name: Publishing to the Workflow Repository
+      name: Publishing Workflow Project
       action: publish:gitlab
       input:
         allowedHosts: ["${{ parameters.gitlabHost }}"]
@@ -332,7 +332,7 @@ spec:
         sourcePath: workflow
 
     - id: createProjectAccessToken
-      name: Create a Project Access Token to the workflow Repository
+      name: Creating Project Access Token
       action: gitlab:projectAccessToken:create
       input:
         projectId: ${{ parameters.orgName }}/${{ parameters.repoName }}
@@ -342,7 +342,7 @@ spec:
           [api, read_api, create_runner, read_repository, write_repository]
 
     - id: createAccessTokenVariable
-      name: Create a Project Variable to hold the Token
+      name: Creating Project Variable
       action: gitlab:projectVariable:create
       input:
         repoUrl: ${{ parameters.gitlabHost }}?owner=${{ parameters.orgName }}&repo=${{ parameters.repoName }}
@@ -361,7 +361,7 @@ spec:
         catalogInfoPath: /catalog-info.yaml
 
     - id: gitopsCodeTemplate
-      name: Generating the GitOps Component and Catalog Info Component
+      name: Generating GitOps and Catalog Info Component
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
@@ -376,10 +376,10 @@ spec:
           system: ${{ parameters.system }}
           applicationType: workflow-project
           description: ${{ parameters.description }}
-          sourceControl: github.com
+          sourceControl: gitlab.com
           lifecycle: development
-          gitUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}.git
-          gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
+          gitUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}.git
+          gitOpsUrl: git@${{ parameters.gitlabHost }}:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           persistencePSQLSecretName: ${{ parameters.persistencePSQLSecretName }}
           persistencePSQLUserKey: ${{ parameters.persistencePSQLUserKey }}
           persistencePSQLPasswordKey: ${{ parameters.persistencePSQLPasswordKey }}
@@ -395,7 +395,7 @@ spec:
     - id: renameFilesForPersistence
       if: ${{ parameters.CI == 'tekton_argocd' }}
       action: fs:rename
-      name: Rename files for persistence
+      name: Rename Files
       input:
         files:
           - from: gitops/kustomize/base/sonataflow-patch-persistence.yaml
@@ -403,7 +403,7 @@ spec:
             overwrite: true
     - id: publishGitOps
       if: ${{ parameters.CI == 'tekton_argocd' }}
-      name: Publishing to the GitOps Code Repository
+      name: Publishing GitOps Project
       action: publish:gitlab
       input:
         allowedHosts: ["${{ parameters.gitlabHost }}"]
