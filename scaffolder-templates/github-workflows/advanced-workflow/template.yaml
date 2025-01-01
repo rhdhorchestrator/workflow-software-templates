@@ -236,7 +236,7 @@ spec:
       if: ${{ parameters.quayConfig == 'Create New Repository' }}
       input:
         baseUrl: ${{ parameters.baseUrl }}
-        token: ${{ parameters.token }}
+        token: ${{ secrets.token }}
         name: ${{ parameters.quayRepoName }}
         visibility: ${{ parameters.visibility }}
         description: ${{ parameters.newRepoDescription }}
