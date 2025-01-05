@@ -48,12 +48,12 @@ spec:
         workflowId:
           title: Workflow ID
           type: string
-          pattern: "^([a-zA-Z][a-zA-Z0-9]*)([.]?[a-zA-Z0-9]+)*$" # hypens '-' are not allowed to not mess with java package
+          pattern: "^[a-z0-9]([.]?[a-z0-9])*$" # hyphens '-' are not allowed, must start and end with lowercase alphanumerical values
           description: Unique identifier of the workflow in SonataFlow
         infrastructureWorkflowId:
           title: Infrastructure Workflow ID
           type: string
-          pattern: "^([a-zA-Z][a-zA-Z0-9]*)([.][a-zA-Z0-9]+)*$" # hypens '-' are not allowed to not mess with java package
+          pattern: "^[a-z0-9]([.]?[a-z0-9])*$" # hyphens '-' are not allowed, must start and end with lowercase alphanumerical values
           description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
         owner:
           title: Owner
