@@ -32,7 +32,7 @@ An infrastructure workflow project is generated from the Github Basic Workflow o
 
 ## Prerequisites
 
-- An OCP/k8s cluster and a RHDH instance. 
+- An OCP/k8s cluster and an RHDH instance. 
 - A GitHub account
 - An account on Quay.io 
 

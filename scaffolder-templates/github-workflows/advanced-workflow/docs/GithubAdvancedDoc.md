@@ -10,7 +10,7 @@ This software template allows the user to generate an advanced assessment workfl
 
 ## Prerequisites
 
-- An OCP/k8s cluster and a RHDH instance. 
+- An OCP/k8s cluster and an RHDH instance. 
 - A GitHub account
 - An account on Quay.io 
 
