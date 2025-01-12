@@ -1,0 +1,31 @@
+site_name: Advanced Github Template
+site_description: Advanced Github Template
+repo_url: https://github.com/ElaiShalevRH/workflow-software-templates
+docs_dir: docs
+
+plugins:
+  - techdocs-core
+
+theme:
+  name: material
+  palette:
+    primary: 'red'
+    accent: 'grey'
+  features:
+    - navigation.tabs
+    - navigation.instant
+    - navigation.indexes
+    - navigation.top
+    - navigation.sections
+    - toc.integrate
+    - toc.follow
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+nav: 
+  - Github Advanced Template:
+      - Github Advanced Template: 'template.md'
+
