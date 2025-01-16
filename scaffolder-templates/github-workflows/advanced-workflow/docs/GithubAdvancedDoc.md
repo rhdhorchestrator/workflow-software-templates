@@ -1,5 +1,9 @@
 # Creating an Advanced Serverless Workflow via a Software Template with GitHub
 
+## Overview
+
+This software template allows the user to generate an advanced assessment workflow project from the user's input.
+
 ## Prerequisites
 
 - An OCP/k8s cluster and an RHDH instance. 
