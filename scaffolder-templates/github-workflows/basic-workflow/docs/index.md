@@ -8,7 +8,7 @@ description: Github Basic Workflow
 
 This document will allow system admins more insight on the required setup to run the software template. 
 
-- [Gitlab Advanced Workflow Template Doc](GithubAdminInfoDoc.md)
+- [Github Admin Info Doc](GithubAdminInfoDoc.md)
 
 # Github Basic Workflow Documentation
 

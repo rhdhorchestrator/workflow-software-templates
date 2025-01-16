@@ -12,7 +12,6 @@ To run the template, the user will need to provide input parameters for configur
 
 ### Page 1: Workflow Software Project Configuration
 
-
 On this page the user will provide input for the following parameters:
 
 - Group Name: Gitlab Group Name
@@ -67,7 +66,6 @@ To generate the Auth token, please follow the pre-requisite step in the [admin e
 
 
 ### Page 3: Build Enviroment
-
 
 The user can review their input parameters and click "Create" to run the template. After completed, a link to the created source code repository will be provided. A link to the GitOps repository will be provided only if the user selected a CI method. 
 

@@ -8,7 +8,7 @@ description: Gitlab Advanced Workflow
 
 This document will allow system admins more insight on the required setup to run the software template. 
 
-- [Gitlab Advanced Workflow Template Doc](GitlabAdminInfoDoc.md)
+- [Gitlab Admin Info Doc](GitlabAdminInfoDoc.md)
 
 # Gitlab Advanced Workflow Documentation
 

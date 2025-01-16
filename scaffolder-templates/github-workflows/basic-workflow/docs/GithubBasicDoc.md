@@ -8,7 +8,6 @@ The Orchestrator features two primary workflow categories:
 - Infrastructure workflows: focus on automating infrastructure-related tasks
 - Assessment workflows: focus on evaluating and analyzing data to suggest suitable infrastructure workflow options for subsequent execution
 
-
 ## Prerequisites
 
 - An OCP/k8s cluster and an RHDH instance. 
@@ -32,14 +31,11 @@ On this page the user will provide input for the following parameters:
 - Owner: A drop down menu will reveal potential owners for this workflow
 - System: An entity from the catalog.
 
-
 ## Page 2: Workflow Type
-
 
 On this page, the user will choose a the workflow type (infrastructure / assessment). 
 Upon choosing 'Assesment', the user will be required to provide an additional parameter: 
 - Infrastructure Workflow ID: Workflow ID, the unique identifier of the infrastructure worklow available in the environment 
-
 
 ### Page 3: Build Enviroment
 
@@ -49,7 +45,6 @@ On this page, the user will choose a CI/CD method for building and monitoring th
 - Upon Choosing 'Tekton with ArgoCD', the user will be prompted to enter some following input parameters to configure the GitOps repository:
 
 #### Repository Configuration
-
 
 - Workflow Namespace: Deployment namespace for workflow applications
 - GitOps Namespace: Deployment namespace for ArgoCD and Tekton resources

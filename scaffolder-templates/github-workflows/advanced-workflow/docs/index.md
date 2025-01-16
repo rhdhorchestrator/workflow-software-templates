@@ -8,7 +8,7 @@ description: Github Advanced Workflow
 
 This document will allow system admins more insight on the required setup to run the software template. 
 
-- [Github Advanced Workflow Template Doc](GithubAdminInfoDoc.md)
+- [Github Admin Info Doc](GithubAdminInfoDoc.md)
 
 # Github Advanced Workflow Documentation
 

@@ -26,6 +26,6 @@ markdown_extensions:
   - toc:
       permalink: true
 nav: 
-  - Github Advanced Template:
-      - Github Advanced Template: 'template.yaml'
+  - Github Advanced Workflow Template:
+      - Github Advanced Workflow Template: 'template.yaml'
 
