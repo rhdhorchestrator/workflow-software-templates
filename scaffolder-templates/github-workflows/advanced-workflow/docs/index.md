@@ -6,7 +6,7 @@ description: Github Advanced Workflow
 
 # Admin Configurations
 
-This document will allow system admins more insight on the required setup to run the software template. 
+This document will guide system admins on the required setup to run the software template. 
 
 - [Github Admin Info Doc](GithubAdminInfoDoc.md)
 
