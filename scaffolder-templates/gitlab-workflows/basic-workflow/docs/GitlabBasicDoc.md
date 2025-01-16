@@ -8,20 +8,17 @@ The Orchestrator features two primary workflow categories:
 - Infrastructure workflows: focus on automating infrastructure-related tasks
 - Assessment workflows: focus on evaluating and analyzing data to suggest suitable infrastructure workflow options for subsequent execution
 
-
 ## Prerequisites
 
 - An OCP/k8s cluster on which to run RHDH. 
 - An account on [Quay.io](https://quay.io/repository/) 
 - Setting up the Gitlab prerequisites as explained in the admin [environment setup documentation](GitlabAdminInfoDoc.md).  
 
-
 ## Steps
 
 To run the template, the user will need to provide input parameters for configuring the serverless workflow.
 
 ### Page 1: Workflow Software Project Configuration
-
 
 On this page the user will provide input for the following parameters:
 
@@ -33,7 +30,6 @@ On this page the user will provide input for the following parameters:
 - System: An entity from the catalog. 
 
 ## Page 2: Workflow Type
-
 
 On this page, the user will choose a the workflow type (infrastructure / assessment). 
 Upon choosing 'Assesment', the user will be required to provide an additional parameter: 
@@ -81,9 +77,7 @@ To generate the Auth token, please follow the pre-requisite step in the [admin e
 - Quay Base URL: URL of your Quay instance (e.g https://quay.io)
 - Quay Namespace: The Quay namespace of the published workflow. This should be the same as the Quay repository name.
 
-
 ### Page 4: Review
-
 
 The user can review their input parameters and click "Create" to run the template. After completed, a link to the created source code repository will be provided. A link to the GitOps repository will be provided only if the user selected a CI method. 
 

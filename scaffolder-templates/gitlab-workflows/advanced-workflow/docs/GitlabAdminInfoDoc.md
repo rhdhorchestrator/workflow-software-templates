@@ -1,4 +1,4 @@
-# Enviroment setup for Admins
+# Environment setup for Admins
 
 ## Gitlab configuration
 
