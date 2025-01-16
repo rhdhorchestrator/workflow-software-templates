@@ -28,5 +28,5 @@ markdown_extensions:
 
 nav: 
   - Gitlab Advanced Workflow Template:
-      - Gitlab Advanced Workflow Template: 'template.md'
+      - Gitlab Advanced Workflow Template: 'template.yaml'
 
