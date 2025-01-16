@@ -27,5 +27,5 @@ markdown_extensions:
       permalink: true
 nav: 
   - Github Advanced Template:
-      - Github Advanced Template: 'template.md'
+      - Github Advanced Template: 'template.yaml'
 

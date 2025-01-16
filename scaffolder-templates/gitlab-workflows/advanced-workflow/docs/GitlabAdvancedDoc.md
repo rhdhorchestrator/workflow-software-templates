@@ -1,46 +1,17 @@
 # Creating an Advanced Serverless Workflow via a Software Template with Gitlab
 
-## Overview
-This software template allows the user to generate an advanced assessment workflow project from the user's input. It includes:
-
-1. **custom java code** to perform advanced operations on the user's inputs. In this case, it evaluates the user's input as string by comparing it to the word `default` to print out the default workflow options or an empty workflow options list from the java code.
-2. **pre-check subflow** to validate whether the workflows in the returned assessment workflow options exist in the workflows service. If there are non-existed workflows in the options, then it removes them from the options and outputs the remaining valid ones to the user.
-3. **data output schema validation** to ensure that the returned assessment workflow options list aligns with the expected schema to render options correctly in the UI.
-4. **README file** with the prerequisites and instructions to run and test the generated assessment workflow.
-
 ## Prerequisites
 
 - An OCP/k8s cluster and an RHDH instance. 
 - An account on [Quay.io](https://quay.io/repository/) 
-- Setting up the Gitlab prerequisites according to the following:
-
-### Prerequisite - Gitlab configuration
-
-To create the software project using Gitlab, some configuration is needed.
-
-1. Have a working Gitlab instance, with a Gitlab Group. 
-2. Create a PAT (Personal Acces Token) to make API calls to that group. Optional: have a dedicated gitlab user to be the owner of that group, and issue the PAT under their user.
-3. Configure a [Gitlab runner](https://docs.gitlab.com/runner/) associated to that instance / group. These runners will create VMs to run Gitlab CI actions needed for this template. The docker runner is the preffered one.
-4. Add a dynamic plugin to handle the Gitlab actions on RHDH.  
-To add this plugin, add a new package to the dynamic plugin CR in the rhdh-operator namespace on the cluster
-```
-- disabled: false
-  package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
-```
-5. Add the following spec to the backstage CR:
-```
-extraEnvs:
-    envs:
-      - name: NODE_TLS_REJECT_UNAUTHORIZED
-        value: "0"
-```
-6. Reload the operators and validate that all new specs are patched. 
+- Setting up the Gitlab prerequisites as explained in the admin [environment setup documentation](GitlabAdminInfoDoc.md).  
 
 ## Steps
 
 To run the template, the user will need to provide input parameters for configuring the serverless workflow.  
 
 ### Page 1: Workflow Software Project Configuration
+
 
 On this page the user will provide input for the following parameters:
 
@@ -55,7 +26,9 @@ On this page the user will provide input for the following parameters:
 ### Page 2: Build Enviroment
 
 On this page, the user will choose a CI/CD method for building and monitoring their serverless worklow application.
-Upon Choosing 'Tekton with ArgoCD', the user will be prompted to enter some following input parameters.
+
+- Upon Choosing 'None', no CI method will be used; the template will create the software project repository and will not create a GitOps repository. 
+- Upon Choosing 'Tekton with ArgoCD', the user will be prompted to enter some following input parameters to configure the GitOps repository:
 
 #### Repository Configuration: 
 
@@ -78,22 +51,14 @@ Upon Choosing 'Tekton with ArgoCD', the user will be prompted to enter some foll
 - Quay Repository Name: A name for the Quay Repository of the published workflow, either existing or to be created
 
 The user can choose an existing Quay repository for pushing the built images, or creating a new one.
-To create a new Quay repository, some additional configuratio needs to be made: 
+To create a new Quay repository, some additional configuration needs to be made. The system administrator must follow the pre-requisite step in the [admin environment setup documentation](GitlabAdminInfoDoc.md).  
 
-1. The [following dynamic plugin](https://www.npmjs.com/package/@janus-idp/backstage-scaffolder-backend-module-quay) needs to be added to RHDH. 
-To add this plugin, add a new package to the dynamic plugin CR in the rhdh-operator namespace on the cluster
-```
-- disabled: false
-  package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-quay
-```
-2. Create or locate an Organization on Quay
-3. Create an OAuth Application in the organization
-4. Configure 'Create Repositories Access' and grant the OAuth app permission to create new repositories: ![image without spacing](assets/QuayOAuth.png)
-5. Generate an Access Token to use
-
-Upon choosing to create a new one, they will be prompted for additional input parameters
+Upon choosing to create a new Quay repository, the user will be prompted for additional input parameters:
 
 - Quay AuthToken : Quay organization bearer token used for authorization
+
+To generate the Auth token, please follow the pre-requisite step in the [admin environment setup documentation](GitlabAdminInfoDoc.md).
+
 - Quay Repository Visiblity: Visibility setting for the created repository, either public or private
 - Quay Repository Kind: The created Quay repository kind, either image or application
 - Quay Repository Description: The Quay repository description
@@ -103,7 +68,7 @@ Upon choosing to create a new one, they will be prompted for additional input pa
 
 ### Page 3: Build Enviroment
 
-The user can review their input parameters and click "Create" to run the template. After completed, links to the created source code repository and GitOps repository will be provided.  
+
+The user can review their input parameters and click "Create" to run the template. After completed, a link to the created source code repository will be provided. A link to the GitOps repository will be provided only if the user selected a CI method. 
 
 The user can follow the instructions on the GitOps repository to activate the ArgoCD application and deploy the created workflow on RHDH.
- 
