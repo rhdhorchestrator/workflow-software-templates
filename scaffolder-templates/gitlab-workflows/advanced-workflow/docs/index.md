@@ -6,7 +6,7 @@ description: Gitlab Advanced Workflow
 
 # Admin Configurations
 
-This document will allow system admins more insight on the required setup to run the software template. 
+This document will guide system admins on the required setup to run the software template. 
 
 - [Gitlab Admin Info Doc](GitlabAdminInfoDoc.md)
 
