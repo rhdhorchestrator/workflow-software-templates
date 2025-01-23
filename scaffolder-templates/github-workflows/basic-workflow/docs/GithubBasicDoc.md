@@ -31,11 +31,14 @@ On this page the user will provide input for the following parameters:
 - Owner: A drop down menu will reveal potential owners for this workflow
 - System: An entity from the catalog.
 
-## Page 2: Workflow Type
+### Page 2: Workflow Type
 
-On this page, the user will choose a the workflow type (infrastructure / assessment). 
+On this page, the user will choose a the workflow type
+* Infrastructure
+* Assessment 
+
 Upon choosing 'Assesment', the user will be required to provide an additional parameter: 
-- Infrastructure Workflow ID: Workflow ID, the unique identifier of the infrastructure worklow available in the environment 
+- Infrastructure Workflow ID: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
 
 ### Page 3: Build Enviroment
 
