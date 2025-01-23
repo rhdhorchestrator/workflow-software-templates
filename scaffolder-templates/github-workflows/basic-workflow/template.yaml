@@ -330,6 +330,7 @@ spec:
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
           convertToFlat: true
+          gitHost: github.com
         targetPath: workflow
     - id: addCIPipeline
       name: Adding the github pipelinerun
@@ -349,7 +350,6 @@ spec:
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
           convertToFlat: true
-          gitHost: github.com
         targetPath: workflow
     - id: publishWorkflow
       name: Publishing to the Workflow Repository
