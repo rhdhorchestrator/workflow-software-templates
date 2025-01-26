@@ -1,9 +1,11 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: basic-workflow-bootstrap
-  title: Basic workflow bootstrap project
-  description: Bootstrap project for basic serverless workflow
+  name: github-basic-workflow-bootstrap
+  title: Github Basic workflow bootstrap project
+  description: Bootstrap project for github basic serverless workflow
+  annotations:
+    backstage.io/techdocs-ref: dir:.
   tags:
     - orchestrator
     - built-in
@@ -19,7 +21,7 @@ metadata:
       icon: techdocs
 spec:
   owner: janus-orchestrator
-  type: basic-workflow-bootstrap
+  type: github-basic-workflow
   parameters:
     - title: Workflow Software Project
       description: Configure the github repository where the Maven software project is located

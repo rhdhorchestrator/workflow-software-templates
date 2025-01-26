@@ -3,7 +3,9 @@ kind: Template
 metadata:
   name: gitlab-basic-workflow-bootstrap
   title: Gitlab Basic workflow bootstrap project
-  description: Bootstrap project for basic serverless workflow with gitlab
+  description: Bootstrap project for gitlab basic serverless workflow with gitlab
+  annotations:
+    backstage.io/techdocs-ref: dir:.
   tags:
     - orchestrator
     - built-in
@@ -19,7 +21,7 @@ metadata:
       icon: techdocs
 spec:
   owner: janus-orchestrator
-  type: gitlab-workflow
+  type: gitlab-basic-workflow
   parameters:
     - title: Workflow Software Project
       description: Configure the gitlab repository where the Maven software project is located
