@@ -1,9 +1,11 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: advanced-workflow-bootstrap
-  title: Advanced workflow bootstrap project
-  description: Bootstrap project for an advanced assessment serverless workflow using custom java code
+  name: github-advanced-workflow-bootstrap
+  title: Github Advanced workflow bootstrap project
+  description: Bootstrap project for a github advanced serverless workflow using custom java code
+  annotations:
+    backstage.io/techdocs-ref: dir:.
   tags:
     - orchestrator
     - built-in
@@ -19,7 +21,7 @@ metadata:
       icon: techdocs
 spec:
   owner: janus-orchestrator
-  type: advanced-workflow-bootstrap
+  type: github-advanced-workflow
   parameters:
     - title: Workflow Software Project
       description: Configure the github repository where the Maven software project is located
