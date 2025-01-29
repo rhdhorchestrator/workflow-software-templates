@@ -305,7 +305,7 @@ spec:
       input:
         url: ../build
         copyWithoutTemplating:
-          - build/.github/workflows/update_pipelinerun.yaml
+          - .github/workflows/update_pipelinerun.yaml
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
