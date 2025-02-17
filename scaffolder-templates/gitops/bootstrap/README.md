@@ -26,7 +26,7 @@ kubectl apply -f .
 **Note:** If you're not logged into the repository, you need to provide a personal access token (PAT) as part of the clone URL.
 
 ```
-git clone https://<PAT>@${{ values.gitHost }}/${{ values.orgName }}/${{ values.repoName }}.git
+git clone https://token:<PAT>@${{ values.gitHost }}/${{ values.orgName }}/${{ values.repoName }}.git
 ```
 
 Replace `<PAT>` with your personal access token. Ensure the token has the necessary permissions to access the repository.
