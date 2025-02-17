@@ -11,7 +11,7 @@ To create the software project using Gitlab, some configuration is needed.
 To add this plugin, add a new package to the dynamic plugin CR in the rhdh-operator namespace on the cluster
 ```
 - disabled: false
-  package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
+  package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-githlab-dynamic
 ```
 5. Add the following spec to the backstage CR:
 ```
