@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: convert-workflow-to-template-github
-  title: Convert serverless workflow to a software template pushed to GitHub
-  description: Create a software template out of an existing serverless workflow and push it to GitHub.
+  name: convert-workflow-to-template-gitlab
+  title: Convert serverless workflow to a template pushed to GitLab
+  description: Create a software template out of an existing serverless workflow and push it to GitLab.
   tags:
     - orchestrator
 
@@ -33,7 +33,7 @@ spec:
           ui:field: RepoUrlPicker
           ui:options:
             allowedHosts:
-              - github.com
+              - gitlab.com
         pluginLocation:
           type: string
           title: Where to publish this new plugin?
@@ -87,24 +87,24 @@ spec:
           repoName: ${{ (parameters.repoUrl | parseRepoUrl).repo }}
           orgName: ${{ (parameters.repoUrl | parseRepoUrl).owner }}
 
-    # GitHub: This step publishes the contents of the working directory to GitHub if it is a new repository.
-    - id: publishGithubRepo
-      name: Publish the template in a new GitHub repository
-      if: ${{ (parameters.repoUrl | parseRepoUrl).host === 'github.com' and parameters.pluginLocation === 'Create a new repository within the specified organization' }}
-      action: publish:github
+    # GitLab: This step publishes the contents of the working directory to a new repository.
+    - id: publishGitlabRepo
+      name: Publish the template in a new GitLab repository
+      action: publish:gitlab
+      if: ${{ (parameters.repoUrl | parseRepoUrl).host === 'gitlab.com' and parameters.pluginLocation === 'Create a new repository within the specified organization' }}
       input:
-        allowedHosts: ['github.com']
+        allowedHosts: ['gitlab.com']
         description: This is the template for the ${{ parameters.workflow_id }} workflow.
         repoUrl: ${{ parameters.repoUrl }}
-        sourcePath: templates/${{parameters.workflow_id}}
+        defaultBranch: main
 
-    # GitHub: This step creates a pull request with the contents of the working directory.
-    - id: publishGithub
-      name: Create GitHub pull request with the template
-      if: ${{ (parameters.repoUrl | parseRepoUrl).host === 'github.com' and parameters.pluginLocation  === 'Submit a pull request to the same repository' }}
-      action: publish:github:pull-request
+    # GitLab: This step creates a pull request with the contents of the working directory.
+    - id: publishGitlab
+      name: Create GitLab merge request with the template
+      action: publish:gitlab:merge-request
+      if: ${{ (parameters.repoUrl | parseRepoUrl).host === 'gitlab.com' and parameters.pluginLocation === 'Submit a pull request to the same repository' }}
       input:
-        allowedHosts: ['github.com']
+        allowedHosts: ['gitlab.com']
         repoUrl: ${{ parameters.repoUrl }}
         branchName: ${{ parameters.branchName }}
         targetBranchName: ${{ parameters.targetBranchName }}
@@ -114,6 +114,6 @@ spec:
   output:
     links:
       - title: View template repository
-        url: ${{ steps.publishGithubRepo.output.remoteUrl }}
-      - title: View pull request with the template
-        url: ${{ steps.publishGithub.output.remoteUrl }}
+        url: ${{ steps.publishGitlabRepo.output.remoteUrl }}
+      - title: View merge request with the template
+        url: ${{ steps.publishGitlab.output.mergeRequestUrl }}
