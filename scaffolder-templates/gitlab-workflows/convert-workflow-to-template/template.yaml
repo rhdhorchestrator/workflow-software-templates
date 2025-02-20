@@ -28,7 +28,7 @@ spec:
         - repoUrl
       properties:
         repoUrl:
-          title: Repository Location
+          title: Project Location
           type: string
           ui:field: RepoUrlPicker
           ui:options:
@@ -38,17 +38,17 @@ spec:
           type: string
           title: Where to publish this new plugin?
           ui:widget: radio
-          default: Create a new repository within the specified organization
+          default: Create a new project within the specified organization
           enum:
-            - Submit a pull request to the same repository
-            - Create a new repository within the specified organization
+            - Submit a pull request to the same project
+            - Create a new project within the specified organization
       dependencies:
         pluginLocation:
           allOf:
             - if:
                 properties:
                   pluginLocation:
-                    const: Submit a pull request to the same repository
+                    const: Submit a pull request to the same project
               then:
                 properties:
                   branchName:
@@ -87,11 +87,11 @@ spec:
           repoName: ${{ (parameters.repoUrl | parseRepoUrl).repo }}
           orgName: ${{ (parameters.repoUrl | parseRepoUrl).owner }}
 
-    # GitLab: This step publishes the contents of the working directory to a new repository.
-    - id: publishGitlabRepo
-      name: Publish the template in a new GitLab repository
+    # GitLab: This step publishes the contents of the working directory to a new project.
+    - id: publishGitlabProject
+      name: Publish the template in a new GitLab project
       action: publish:gitlab
-      if: ${{ (parameters.repoUrl | parseRepoUrl).host === 'gitlab.com' and parameters.pluginLocation === 'Create a new repository within the specified organization' }}
+      if: ${{ (parameters.repoUrl | parseRepoUrl).host === 'gitlab.com' and parameters.pluginLocation === 'Create a new project within the specified organization' }}
       input:
         allowedHosts: ['gitlab.com']
         description: This is the template for the ${{ parameters.workflow_id }} workflow.
@@ -99,10 +99,10 @@ spec:
         defaultBranch: main
 
     # GitLab: This step creates a pull request with the contents of the working directory.
-    - id: publishGitlab
+    - id: publishGitlabPR
       name: Create GitLab merge request with the template
       action: publish:gitlab:merge-request
-      if: ${{ (parameters.repoUrl | parseRepoUrl).host === 'gitlab.com' and parameters.pluginLocation === 'Submit a pull request to the same repository' }}
+      if: ${{ (parameters.repoUrl | parseRepoUrl).host === 'gitlab.com' and parameters.pluginLocation === 'Submit a pull request to the same project' }}
       input:
         allowedHosts: ['gitlab.com']
         repoUrl: ${{ parameters.repoUrl }}
@@ -113,7 +113,9 @@ spec:
 
   output:
     links:
-      - title: View template repository
-        url: ${{ steps.publishGitlabRepo.output.remoteUrl }}
+      - title: View template project
+        icon: gitlab
+        url: ${{ steps.publishGitlabProject.output.remoteUrl }}
       - title: View merge request with the template
-        url: ${{ steps.publishGitlab.output.mergeRequestUrl }}
+        icon: gitlab
+        url: ${{ steps.publishGitlabPR.output.mergeRequestUrl }}

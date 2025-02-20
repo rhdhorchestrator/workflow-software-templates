@@ -1,5 +1,5 @@
 ---
-id: gitlab-convert-workflow-to-template
+id: convert-workflow-to-template-gitlab
 title: Convert serverless workflow to a template
 description: Create a software template out of an existing serverless workflow.
 ---
@@ -8,7 +8,8 @@ description: Create a software template out of an existing serverless workflow.
 
 ## Overview
 
-This template allows the user to generate another software template from a serverless workflow deployed for the Orchestrator.
+This template allows the user to generate a software template from a serverless workflow deployed for the Orchestrator.
+The artifacts will be pushed to GitLab.
 
 ## Prerequisites
 
@@ -31,17 +32,17 @@ On this page the user will provide input for the following parameters:
 On this page the user will provide input for the following parameters:
 
 - Host: gitlab.com
-- Owner: the organization on GitLab owning the repository
-- Repository: the repository name
+- Owner: the organization on GitLab owning the project
+- Project: the project name
   
 Choose one from
-- Submit a merge request to the same repository
-  - create a branch in the existing repository and file a new merge request out of it
+- Submit a merge request to the same project
+  - create a branch in the existing project and file a new merge request out of it
   - Additional input needs to be provided:
     - Branch Name: branch to be created
     - Target Branch Name: to merge the new changes into (i.e. the `main`)
-- Create a new repository within the specified organization
-  - to create a brand new repository under the `owner` organization
+- Create a new project within the specified organization
+  - to create a brand new project under the `owner` organization
 
 ### Page 4: Review
 

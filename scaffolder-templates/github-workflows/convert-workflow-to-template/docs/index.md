@@ -1,5 +1,5 @@
 ---
-id: github-convert-workflow-to-template
+id: convert-workflow-to-template-github
 title: Convert serverless workflow to a template
 description: Create a software template out of an existing serverless workflow.
 ---
@@ -8,7 +8,8 @@ description: Create a software template out of an existing serverless workflow.
 
 ## Overview
 
-This template allows the user to generate another software template from a serverless workflow deployed for the Orchestrator.
+This template allows the user to generate a software template from a serverless workflow deployed for the Orchestrator.
+The artifacts will be pushed to GitHub.
 
 ## Prerequisites
 
