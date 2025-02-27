@@ -1,6 +1,6 @@
 site_name: Gitlab Basic Workflow Template
 site_description: Gitlab Basic Workflow Template
-repo_url: https://github.com/ElaiShalevRH/workflow-software-templates
+repo_url: https://github.com/rhdhorchestrator/workflow-software-templates
 docs_dir: docs
 
 plugins:
@@ -29,5 +29,3 @@ markdown_extensions:
 nav: 
   - Gitlab Basic Workflow Template:
       - Gitlab Basic Workflow Template: 'template.yaml'
-  - 
-
