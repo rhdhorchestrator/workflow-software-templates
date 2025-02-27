@@ -1,6 +1,6 @@
 site_name: Advanced Github Template
 site_description: Advanced Github Template
-repo_url: https://github.com/ElaiShalevRH/workflow-software-templates
+repo_url: https://github.com/rhdhorchestrator/workflow-software-templates
 docs_dir: docs
 
 plugins:
