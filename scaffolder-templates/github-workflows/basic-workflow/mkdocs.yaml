@@ -1,6 +1,6 @@
 site_name: Github Basic Workflow Template
 site_description: Github Basic Workflow Template
-repo_url: https://github.com/ElaiShalevRH/workflow-software-templates
+repo_url: https://github.com/rhdhorchestrator/workflow-software-templates
 docs_dir: docs
 
 plugins:
