@@ -1,3 +1,8 @@
+> **🚨 Deprecation Notice: 🚨**  
+> From Orchestrator release version 1.7, Workflow Types will be retired. All workflows will act as infrastructure workflows, and no workflow will act as an assesment workflow. <br>
+> Any reference to assessment workflows in this document will be obsolete.
+
+
 # workflow-software-templates
 
 This repository is a collection of software and documentation templates for the Backstage Orchestrator plugin. The templates are organized into two folders: `scaffolder-templates` for Software Templates and `documentation-templates` for general documentation templates. Contributions are welcome for new and existing templates!

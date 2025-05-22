@@ -1,5 +1,9 @@
 # Creating a Basic Serverless Workflow via a Software Template with Gitlab
 
+> **🚨 Deprecation Notice: 🚨**  
+> From Orchestrator release version 1.7, Workflow Types will be retired. All workflows will act as infrastructure workflows, and no workflow will act as an assesment workflow. <br>
+> Any reference to assessment workflows in this document will be obsolete.
+
 ## Overview
 
 This template allows the user to generate a basic workflow project from the user's input.
