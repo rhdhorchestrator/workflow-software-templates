@@ -19,6 +19,7 @@ spec:
       name: Run workflow
       action: orchestrator:workflow:run
       input:
+        workflow_id: ${{values.workflow_id}}
         parameters: {% raw %}${{ parameters }}{% endraw %}
 
   output:
