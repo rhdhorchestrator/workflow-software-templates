@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: ${{values.workflow_id}} # matches the workflow ID, will be used by orchestrator:workflow:run
+  name: ${{values.workflow_id}}
   title: ${{values.title}}
   description: ${{values.description}}
   tags:
