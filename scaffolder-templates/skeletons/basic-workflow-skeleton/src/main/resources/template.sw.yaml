@@ -3,8 +3,6 @@ version: "${{ values.version}}"
 specVersion: "0.8"
 name: "${{ values.workflowId }}"
 description: "${{ values.description }}"
-annotations:
-  - "workflow-type/infrastructure"
 dataInputSchema:
   failOnValidationErrors: true
   schema: schemas/${{ values.artifactId }}-input-schema.json

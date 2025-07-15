@@ -72,39 +72,6 @@ spec:
             catalogFilter:
               kind:
                 - System
-    - title: Workflow Type
-      description: Select the workflow type. For an assessment, provide an infrastructure workflow option, which should already be set up in your environment
-      required:
-        - workflowType
-      properties:
-        workflowType:
-          title: Workflow Type
-          type: string
-          description: Annotation to be added to the workflow in SonataFlow to specify its type
-          ui:widget: radio
-          enum:
-            - infrastructure
-            - assessment
-          enumNames:
-            - Infrastructure
-            - Assessment
-          default: infrastructure
-      dependencies:
-        workflowType:
-          oneOf:
-            - properties:
-                workflowType:
-                  const: infrastructure
-            - properties:
-                workflowType:
-                  const: assessment
-                infrastructureWorkflowId:
-                  title: Infrastructure Workflow ID
-                  type: string
-                  pattern: "^([a-zA-Z][a-zA-Z0-9]*)([.]?[a-zA-Z0-9]+)*$" # hypens '-' are not allowed to not mess with java package
-                  description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
-              required:
-                - infrastructureWorkflowId
     - title: Build Environment
       required:
         - CI
@@ -298,8 +265,6 @@ spec:
           artifactId: ${{ parameters.workflowId }}
           version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
-          workflowType: ${{ parameters.workflowType }}
-          infrastructureWorkflowId: ${{ parameters.infrastructureWorkflowId }}
           sourceControl: gitlab.com
           applicationType: workflow-project
           lifecycle: development
@@ -311,7 +276,7 @@ spec:
       name: Rename Files
       input:
         files:
-          - from: workflow/src/main/resources/${{ parameters.workflowType }}-template.sw.yaml
+          - from: workflow/src/main/resources/template.sw.yaml
             to: workflow/src/main/resources/${{ parameters.workflowId }}.sw.yaml
             overwrite: false
     - id: deleteFiles
@@ -319,8 +284,7 @@ spec:
       name: Delete files
       input:
         files:
-          - workflow/src/main/resources/assessment-template.sw.yaml
-          - workflow/src/main/resources/infrastructure-template.sw.yaml
+          - workflow/src/main/resources/template.sw.yaml
     - id: buildCodeTemplate
       name: Generating the Build Code for the Workflow
       action: fetch:template

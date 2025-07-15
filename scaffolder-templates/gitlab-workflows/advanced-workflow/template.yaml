@@ -30,7 +30,6 @@ spec:
         - repoName
         - workflowId
         - description
-        - infrastructureWorkflowId
         - owner
         - system
       properties:
@@ -52,11 +51,6 @@ spec:
           type: string
           pattern: "^([a-z][a-z0-9]*)$" # java forbids hyphens '-', argocd requires lowercase alphanumeric, k8s forbids periods '.' and requires non-number start
           description: Unique identifier of the workflow in SonataFlow
-        infrastructureWorkflowId:
-          title: Infrastructure Workflow ID
-          type: string
-          pattern: "^([a-z][a-z0-9]*)$" # java forbids hyphens '-', argocd requires lowercase alphanumeric, k8s forbids periods '.' and requires non-number start
-          description: Workflow ID, the unique identifier of the infrastructure worklow available in the environment
         owner:
           title: Owner
           type: string
@@ -267,7 +261,6 @@ spec:
           artifactId: ${{ parameters.workflowId }}
           version: 1.0.0-SNAPSHOT
           workflowId: ${{ parameters.workflowId }}
-          infrastructureWorkflowId: ${{ parameters.infrastructureWorkflowId }}
           sourceControl: gitlab.com
           applicationType: workflow-project
           lifecycle: development
@@ -286,7 +279,7 @@ spec:
             to: workflow/src/main/resources/${{ parameters.workflowId }}.sw.yaml
             overwrite: true
     - id: buildCodeTemplate
-      name: Generating Build Code 
+      name: Generating Build Code
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
