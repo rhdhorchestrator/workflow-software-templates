@@ -7,8 +7,8 @@ import java.util.ArrayList;
 public class SampleAssessment {
     public WorkflowOptions execute(String sampleText) {
         WorkflowOptions workflowOptions = new WorkflowOptions();
-        if (null != sampleText && !sampleText.isEmpty()) { // basic check on the user's input "sampleText" to mimic an assessment
-            workflowOptions.setCurrentVersion(new WorkflowOption("${{ values.infrastructureWorkflowId }}", "${{ values.infrastructureWorkflowId }}"));
+        if (null != sampleText && !sampleText.isEmpty()) {
+            workflowOptions.setCurrentVersion(new WorkflowOption("${{ values.workflowId }}", "${{ values.workflowId }}"));
             return workflowOptions;
         }
         return workflowOptions;
