@@ -29,7 +29,6 @@ spec:
         - orgName
         - repoName
         - workflowId
-        - gitlabHost
         - description
         - owner
         - system
@@ -43,11 +42,6 @@ spec:
           title: Project Name
           type: string
           description: Gitlab Project name
-        gitlabHost:
-          title: Gitlab Instance Name
-          type: string
-          default: gitlab-host
-          description: The name or host of your gitlab instance
         description:
           title: Description
           type: string
@@ -97,9 +91,19 @@ spec:
             - properties:
                 CI:
                   const: none
+                gitlabHost:
+                  title: Gitlab Instance Name
+                  type: string
+                  default: gitlab-host
+                  description: The name or host of your gitlab instance
             - properties:
                 CI:
                   const: tekton_argocd
+                gitlabHost:
+                  title: Gitlab Instance Name
+                  type: string
+                  default: gitlab-host
+                  description: The name or host of your gitlab instance
                 namespace:
                   title: Workflow Namespace
                   type: string
